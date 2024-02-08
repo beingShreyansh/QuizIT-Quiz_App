@@ -9,7 +9,7 @@ QuizIT is a quiz application built using the MERN (MongoDB, Express.js, React.js
 
 ## Installation
 To run QuizIT locally, follow these steps:
-1. Clone the repository: `git clone https://github.com/your_username/quizit.git`
+1. Clone the repository: `git clone https://github.com/beingShreyansh/QuizIT-Quiz_App`
 2. Navigate to the project directory: `cd quizit`
 3. Install dependencies for both the client and server:
    - For the server, run `npm install` in the `server` directory.
