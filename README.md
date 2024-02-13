@@ -29,3 +29,12 @@ Contributions are welcome! If you'd like to contribute to QuizIT, please follow 
 4. Push to the branch: `git push origin feature-name`
 5. Submit a pull request.
 
+
+## Setup GIT
+
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/beingShreyansh/demo.git
+git push -u origin main
