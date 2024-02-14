@@ -1,9 +1,9 @@
 // const authRouter = require('./authRoutes');
-// const adminRouter = require('./adminRoutes');
+const adminRouter = require('./adminRoutes');
 // const quizRouter = require('./quizRoutes');
 
-// module.exports = {
+module.exports = {
 //   authRouter,
-//   adminRouter,
+  adminRouter,
 //   quizRouter,
-// };
+};

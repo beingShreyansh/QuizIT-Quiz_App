@@ -1,25 +1,50 @@
-import { useState } from 'react'
+import React from "react";
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { AdminDashboard, Login, PageNotFound, Register, UserDashboard } from "./pages";
 
-import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element:<UserDashboard/>,
+      errorElement: <PageNotFound />,
+    },
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: "/register",
+      element: <Register />,
+    },
+    {
+      path: "/admin",
+      element: <AdminDashboard/>,
+    },
+  ]);
 
   return (
-    <>
-      <div>
-     
-      </div>
-      <h1>QuizIT: Test your knowledge</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      
-      </div>
-     
-    </>
-  )
+    <div>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          success: {
+            theme: {
+              primary: "#4aed88",
+            },
+          },
+          error: {
+            theme: {
+              primary: "red",
+            },
+          },
+        }}
+      />
+      <RouterProvider router={router} />
+    </div>
+  );
 }
 
-export default App
+export default App;
