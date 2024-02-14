@@ -35,5 +35,5 @@ Contributions are welcome! If you'd like to contribute to QuizIT, please follow 
 2. git add README.md
 3. git commit -m "first commit"
 4. git branch -M main
-5. git remote add origin https://github.com/beingShreyansh/demo.git
+5. git remote add origin https://github.com/beingShreyansh/QuizIT-Quiz_App
 6. git push -u origin main
