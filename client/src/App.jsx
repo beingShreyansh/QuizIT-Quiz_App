@@ -1,8 +1,7 @@
 import React from "react";
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { AdminDashboard, Login, PageNotFound, Register, UserDashboard } from "./pages";
-
+import { AdminDashboard, Login, PageNotFound, Register, Results, UploadQuiz, UserDashboard, UserHistory } from "./pages";
 
 function App() {
   const router = createBrowserRouter([
@@ -10,6 +9,10 @@ function App() {
       path: "/",
       element:<UserDashboard/>,
       errorElement: <PageNotFound />,
+    },
+    {
+      path: "/quiz-result",
+      element:<Results/>,
     },
     {
       path: "/login",
@@ -23,6 +26,15 @@ function App() {
       path: "/admin",
       element: <AdminDashboard/>,
     },
+    {
+      path: "/admin/add-quiz",
+      element: <UploadQuiz/>,
+    },
+    {
+      path: "/admin/user-history",
+      element: <UserHistory/>,
+    },
+
   ]);
 
   return (
