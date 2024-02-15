@@ -33,7 +33,7 @@ export default function Navbar() {
           ) : (
             <div id="navLinks" className={`${menuOpen ? "open" : ""}`}>
               <NavLink to="/#home" className="navlink">
-                Home
+                User Home
               </NavLink>
 
               <NavLink to= {`/user-history/${userId}`} className="navlink">
