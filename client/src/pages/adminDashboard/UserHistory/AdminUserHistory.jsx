@@ -4,7 +4,7 @@ import "./UserHistory.css";
 import Navbar from "../../../components/Navbar/Navbar";
 
 const pageLimit = 12;
-const UserHistory = () => {
+const AdminUserHistory = () => {
   const [userHistory, setUserHistory] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
 
@@ -34,8 +34,9 @@ const UserHistory = () => {
   };
 
   const startIndex = (pageNumber - 1) * pageLimit;
-  const endIndex = startIndex + pageLimit;
-  const displayedUser = userHistory.slice(startIndex, endIndex);
+
+
+
   return (
     <>
       <Navbar />
@@ -79,4 +80,4 @@ const UserHistory = () => {
   );
 };
 
-export default UserHistory;
+export default AdminUserHistory;

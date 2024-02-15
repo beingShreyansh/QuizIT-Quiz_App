@@ -3,10 +3,10 @@ const {
   //  quizRouter,
   //  authRouter,
   adminRouter,
+  userRouter,
 } = require("./routes");
 const cors = require("cors");
 const app = express();
-const fileUpload = require('express-fileupload');
 
 const PORT = 3001;
 
@@ -23,6 +23,7 @@ app.use(
 
 // app.use('/auth', authRouter);
 app.use("/admin", adminRouter);
+app.use("/user", userRouter);
 // app.use('/quiz', quizRouter);
 
 app.listen(PORT, () => {

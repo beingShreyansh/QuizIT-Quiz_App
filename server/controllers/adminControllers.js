@@ -2,6 +2,7 @@ const xlsx = require("xlsx");
 
 const addQuiz = async (req, res) => {
   const { file } = req;
+  console.log(file)
   if (!file) {
     return res.status(400).send("No file uploaded.");
   }
