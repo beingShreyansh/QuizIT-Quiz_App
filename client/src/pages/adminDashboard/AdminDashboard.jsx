@@ -5,7 +5,7 @@ import Navbar from '../../components/Navbar/Navbar'
 const AdminDashboard = () => {
   return (
     <>
-    <Navbar />
+    <Navbar userId={"121"}/>
     
     </>
   )

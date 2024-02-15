@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import "./Navbar.css";
-// import Logo from '../../assets/Logo.png';
+import Logo from "../../assets/logo.png";
 import { NavLink } from "react-router-dom";
 
+const userId = 12;
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-const isAdmin = false;
+  const isAdmin = false;
   return (
     <>
       <nav id="admin-navbar" className={`${menuOpen ? "open" : ""}`}>
         <div className="nav-wrapper">
           <div className="logo">
-            {/* <img width="200px" height="auto" src={Logo} alt="Logo" /> */}
-            QuizIT
+            <img width="150px" height="auto" src={Logo} alt="Logo" />
           </div>
 
           {isAdmin ? (
@@ -24,7 +24,7 @@ const isAdmin = false;
                 Add Quiz
               </NavLink>
               <NavLink to="/admin/user-history" className="navlink">
-                User History
+                User Statistics
               </NavLink>
               <NavLink to="/login" className="navlink">
                 <button className="btn">Logout</button>
@@ -36,7 +36,7 @@ const isAdmin = false;
                 Home
               </NavLink>
 
-              <NavLink to="/user/history" className="navlink">
+              <NavLink to= {`/user-history/${userId}`} className="navlink">
                 History
               </NavLink>
               <NavLink to="/login" className="navlink">
