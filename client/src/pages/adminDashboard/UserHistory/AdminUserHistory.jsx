@@ -68,32 +68,7 @@ const AdminUserHistory = () => {
 						<div className="table-cell">45</div>
 						<div className="table-cell">23/02/2024</div>
 					</div>
-					<Modal isOpen={open} onClose={handleClose}>
-						<>
-							<div className="history-table">
-								<div className="table-row header">
-									<div className="table-cell">Quiz</div>
-									<div className="table-cell">Name</div>
-									<div className="table-cell">Category</div>
-									<div className="table-cell">Score</div>
-									<div className="table-cell">Out of</div>
-									<div className="table-cell">Date</div>
-									<div className="table-cell">Time Taken</div>
-								</div>
-								{userHistory.map((historyItem, index) => (
-									<div key={index} className="table-row">
-										<div className="table-cell">{index + 1}</div>
-										<div className="table-cell">{historyItem.userName}</div>
-										<div className="table-cell">{historyItem.category}</div>
-										<div className="table-cell">{historyItem.score}</div>
-										<div className="table-cell">{historyItem.outOf}</div>
-										<div className="table-cell">{historyItem.date}</div>
-										<div className="table-cell">{historyItem.timeTaken}</div>
-									</div>
-								))}
-							</div>
-						</>
-            		</Modal>
+					<Modal isOpen={open} onClose={handleClose}/>
 				</div>
 				
 				{pageNumber > 1 &&

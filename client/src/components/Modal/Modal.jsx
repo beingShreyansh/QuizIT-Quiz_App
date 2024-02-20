@@ -1,6 +1,7 @@
 // Modal.jsx
  
 import React from "react";
+import UserHistory from "../../pages/userDashboard/userHistory/UseHistory";
  
 const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
@@ -32,7 +33,7 @@ const Modal = ({ isOpen, onClose, children }) => {
                     boxShadow: "2px solid black",
                 }}
             >
-                {children}
+                <UserHistory/>
             </div>
         </div>
     );
