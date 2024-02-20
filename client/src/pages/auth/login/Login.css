@@ -1,0 +1,125 @@
+input {
+  outline: none;
+  border: none;
+}
+
+input:focus::-webkit-input-placeholder {
+  color: transparent;
+}
+
+input::-webkit-input-placeholder {
+  color: #adadad;
+}
+
+.txt1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  color: #dadada;
+  line-height: 1.5;
+}
+
+.txt2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  color: #dadada;
+  line-height: 1.5;
+}
+.text-center {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+}
+
+.p-b-26 {
+  padding-bottom: 26px;
+}
+.p-b-48 {
+  padding-bottom: 48px;
+}
+
+.p-t-115 {
+  padding-top: 80px;
+}
+.limiter {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.container-login100 {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  background: #ffffff;
+}
+
+.wrap-login100 {
+  width: 390px;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 77px 55px 33px 55px;
+}
+
+.login100-form {
+  width: 100%;
+}
+
+.login100-form-title {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 30px;
+  color: #dadada;
+  line-height: 1.2;
+  text-align: center;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.login100-form-title i {
+  font-size: 60px;
+}
+
+.wrap-input {
+  width: 100%;
+  position: relative;
+  border-bottom: 2px solid #adadad;
+  margin-bottom: 37px;
+  display: flex;
+}
+
+.input100 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  color: #555555;
+  line-height: 1.2;
+
+  display: block;
+  width: 100%;
+  height: 45px;
+  background: transparent;
+  padding: 0 5px;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 576px) {
+  .wrap-login100 {
+    padding: 77px 15px 33px 15px;
+  }
+}
+
+.validate-input {
+  position: relative;
+}
+
+@media (max-width: 992px) {
+  .alert-validate::before {
+    visibility: visible;
+    opacity: 1;
+  }
+}
