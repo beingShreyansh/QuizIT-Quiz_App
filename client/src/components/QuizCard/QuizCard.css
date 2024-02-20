@@ -1,0 +1,75 @@
+/* QuizCard.css */
+
+  .question-box {
+    background-color: #333; /* Dark background color */
+    width: fit-content;
+    padding: 10px;
+    border-radius: 8px;
+    margin: auto;
+    margin-bottom: 50px;
+  }
+  
+  .options-box {
+    background-color: #333; /* Dark background color */
+    padding: 10px;
+    width: 60%;
+    border-radius: 8px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+  }
+  
+  .prev-btn-container{
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 50px;
+  }
+  
+  .quiz-card h2 {
+    margin-bottom: 10px;
+    text-align: center; /* Center-align the question */
+  }
+  
+  .quiz-card label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .quiz-card input[type="radio"] {
+    margin-right: 10px;
+  }
+  
+  .quiz-card span {
+    font-weight: bold;
+  }
+  
+  /* Button Styles */
+  .quiz-card button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .quiz-card button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Responsive Styles */
+  @media only screen and (max-width: 768px) {
+    .question-box,
+    .options-box {
+      width: 100%; /* Make the boxes full width on smaller screens */
+      font-size: 14px; /* Adjust font size for smaller screens */
+    }
+  
+    .quiz-card h2 {
+      font-size: 18px; /* Adjust font size for smaller screens */
+    }
+  }
+  

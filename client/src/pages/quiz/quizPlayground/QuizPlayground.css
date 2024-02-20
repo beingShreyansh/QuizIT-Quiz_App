@@ -1,0 +1,28 @@
+/* QuizPlayground.css */
+
+/* Styles for larger screens */
+.quiz-playground-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .review-panel {
+    flex: 1;
+  }
+  
+  .quiz-container {
+    flex: 2;
+  }
+  
+  /* Styles for smaller screens */
+  @media (max-width: 768px) {
+    .quiz-playground-container {
+      flex-direction: column;
+    }
+  
+    .review-panel,
+    .quiz-container {
+      width: 80%;
+    }
+  }
+  
