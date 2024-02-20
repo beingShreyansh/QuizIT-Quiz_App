@@ -1,7 +1,7 @@
 import React from "react";
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { AdminDashboard, Login, PageNotFound, Register, Results, UploadQuiz, UserHome, AdminUserHistory, UserHistory, QuizPlayground } from "./pages";
+import { AdminDashboard, Login, PageNotFound, Register, Results, UploadQuiz, UserHome, AdminUserHistory, UserHistory } from "./pages";
 
 function App() {
   const router = createBrowserRouter([
@@ -9,10 +9,6 @@ function App() {
       path: "/",
       element:<UserHome/>,
       errorElement: <PageNotFound />,
-    },
-    {
-      path: "/quiz",
-      element:<QuizPlayground/>,
     },
     {
       path: "/quiz-result",

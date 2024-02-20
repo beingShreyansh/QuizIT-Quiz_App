@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
@@ -21,6 +22,13 @@
     "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.9.1",
+=======
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.3",
+    "multer": "^1.4.5-lts.1",
+    "mysql": "^2.18.1",
+>>>>>>> 30cc81be6f773d9d1cafad42a8e080c0c0e3fb5b
     "nodemon": "^3.0.3",
     "xlsx": "^0.18.5"
   }

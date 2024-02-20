@@ -1,16 +1,13 @@
 import React, { useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import "./UserHome.css";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 const UserHome = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
-  const navigate = useNavigate();
-
-  const categories = ["Docker", "AWS", "Azure"];
+  
+  const categories= ['Docker', 'AWS', 'Azure'];
   const handleInputChange = (event) => {
     const value = event.target.value;
     setSearchTerm(value);
@@ -20,7 +17,7 @@ const UserHome = () => {
   const handleCategorySelect = (category) => {
     setSearchTerm("");
     setShowDropdown(false);
-    setSelectedCategory(category);
+    // Handle category selection logic here
     console.log(`Selected category: ${category}`);
   };
 
@@ -28,13 +25,10 @@ const UserHome = () => {
     category.toLowerCase().includes(searchTerm.toLowerCase().trim())
   );
   const handleStartQuiz = () => {
-    if (selectedCategory) {
-      console.log(`Starting quiz for category: ${selectedCategory}`);
-      navigate("/quiz");
-    } else {
-      toast.error("Select a Category");
-    }
+    // Implement logic to start quiz for the selected category
+    console.log(`Starting quiz for category: ${selectedCategory}`);
   };
+
 
   return (
     <>
@@ -65,7 +59,11 @@ const UserHome = () => {
             )}
           </div>
         </div>
-        <button className="start-quiz-button" onClick={handleStartQuiz}>
+        <button
+          className="start-quiz-button"
+          onClick={handleStartQuiz}
+          disabled={!selectedCategory}
+        >
           Start Quiz
         </button>
       </div>

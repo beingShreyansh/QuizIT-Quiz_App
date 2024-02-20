@@ -32,7 +32,7 @@ app.use(
     origin: "http://localhost:3000", // Replace with your frontend's URL
 =======
 const {
-   quizRouter,
+  //  quizRouter,
   //  authRouter,
   adminRouter,
   userRouter,
@@ -65,7 +65,7 @@ app.listen(PORT, () => {
 // app.use('/auth', authRouter);
 app.use("/admin", adminRouter);
 app.use("/user", userRouter);
-app.use('/quiz', quizRouter);
+// app.use('/quiz', quizRouter);
 
 app.listen(PORT, () => {
   console.log(`Server started at ${PORT}`);
