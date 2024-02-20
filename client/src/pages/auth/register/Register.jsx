@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -141,3 +142,14 @@ function Register() {
 }
 
 export default Register;
+=======
+import React from 'react'
+
+const Register = () => {
+  return (
+    <div>Register</div>
+  )
+}
+
+export default Register
+>>>>>>> 30cc81be6f773d9d1cafad42a8e080c0c0e3fb5b

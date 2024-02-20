@@ -6,7 +6,11 @@ import { NavLink } from "react-router-dom";
 const userId = 12;
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+<<<<<<< HEAD
   const isAdmin = false;
+=======
+  const isAdmin = true;
+>>>>>>> 30cc81be6f773d9d1cafad42a8e080c0c0e3fb5b
   return (
     <>
       <nav id="admin-navbar" className={`${menuOpen ? "open" : ""}`}>
