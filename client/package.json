@@ -11,8 +11,6 @@
     "remote": "vite --host"
   },
   "dependencies": {
-    "axios": "^1.6.7",
-<<<<<<< HEAD
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.4",
@@ -20,12 +18,6 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.22.1"
-=======
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-hot-toast": "^2.4.1",
-    "react-router-dom": "^6.22.0"
->>>>>>> 30cc81be6f773d9d1cafad42a8e080c0c0e3fb5b
   },
   "devDependencies": {
     "@types/react": "^18.2.55",
