@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Login.jsx
 import React, { useState } from "react";
 import axios from "axios";
@@ -126,14 +125,3 @@ function Login() {
 }
 
 export default Login;
-=======
-import React from 'react'
-
-const Login = () => {
-  return (
-    <div>Login</div>
-  )
-}
-
-export default Login
->>>>>>> 30cc81be6f773d9d1cafad42a8e080c0c0e3fb5b
