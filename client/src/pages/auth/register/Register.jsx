@@ -31,12 +31,12 @@ function Register() {
     }
   };
 
- const handleChange = (e) => {
-   setFormData((prevData) => ({
-     ...prevData,
-     [e.target.name]: e.target.value,
-   }));
- };
+  const handleChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -44,16 +44,18 @@ function Register() {
     try {
       setLoading(true);
 
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/auth/register`,
-      formData
-    );
-
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/register`,
+        formData
+      );
 
       console.log("Registration successful. Response:", response.data);
 
-      if (response.status === 200) {
-        toast.success(`Registered Successfully!`);
+      if (response.status === 201) {
+        // Show a success toast upon successful registration
+        toast.success("Registered Successfully!");
+
+        // Redirect to the login page after successful registration
         navigate("/login");
       }
     } catch (error) {
@@ -74,6 +76,7 @@ function Register() {
       setLoading(false);
     }
   };
+
   return (
     <div className="limiter">
       <div className="container-login100">

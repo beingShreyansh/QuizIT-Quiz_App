@@ -2,11 +2,21 @@ import React, { useState } from "react";
 import "./Navbar.css";
 import Logo from "../../assets/logo.png";
 import { NavLink } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const userId = 12;
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const isAdmin = false;
+  const isAdmin = localStorage.getItem("role") === "admin" ? true : false;
+  const handleLogout = () => {
+    // Clear localStorage items on logout
+    toast.success("logged out");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("accessToken");
+
+  };
+
   return (
     <>
       <nav id="admin-navbar" className={`${menuOpen ? "open" : ""}`}>
@@ -35,13 +45,15 @@ export default function Navbar() {
               <NavLink to="/#home" className="navlink">
                 User Home
               </NavLink>
-
-              <NavLink to= {`/user-history/${userId}`} className="navlink">
+              <NavLink to={`/user-history/${userId}`} className="navlink">
                 History
               </NavLink>
               <NavLink to="/login" className="navlink">
-                <button className="btn">Logout</button>
-              </NavLink>
+                <button className="btn" onClick={handleLogout}>
+                  Logout
+                </button>
+              </NavLink>    
+          
             </div>
           )}
 

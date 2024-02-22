@@ -30,32 +30,30 @@ function QuizPlayground() {
       setTimer((prevTimer) => prevTimer + 1);
     }
 
-  const fetchQuizData = async () => {
-    try {
-      const response = await axios.get("http://localhost:3001/quiz/getQuiz");
-      setQuizData(response.data);
-    } catch (error) {
-      console.error("Error fetching quiz data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchQuizData();
-  }, []);
-
-  useEffect(() => {
-    startTimer();
-    return () => {
-      stopTimer();
+    const fetchQuizData = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/quiz/getQuiz");
+        setQuizData(response.data);
+      } catch (error) {
+        console.error("Error fetching quiz data:", error);
+      }
     };
-  }, []);
 
-  useEffect(() => {
-    const interval = setInterval(handleTimerTick, 1000);
-    return () => clearInterval(interval);
-  }, [isTimerRunning, timer]);
-  
+    useEffect(() => {
+      fetchQuizData();
+    }, []);
 
+    useEffect(() => {
+      startTimer();
+      return () => {
+        stopTimer();
+      };
+    }, []);
+
+    useEffect(() => {
+      const interval = setInterval(handleTimerTick, 1000);
+      return () => clearInterval(interval);
+    }, [isTimerRunning, timer]);
   };
 
   const handleNextQuestion = () => {
@@ -152,9 +150,7 @@ function QuizPlayground() {
           ) : (
             <button
               onClick={handleNextQuestion}
-              disabled={
-                questionIndex === quizData.length - 1 || quizSubmitted
-              }
+              disabled={questionIndex === quizData.length - 1 || quizSubmitted}
             >
               Next
             </button>

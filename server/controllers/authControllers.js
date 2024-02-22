@@ -44,11 +44,10 @@ const loginUser = async (req, res) => {
     const existingUser = await User.findOneByEmail(email);
 
     if (!existingUser) {
-      // User not found
+    
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    // Compare the provided password with the hashed password in the database
     const passwordMatch = await bcrypt.compare(password, existingUser.password);
 
     if (passwordMatch) {
@@ -57,7 +56,7 @@ const loginUser = async (req, res) => {
 
       // Respond with user ID, role, and access token
       return res
-        .status(200)
+        .status(201)
         .json({
           userId: existingUser.id,
           role: existingUser.role,

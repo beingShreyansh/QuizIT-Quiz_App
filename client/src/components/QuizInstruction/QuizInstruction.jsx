@@ -1,28 +1,82 @@
-import React from 'react';
-import { Modal, Button } from 'react-bootstrap'; // Importing Modal and Button from React Bootstrap
-import 'bootstrap/dist/css/bootstrap.min.css'; // Importing Bootstrap CSS for styling
+// QuizPlayground.js
 
-const QuizInstruction = ({ show, handleClose }) => {
+import React, { useState, useEffect } from "react";
+import QuizCard from "./QuizCard";
+import Modal from "react-modal";
+import "./QuizPlayground.css";
+
+const QuizPlayground = () => {
+  const mockQuizData = [
+    {
+      id: 1,
+      question: "What is the capital of France?",
+      options: ["Berlin", "Paris", "Madrid", "Rome"],
+      correctOption: "Paris",
+    },
+    {
+      id: 2,
+      question: "Which planet is known as the Red Planet?",
+      options: ["Earth", "Mars", "Venus", "Jupiter"],
+      correctOption: "Mars",
+    },
+    // Add more mock questions as needed
+  ];
+
+  const [answers, setAnswers] = useState([]);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleAnswerSubmit = (correctOption, selectedOption) => {
+    const isCorrect = correctOption === selectedOption;
+    if (isCorrect) {
+      setScore(score + 1);
+    }
+
+    setAnswers([
+      ...answers,
+      { question: mockQuizData[questionIndex].question, isCorrect },
+    ]);
+    setQuestionIndex(questionIndex + 1);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  useEffect(() => {
+    if (questionIndex === mockQuizData.length) {
+      setIsModalOpen(true);
+    }
+  }, [questionIndex, mockQuizData.length]);
+
   return (
-    <Modal show={show} onHide={handleClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Quiz Instructions</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <h5>Instructions:</h5>
-        <ul>
-          <li>Read each question carefully before answering.</li>
-          <li>Select the best answer from the provided options.</li>
-          <li>You can navigate between questions using the "Prev" and "Next" buttons.</li>
-          <li>Questions marked as "Review" will be revisited before submitting the quiz.</li>
-          <li>There is a timer, So clock is ticking</li>
-        </ul>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Close</Button>
-      </Modal.Footer>
-    </Modal>
+    <div className="quiz-playground-container">
+      <QuizCard
+        question={mockQuizData[questionIndex].question}
+        options={mockQuizData[questionIndex].options}
+        questionNo={questionIndex + 1}
+        correctOption={mockQuizData[questionIndex].correctOption}
+        selectedOption={answers[questionIndex]?.selectedOption}
+        setSelectedOption={(selectedOption) =>
+          setAnswers([...answers, { selectedOption }])
+        }
+        handleAnswerSubmit={handleAnswerSubmit}
+      />
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="Quiz Summary"
+      >
+        <h2>Quiz Summary</h2>
+        <p>Total Questions: {mockQuizData.length}</p>
+        <p>Attempted Questions: {answers.length}</p>
+        <p>Unattempted Questions: {mockQuizData.length - answers.length}</p>
+        <p>Total Score: {score}</p>
+        <button onClick={closeModal}>Close</button>
+      </Modal>
+    </div>
   );
-}
+};
 
-export default QuizInstruction;
+export default QuizPlayground;
