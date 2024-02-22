@@ -3,7 +3,7 @@ const User = require("../models/User");
 const { signAccessToken } = require("./jwtController");
 
 const createUser = async (req, res) => {
-  const { name, email, password }= req.body;
+  const { name, email, password, role } = req.body;
 
   try {
     // Check if user with the same email already exists
@@ -19,7 +19,7 @@ const createUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-
+      role: role || "user",
     });
 
     // Save the user to the database
@@ -42,27 +42,19 @@ const loginUser = async (req, res) => {
   try {
     // Find user by email
     const existingUser = await User.findOneByEmail(email);
-    console.log(existingUser);
+
     if (!existingUser) {
     
       return res.status(401).json({ error: "Invalid email or password" });
     }
-<<<<<<< Updated upstream
 
-=======
-    console.log("Above match", password, existingUser.password);
-    // Compare the provided password with the hashed password in the database
->>>>>>> Stashed changes
     const passwordMatch = await bcrypt.compare(password, existingUser.password);
-
-    console.log("below match");
 
     if (passwordMatch) {
       // Generate JWT access token with existingUser.id as userId
       const accessToken = await signAccessToken(existingUser.id);
 
       // Respond with user ID, role, and access token
-<<<<<<< Updated upstream
       return res
         .status(201)
         .json({
@@ -70,13 +62,6 @@ const loginUser = async (req, res) => {
           role: existingUser.role,
           accessToken,
         });
-=======
-      return res.status(200).json({
-        userId: existingUser.id,
-        role: existingUser.role,
-        accessToken,
-      });
->>>>>>> Stashed changes
     } else {
       // Password does not match
       return res.status(401).json({ error: "Invalid email or password" });
