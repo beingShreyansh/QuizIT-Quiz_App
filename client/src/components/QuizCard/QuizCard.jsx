@@ -15,10 +15,6 @@ const QuizCard = ({
     console.log("Selected option:", e.target.value);
   };
 
-  const handleSaveAndNext = () => {
-    handleAnswerSubmit(correctOption, selectedOption, true);
-  };
-
   return (
     <div className="quiz-card">
       <div className="question-box">
@@ -40,9 +36,6 @@ const QuizCard = ({
             />
           ))}
         </Form.Group>
-      </div>
-      <div className="save-next-button">
-        <button onClick={handleSaveAndNext}>Save and Next</button>
       </div>
     </div>
   );

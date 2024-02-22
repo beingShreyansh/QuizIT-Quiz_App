@@ -65,7 +65,7 @@ function Login() {
         }
       }
     } else {
-      toast.error("Invalid credentials");
+      toast.error("Validation Error");
     }
   };
 
