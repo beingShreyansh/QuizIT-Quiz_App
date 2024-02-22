@@ -1,26 +1,37 @@
 import React from "react";
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import { AdminDashboard, Login, PageNotFound, Register, Results, UploadQuiz, UserHome, AdminUserHistory, UserHistory, QuizPlayground } from "./pages";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import {
+  AdminDashboard,
+  Login,
+  PageNotFound,
+  Register,
+  Results,
+  UploadQuiz,
+  UserHome,
+  AdminUserHistory,
+  UserHistory,
+  QuizPlayground,
+} from "./pages";
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element:<UserHome/>,
+      element: <UserHome />,
       errorElement: <PageNotFound />,
     },
     {
       path: "/quiz",
-      element:<QuizPlayground/>,
+      element: <QuizPlayground />,
     },
     {
       path: "/quiz-result",
-      element:<Results/>,
+      element: <Results />,
     },
     {
       path: "/user-history/:id",
-      element:<UserHistory/>,
+      element: <UserHistory />,
     },
     {
       path: "/login",
@@ -32,17 +43,16 @@ function App() {
     },
     {
       path: "/admin",
-      element: <AdminDashboard/>,
+      element: <AdminDashboard />,
     },
     {
       path: "/admin/add-quiz",
-      element: <UploadQuiz/>,
+      element: <UploadQuiz />,
     },
     {
       path: "/admin/user-history",
-      element: <AdminUserHistory/>,
+      element: <AdminUserHistory />,
     },
-
   ]);
 
   return (

@@ -1,4 +1,3 @@
-// Login.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -42,15 +41,19 @@ function Login() {
           formData
         );
 
-        if (response.status === 200) {
+        if (response.status === 201) {
           localStorage.setItem("accessToken", response.data.accessToken);
           localStorage.setItem("role", response.data.role);
+          localStorage.setItem("userId", response.data.userId);
 
           if (response.data.role === "admin") {
             navigate("/admin");
           } else {
             navigate("/");
           }
+
+          // Show success toast upon successful login
+          toast.success("Successfully logged in!");
         }
       } catch (error) {
         if (error.response.status === 402) {
