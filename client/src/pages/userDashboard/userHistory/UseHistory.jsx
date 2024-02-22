@@ -41,9 +41,7 @@ const UserHistory = () => {
 
   return (
     <>
-      <Navbar/>
       <div className="user-history-container">
-        <h2>User History</h2>
         <div className="history-table">
           <div className="table-row header">
             <div className="table-cell">S. No.</div>

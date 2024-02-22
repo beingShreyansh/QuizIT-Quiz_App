@@ -77,7 +77,7 @@ const getUserQuizHistory = async (req, res) => {
   }
 };
 
-uploadFileToDB = async (quizData) => {
+const uploadFileToDB = async (quizData) => {
   try {
     for (const quiz of quizData) {
       const quizName = quiz["Quiz Name"];

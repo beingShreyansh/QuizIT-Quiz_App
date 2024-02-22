@@ -8,7 +8,7 @@ dotenv.config({ path: "./.env" });
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const { authRouter, adminRouter, userRouter } = require("./routes");
+const { authRouter, adminRouter, userRouter, quizRouter } = require("./routes");
 
 const db = mysql.createConnection({
   host: process.env.DATABASE_HOST,
@@ -38,6 +38,7 @@ app.use(
 app.use("/auth", authRouter);
 app.use("/admin", adminRouter);
 app.use("/user", userRouter);
+app.use("/quiz", quizRouter);
 
 app.listen(PORT, () => {
   console.log(`Server started at http://localhost:${PORT}`);

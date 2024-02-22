@@ -12,13 +12,14 @@ const AdminUserHistory = () => {
 	const [pageNumber, setPageNumber] = useState(1);
 	const [open, setOpen] = React.useState(false);
 
+	3
 	useEffect(
 		() => {
 			// Fetch user history data from the API
 			const fetchUserHistory = async () => {
 				try {
 					const response = await axios.post(
-						`		${import.meta.env.VITE_API_URL}/admin/getUserHistory`,
+						`${import.meta.env.VITE_API_URL}/admin/getUserHistory`,
 						{
 							pagination: {
 								pageLimit,

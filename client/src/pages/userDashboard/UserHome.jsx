@@ -30,7 +30,7 @@ const UserHome = () => {
   const handleStartQuiz = () => {
     if (selectedCategory) {
       console.log(`Starting quiz for category: ${selectedCategory}`);
-      navigate("/quiz");
+      navigate(`/quiz/${selectedCategory}`);
     } else {
       toast.error("Select a Category");
     }
@@ -40,7 +40,7 @@ const UserHome = () => {
     <>
       <Navbar />
       <div className="user-home-container">
-        <h2>Welcome to QuizIT!</h2>
+        <h1>Welcome to QuizIT!</h1>
         <p>Please select a category to start the quiz:</p>
         <div className="category-selector">
           <div className="search-bar-section">
