@@ -1,7 +1,6 @@
-// QuizCard.js
-
 import React from "react";
 import PropTypes from "prop-types";
+import { Form } from "react-bootstrap";
 import "./QuizCard.css";
 
 const QuizCard = ({
@@ -10,8 +9,6 @@ const QuizCard = ({
   options,
   selectedOption,
   setSelectedOption,
-  correctOption,
-  handleAnswerSubmit,
 }) => {
   const handleOptionChange = (e) => {
     setSelectedOption(e.target.value);
@@ -30,24 +27,19 @@ const QuizCard = ({
         </h2>
       </div>
       <div className="options-box">
-        {options.map((option, index) => (
-          <div className="options" key={index}>
-            <label htmlFor={`option-${index}`}>
-              <input
-                type="radio"
-                id={`option-${index}`}
-                name="answer"
-                value={option}
-                checked={selectedOption === option}
-                onChange={handleOptionChange}
-              />
-              <span>
-                {index + 1}---{">"}{" "}
-              </span>
-              {option}
-            </label>
-          </div>
-        ))}
+        <Form.Group>
+          {options.map((option, index) => (
+            <Form.Check
+              key={index}
+              type="radio"
+              id={`option-${index}`}
+              label={option}
+              value={option}
+              checked={selectedOption === option}
+              onChange={handleOptionChange}
+            />
+          ))}
+        </Form.Group>
       </div>
       <div className="save-next-button">
         <button onClick={handleSaveAndNext}>Save and Next</button>

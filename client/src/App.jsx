@@ -22,8 +22,8 @@ function App() {
       errorElement: <PageNotFound />,
     },
     {
-      path: "/quiz",
-      element: <QuizPlayground />,
+      path: "/quiz/:id",
+      element:<QuizPlayground/>,
     },
     {
       path: "/quiz-result",

@@ -14,7 +14,6 @@ export default function Navbar() {
     localStorage.removeItem("role");
     localStorage.removeItem("userId");
     localStorage.removeItem("accessToken");
-
   };
 
   return (
@@ -37,7 +36,9 @@ export default function Navbar() {
                 User Statistics
               </NavLink>
               <NavLink to="/login" className="navlink">
-                <button className="btn">Logout</button>
+                <button className="btn" onClick={handleLogout}>
+                  Logout
+                </button>
               </NavLink>
             </div>
           ) : (
@@ -52,8 +53,7 @@ export default function Navbar() {
                 <button className="btn" onClick={handleLogout}>
                   Logout
                 </button>
-              </NavLink>    
-          
+              </NavLink>
             </div>
           )}
 
