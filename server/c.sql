@@ -13,7 +13,7 @@ CREATE TABLE user
 CREATE TABLE quiz
 (
   quiz_id INT AUTO_INCREMENT PRIMARY KEY,
-  category VARCHAR(255),
+  quiz_name VARCHAR(255) NOT NULL,
   no_of_questions INT
 );
 
@@ -38,3 +38,4 @@ CREATE TABLE options
    FOREIGN KEY (question_id) REFERENCES quiz_question(question_id),
    CHECK (correct_01 IN ("0","1"))
 );
+
