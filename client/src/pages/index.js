@@ -8,6 +8,6 @@ export { default as AdminUserHistory } from './adminDashboard/UserHistory/AdminU
 export { default as UserHome } from './userDashboard/UserHome';
 export { default as QuizPlayground } from './quiz/quizPlayground/QuizPlayground';
 export { default as Results } from './quiz/results/Results';
-export { default as UserHistory } from './userDashboard/userHistory/UseHistory';
+export { default as UserHistoryStats } from './userDashboard/userHistory/UserHistoryStats';
 
 export { default as PageNotFound } from './pageNotFound/pageNotFound';

@@ -10,7 +10,7 @@ import {
   UploadQuiz,
   UserHome,
   AdminUserHistory,
-  UserHistory,
+  UserHistoryStats,
   QuizPlayground,
 } from "./pages";
 
@@ -31,7 +31,7 @@ function App() {
     },
     {
       path: "/user-history/:id",
-      element: <UserHistory />,
+      element: <UserHistoryStats />,
     },
     {
       path: "/login",

@@ -2,6 +2,6 @@ const { getQuizData } = require("../controllers/quizControllers");
 
 const router = require("express").Router();
 
-router.get("/getQuiz/:id", getQuizData);
+router.get("/getQuiz/:quizId", getQuizData);
 
 module.exports = router;
