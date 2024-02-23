@@ -42,7 +42,7 @@ function QuizPlayground() {
   };
 
   const handleTimerTick = () => {
-    if (isTimerRunning && timer >= 120) {
+    if (isTimerRunning && timer === 120) {
       stopTimer(); // Stop the timer
       handleSubmitQuiz(); // Submit the quiz
     } else if (isTimerRunning) {
@@ -50,12 +50,12 @@ function QuizPlayground() {
     }
   };
 
-    useEffect(() => {
-      startTimer();
-      return () => {
-        stopTimer();
-      };
-    }, []);
+  useEffect(() => {
+    startTimer();
+    return () => {
+      stopTimer();
+    };
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(handleTimerTick, 1000);
@@ -145,12 +145,12 @@ function QuizPlayground() {
   };
 
   const handleSubmitQuiz = () => {
-    stopTimer();
-    setQuizSubmitted(true);
     const underReview = Object.values(answers).some(
       (answer) => answer === "review"
     );
     if (!underReview) {
+      stopTimer();
+      setQuizSubmitted(true);
       openModal();
       setFormData({
         ...formData,
@@ -171,20 +171,21 @@ function QuizPlayground() {
 
   return (
     <div className="quiz-playground-container">
-      <div className="timer">
-        Timer: {Math.floor(timer / 60)}:{timer % 60 < 10 ? "0" : ""}
-        {timer % 60}
+      <div className="review-panel">
+        <ReviewPanel
+          quizData={quizData}
+          answers={answers}
+          questionIndex={questionIndex}
+          setQuestionIndex={setQuestionIndex}
+          markAsReview={markAsReview}
+        />
       </div>
       <div className="review-quiz-container">
-        <div className="review-panel">
-          <ReviewPanel
-            quizData={quizData}
-            answers={answers}
-            questionIndex={questionIndex}
-            setQuestionIndex={setQuestionIndex}
-            markAsReview={markAsReview}
-          />
+        <div className="timer">
+          Timer: {Math.floor(timer / 60)}:{timer % 60 < 10 ? "0" : ""}
+          {timer % 60}
         </div>
+
         <div className="quiz-container">
           {quizData.length > 0 && (
             <QuizCard

@@ -1,4 +1,5 @@
 const xlsx = require("xlsx");
+const { db } = require("../dbConfig");
 
 const rows = [
   {
@@ -73,11 +74,58 @@ const rows = [
   },
 ];
 
-/// http://localhost:3001/user/getHistory/12
+const getCategories = async (req, res) => {
+  try {
+    const query = `SELECT DISTINCT category FROM quiz; `;
+    db.query(query, (err, rows) => {
+      if (err) {
+        console.error("Error  to fetch the user history: ", err);
+        return;
+      }
+      console.log("Categories");
+      console.log(rows);
+    });
+
+    res.send(rows);
+  } catch (error) {
+    console.error("Error fetching Categories:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching Categories." });
+  }
+};
+
 const getUserQuizHistory = async (req, res) => {
   const userId = req.params.id;
   try {
-    const query = `SELECT * FROM  `;
+    const query = `
+    SELECT
+        U.full_name,
+        P.date_played,
+        Q.quiz_name,
+        Q.category,
+        P.marked_obtained,
+        P.num_of_questions_attempted,
+        P.no_of_marked_attempted
+    FROM
+        Plays P
+    JOIN
+        User U ON P.user_id = U.user_id
+    JOIN
+        Quiz Q ON P.quiz_id = Q.quiz_id
+    WHERE
+        U.user_id = ?
+    ORDER BY
+        P.date_played DESC
+`;
+    db.query(query, [userId], (err, rows) => {
+      if (err) {
+        console.error("Error  to fetch the user history: ", err);
+        return;
+      }
+      console.log("Users history for user with ID ${userId}:");
+      console.log(rows);
+    });
 
     res.send(rows);
   } catch (error) {
@@ -88,4 +136,4 @@ const getUserQuizHistory = async (req, res) => {
   }
 };
 
-module.exports = { getUserQuizHistory };
+module.exports = { getUserQuizHistory, getCategories };

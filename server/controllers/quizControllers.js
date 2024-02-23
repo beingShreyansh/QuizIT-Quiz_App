@@ -1,3 +1,5 @@
+const { db } = require("../dbConfig");
+
 const quizData = [
   {
     id: 1,
@@ -21,13 +23,20 @@ const quizData = [
 ];
 
 const getQuizData = (req, res) => {
+  const { quizId } = req.params;
+  console.log(quizId);
   try {
     // Query to fetch quiz data from the database
-    const query = "SELECT * FROM quiz_table";
+    const query = "SELECT * FROM Quiz_Question WHERE quiz_id = ?";
     // Execute the query
-
-    // Close the MySQL connection
-
+    db.query(query, [quizId], (err, rows) => {
+      if (err) {
+        console.error("Error retrieving questions for quiz: ", err);
+        return;
+      }
+      console.log(`Questions for quiz with ID ${quizId}:`);
+      console.log(rows);
+    });
     // Send the quiz data as a response
     res.send(quizData);
   } catch (error) {

@@ -1,8 +1,9 @@
 const router = require('express').Router();
 
-const { getUserQuizHistory} = require('../controllers/userControllers');
+const { getUserQuizHistory, getCategories} = require('../controllers/userControllers');
 
 router.post('/getHistory/:id', getUserQuizHistory);
+router.get('/getCategories', getCategories);
 
 
 module.exports = router;

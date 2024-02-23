@@ -1,5 +1,4 @@
 const express = require("express");
-const mysql = require("mysql");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
@@ -9,21 +8,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 const { authRouter, adminRouter, userRouter, quizRouter } = require("./routes");
+const { dbConnection } = require("./dbConfig");
 
-const db = mysql.createConnection({
-  host: process.env.DATABASE_HOST,
-  user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD,
-  database: process.env.DATABASE,
-});
-
-db.connect((error) => {
-  if (error) {
-    console.error("MySQL connection error:", error);
-  } else {
-    console.log("MySQL connected");
-  }
-});
+dbConnection()
 
 app.use(express.json());
 app.use(
