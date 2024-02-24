@@ -4,6 +4,7 @@ import { Form } from "react-bootstrap";
 import "./QuizCard.css";
 
 const QuizCard = ({
+  key,
   question,
   questionNo,
   options,
@@ -12,7 +13,6 @@ const QuizCard = ({
 }) => {
   const handleOptionChange = (e) => {
     setSelectedOption(e.target.value);
-    console.log("Selected option:", e.target.value);
   };
 
   return (
@@ -48,8 +48,6 @@ QuizCard.propTypes = {
   questionNo: PropTypes.number.isRequired,
   selectedOption: PropTypes.string,
   setSelectedOption: PropTypes.func.isRequired,
-  correctOption: PropTypes.string.isRequired,
-  handleAnswerSubmit: PropTypes.func.isRequired,
 };
 
 export default QuizCard;

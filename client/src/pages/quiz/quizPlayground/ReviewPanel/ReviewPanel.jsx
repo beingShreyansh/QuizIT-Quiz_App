@@ -4,6 +4,7 @@ import "./ReviewPanel.css";
 
 const ReviewPanel = ({
   quizData,
+  key,
   answers,
   questionIndex,
   setQuestionIndex,
@@ -11,6 +12,7 @@ const ReviewPanel = ({
 }) => {
   const handleQuestionNavigation = (index) => {
     setQuestionIndex(index);
+    console.log(quizData);
   };
 
   return (
@@ -19,12 +21,12 @@ const ReviewPanel = ({
       <div className="grid-container">
         {quizData.map((question, index) => (
           <div
-            key={question.id}
+            key={question.questionId}
             className={`review-item ${
               index === questionIndex ? "active" : ""
             } ${
-              answers[question.id] ? "answered" : ""
-            } ${answers[question.id] === "review" ? "review" : ""}`}
+              answers[question.ques] ? "answered" : ""
+            } ${answers[question.questionId] === "review" ? "review" : ""}`}
             onClick={() => handleQuestionNavigation(index)}
           >
             <span>{index + 1}</span>
@@ -32,7 +34,7 @@ const ReviewPanel = ({
               className="mark-as-review-button"
               onClick={(e) => {
                 e.stopPropagation(); // Prevent event bubbling
-                markAsReview(question.id);
+                markAsReview(question.questionId);
               }}
             >
               Review
