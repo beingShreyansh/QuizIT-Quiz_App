@@ -18,8 +18,6 @@ function QuizPlayground() {
   const [timer, setTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [selctedOption, setSelectedOption] = useState([]);
-  const [formData, setFormData] = useState({});
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -118,23 +116,17 @@ function QuizPlayground() {
       stopTimer();
       setQuizSubmitted(true);
       openModal();
-      setFormData({
-        ...formData, // Spread the previous formData
-        timeTaken: timer,
-        quizData: answers,
-        categoryName: id,
-        userID: localStorage.getItem("userId"),
-      });
     } else {
       toast.error(
         "One or more questions are under review. Please complete all reviews before submitting."
       );
     }
-    console.log(formData);
+    console.log(FormData);
   };
-  
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
   return (
     <div className="quiz-playground-container">
       <div className="review-panel">
@@ -157,7 +149,7 @@ function QuizPlayground() {
               question={quizData[questionIndex]?.questionContent}
               options={quizData[questionIndex]?.options}
               questionType={quizData[questionIndex]?.questionType}
-              selectedOption={selctedOption}
+              selectedOption={answers[quizData[questionIndex]?.questionId]}
               handleSelectedOption={handleSelectedOption}
             />
           )}
