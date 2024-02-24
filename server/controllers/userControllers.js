@@ -116,7 +116,6 @@ const getUserQuizHistory = async (req, res) => {
           });
         return;
       }
-      console.log(`User's history for user with ID ${userId}:`);
       const userHistory = JSON.parse(JSON.stringify(rows));
 
       res.send(userHistory);

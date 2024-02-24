@@ -55,7 +55,7 @@ CREATE TABLE user_history
 );
 
 /* TO get all quiz names */
-SELECT quiz_name, quiz_id  
+SELECT quiz_name
 FROM quiz;
 
 /* To get the complete history of user on basis of user_id */
@@ -81,4 +81,7 @@ INSERT INTO quiz_question VALUES("ques_id", "quiz_id", "question_content");
 
 INSERT INTO options VALUES("option_id", "quiz_id", "question_id", "optioN_value", "1");
 
-/* */
+/**/
+SELECT COUNT(*) AS correct_cnt
+FROM quiz_question AS qq, options AS o
+WHERE qq.quiz_id = o.quiz_id AND qq.question_id = o.question_id AND qq.question_id = "c200221c-316c-4886-80e7-db482ff912d9" AND correct_01 = "1";
