@@ -14,18 +14,17 @@ const QuizCard = ({
   const handleOptionChange = (e) => {
     const value = e.target.value;
     if (questionType === "MCQ") {
-      handleSelectedOption(value); // For MCQ, set the selected option as a single value
+      handleSelectedOption(value);
     } else {
       const isChecked = e.target.checked;
       if (isChecked) {
-        handleSelectedOption(value); // Add the selected option to the array of selected options
+        handleSelectedOption(value);
       } else {
         handleSelectedOption((prevSelectedOptions) =>
           prevSelectedOptions.filter((option) => option !== value)
-        ); // Remove the deselected option from the array of selected options
+        );
       }
     }
-  
   };
 
   return (
@@ -65,10 +64,9 @@ QuizCard.propTypes = {
   questionType: PropTypes.oneOf(["MCQ", "MSQ"]).isRequired,
   selectedOption: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string), // Ensure selectedOption can be treated as an array
+    PropTypes.arrayOf(PropTypes.string),
   ]),
-  handleSelectedOption: PropTypes.func.isRequired, // Corrected prop name
+  handleSelectedOption: PropTypes.func.isRequired,
 };
-
 
 export default QuizCard;
