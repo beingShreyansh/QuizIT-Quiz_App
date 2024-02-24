@@ -1,8 +1,10 @@
 const xlsx = require("xlsx");
+const { v4: uuidv4 } = require("uuid");
+const { db } = require("../dbConfig");
 
 const addQuiz = async (req, res) => {
   const { file } = req;
-  console.log(file)
+
   if (!file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -22,53 +24,24 @@ const addQuiz = async (req, res) => {
 
 const getUserQuizHistory = async (req, res) => {
   const userId = req.params.userId;
-
   try {
-    const query = `SELECT * FROM  `;
-    const rows = [
-      {
-        userId: 1,
-        userName: "Alice",
-        quizId: 101,
-        category: "Cloud Computing",
-        score: 8,
-        outOf: 10,
-        date: "2024-02-12",
-        timeTaken: "00:06:30",
-      },
-      {
-        userId: 1,
-        userName: "John Doe",
-        quizId: 102,
-        category: "Docker",
-        score: 7,
-        outOf: 10,
-        date: "2024-02-10",
-        timeTaken: "00:08:45",
-      },
-      {
-        userId: 2,
-        userName: "Bob",
-        quizId: 101,
-        category: "kubernetes",
-        score: 9,
-        outOf: 10,
-        date: "2024-02-11",
-        timeTaken: "00:05:20",
-      },
-      {
-        userId: 2,
-        userName: "Jane Doe",
-        quizId: 102,
-        category: "Docker",
-        score: 6,
-        outOf: 10,
-        date: "2024-02-09",
-        timeTaken: "00:09:05",
-      },
-    ];
+    const query = `SELECT u.name, COUNT(*) AS no_of_times_played, AVG(uh.marks_obtained) AS avg_score, MAX(uh.date_played) as last_date_played
+    FROM user_history AS uh, user AS u
+    WHERE uh.user_id = u.id
+    AND u.id = ?
+    GROUP BY uh.user_id; `;
 
-    res.send(rows);
+    db.query(query, [userId], (err, rows) => {
+      if (err) {
+        console.error("Error fetching user quiz history:", err);
+        res.status(500).json({
+          error: "An error occurred while fetching user quiz history.",
+        });
+        return;
+      }
+
+      res.send(rows);
+    });
   } catch (error) {
     console.error("Error fetching user quiz history:", error);
     res
@@ -79,19 +52,72 @@ const getUserQuizHistory = async (req, res) => {
 
 const uploadFileToDB = async (quizData) => {
   try {
+    const quizId = uuidv4();
     for (const quiz of quizData) {
-      const quizName = quiz["Quiz Name"];
-      const question = quiz["Question"];
-      const correctAnswer = quiz["Correct Answer"];
-      const options = Object.keys(quiz)
-        .filter((key) => key.startsWith("Option"))
-        .map((key) => quiz[key]);
+      const quizName = quiz["Quiz Name"] || "HTML";
+      const questions = [];
 
-      console.log("EXCEL:", quizName, question, correctAnswer, options);
+      // Iterate over each row to extract questions and options
+      for (let i = 0; i < quizData.length; i++) {
+        const questionContent = quizData[i]["question"];
+        const options = Object.keys(quizData[i])
+          .filter((key) => key.startsWith("option_"))
+          .map((key) => quizData[i][key]);
+        const correctAnswers = (quizData[i]["correct_answer"] || "").toString().split(",").map(Number);
+
+        questions.push({ content: questionContent, options, correctAnswers });
+      }
+
+      // Insert quiz data
+      const quizInsertQuery =
+        "INSERT INTO quiz (quiz_id, quiz_name, no_of_questions) VALUES (?, ?, ?)";
+      await executeQuery(quizInsertQuery, [quizId, quizName, questions.length]);
+
+      // Insert question and options data
+      for (const question of questions) {
+        const questionId = uuidv4();
+
+        // Insert question data
+        const questionInsertQuery =
+          "INSERT INTO quiz_question (quiz_id, question_id, question_content) VALUES (?, ?, ?)";
+        await executeQuery(questionInsertQuery, [
+          quizId,
+          questionId,
+          question.content,
+        ]);
+
+        for (let i = 0; i < question.options.length; i++) {
+          const optionValue = question.options[i];
+          const isCorrect = question.correctAnswers.includes(i + 1) ? 1 : 0;
+
+          const optionInsertQuery =
+            "INSERT INTO options (option_id, quiz_id, question_id, option_value, correct_01) VALUES (?, ?, ?, ?, ?)";
+          await executeQuery(optionInsertQuery, [
+            uuidv4(),
+            quizId,
+            questionId,
+            optionValue,
+            isCorrect,
+          ]);
+        }
+      }
+
+      console.log("Quiz uploaded:", quizName);
     }
   } catch (error) {
     throw new Error("Error uploading quiz data to DB: " + error.message);
   }
 };
 
+
+
+const executeQuery = async (query, params) => {
+  try {
+    const result = await db.query(query, params);
+    return result;
+  } catch (error) {
+    throw new Error("Error executing SQL query: " + error.message);
+  }
+};
 module.exports = { addQuiz, getUserQuizHistory };
+

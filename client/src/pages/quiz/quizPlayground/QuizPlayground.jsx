@@ -5,16 +5,17 @@ import ReviewPanel from "./ReviewPanel/ReviewPanel";
 import "./QuizPlayground.css";
 import toast from "react-hot-toast";
 import Modal from "react-modal"; // Import Modal from react-modal library
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 Modal.setAppElement("#root");
 
 function QuizPlayground() {
+  let { id } = useParams();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [quizData, setQuizData] = useState([]);
   const [score, setScore] = useState(10);
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState([]);
 
   const [timer, setTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -23,11 +24,11 @@ function QuizPlayground() {
   const [formData, setFormData] = useState({
     quizData: [],
     timeTaken: timer,
-    categoryName: "",
+    categoryId: id,
     userID: "",
   });
-  let { id } = useParams();
 
+  const navigate = useState();
   const startTimer = () => {
     setIsTimerRunning(true);
     setTimer(0);
@@ -51,7 +52,6 @@ function QuizPlayground() {
   };
 
   useEffect(() => {
-    startTimer();
     return () => {
       stopTimer();
     };
@@ -68,13 +68,20 @@ function QuizPlayground() {
         const response = await axios.get(
           `http://localhost:3001/quiz/getQuiz/${id}`
         );
-        setQuizData(response.data);
+        console.log(response);
+        if (response.status === 200 && response.data.length>0) {
+          setQuizData(response.data);
+          startTimer();
+        }else{
+          navigate('/')
+          toast.error("No quiz Found")
+        }
       } catch (error) {
         console.error("Error fetching quiz data:", error);
       }
     };
     fetchQuizData();
-  }, []);
+  }, [id]);
 
   const customStyles = {
     overlay: {
@@ -97,7 +104,7 @@ function QuizPlayground() {
 
   const handleNextQuestion = () => {
     if (!quizSubmitted) {
-      const selectedOption = answers[quizData[questionIndex]?.id];
+      const selectedOption = answers[quizData[questionIndex]?.questionId];
       if (selectedOption) {
         setAnswers((prevAnswers) => ({
           ...prevAnswers,
@@ -108,6 +115,7 @@ function QuizPlayground() {
         setQuestionIndex((prevIndex) => prevIndex + 1);
       }
     }
+    console.log("answres:", answers);
   };
 
   const handlePrevQuestion = () => {
@@ -118,24 +126,31 @@ function QuizPlayground() {
 
   const setSelectedOption = (option) => {
     if (!quizSubmitted) {
-      setAnswers((prevAnswers) => ({
-        ...prevAnswers,
-        [quizData[questionIndex]?.id]: option,
-      }));
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        quizData: [
-          ...prevFormData.quizData,
-          {
-            questionId: quizData[questionIndex]?.id,
-            answerSelected: option,
-          },
-        ],
-      }));
+      const questionId = quizData[questionIndex]?.questionId;
+      setAnswers((prevAnswers) => {
+        // Check if the current question's answer already exists in the answers array
+        const existingAnswerIndex = prevAnswers.findIndex(
+          (answer) => answer.questionId === questionId
+        );
+
+        // If the current question's answer exists, update it
+        if (existingAnswerIndex !== -1) {
+          const updatedAnswers = [...prevAnswers];
+          updatedAnswers[existingAnswerIndex] = {
+            questionId,
+            selectedOption: option,
+          };
+          return updatedAnswers;
+        } else {
+          // If the current question's answer doesn't exist, add it to the answers array
+          return [...prevAnswers, { questionId, selectedOption: option }];
+        }
+      });
     }
   };
 
   const markAsReview = (questionId) => {
+    console.log(questionId);
     if (!quizSubmitted) {
       setAnswers((prevAnswers) => ({
         ...prevAnswers,
@@ -155,11 +170,8 @@ function QuizPlayground() {
       setFormData({
         ...formData,
         timeTaken: timer,
-        quizData: quizData.map((questionData) => ({
-          questionId: questionData.id,
-          answerSelected: answers[questionData.id] || "Not Answered",
-        })),
-        categoryName: "Your Category Name",
+        quizData: answers,
+        categoryName: id,
         userID: localStorage.getItem("userId"),
       });
     } else {
@@ -167,6 +179,7 @@ function QuizPlayground() {
         "One or more questions are under review. Please complete all reviews before submitting."
       );
     }
+    console.log(formData);
   };
 
   return (
@@ -189,11 +202,11 @@ function QuizPlayground() {
         <div className="quiz-container">
           {quizData.length > 0 && (
             <QuizCard
-              key={quizData[questionIndex]?.id}
+              key={quizData[questionIndex]?.questionId}
               questionNo={questionIndex + 1}
-              question={quizData[questionIndex]?.question}
+              question={quizData[questionIndex]?.questionContent}
               options={quizData[questionIndex]?.options}
-              selectedOption={answers[quizData[questionIndex]?.id]}
+              selectedOption={answers[quizData[questionIndex]?.questionId]}
               setSelectedOption={setSelectedOption}
             />
           )}
@@ -207,7 +220,6 @@ function QuizPlayground() {
             <button onClick={handleSubmitQuiz}>Submit Quiz</button>
             <button onClick={handleNextQuestion}>Next</button>
           </div>
-          {/* Note indicating inability to change options after submission */}
 
           <p className="submission-note">
             Note: After submission, you will not be able to change your answers.

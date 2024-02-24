@@ -76,22 +76,24 @@ const rows = [
 
 const getCategories = async (req, res) => {
   try {
-    const query = `SELECT DISTINCT category FROM quiz; `;
+    const query = `SELECT quiz_name, quiz_id FROM quiz;`; // Modified query to select both id and quiz_name
     db.query(query, (err, rows) => {
       if (err) {
-        console.error("Error  to fetch the user history: ", err);
+        console.error("Error fetching categories: ", err);
+        res
+          .status(500)
+          .json({ error: "An error occurred while fetching categories." });
         return;
       }
-      console.log("Categories");
-      console.log(rows);
-    });
+      const categories = JSON.parse(JSON.stringify(rows)); // Parse rows to JSON
 
-    res.send(rows);
+      res.json(categories);
+    });
   } catch (error) {
-    console.error("Error fetching Categories:", error);
+    console.error("Error fetching categories:", error);
     res
       .status(500)
-      .json({ error: "An error occurred while fetching Categories." });
+      .json({ error: "An error occurred while fetching categories." });
   }
 };
 
@@ -99,35 +101,26 @@ const getUserQuizHistory = async (req, res) => {
   const userId = req.params.id;
   try {
     const query = `
-    SELECT
-        U.full_name,
-        P.date_played,
-        Q.quiz_name,
-        Q.category,
-        P.marked_obtained,
-        P.num_of_questions_attempted,
-        P.no_of_marked_attempted
-    FROM
-        Plays P
-    JOIN
-        User U ON P.user_id = U.user_id
-    JOIN
-        Quiz Q ON P.quiz_id = Q.quiz_id
-    WHERE
-        U.user_id = ?
-    ORDER BY
-        P.date_played DESC
-`;
+    SELECT q.quiz_name, uh.marks_obtained, uh.date_played, uh.num_of_questions_attempted, uh.total_time_taken_in_sec
+    FROM quiz AS q, user_history AS uh
+    WHERE q.quiz_id = uh.quiz_id AND uh.user_id = ?;
+    `;
+
     db.query(query, [userId], (err, rows) => {
       if (err) {
-        console.error("Error  to fetch the user history: ", err);
+        console.error("Error fetching the user history: ", err);
+        res
+          .status(500)
+          .json({
+            error: "An error occurred while fetching the user history.",
+          });
         return;
       }
-      console.log("Users history for user with ID ${userId}:");
-      console.log(rows);
-    });
+      console.log(`User's history for user with ID ${userId}:`);
+      const userHistory = JSON.parse(JSON.stringify(rows));
 
-    res.send(rows);
+      res.send(userHistory);
+    });
   } catch (error) {
     console.error("Error fetching user quiz history:", error);
     res

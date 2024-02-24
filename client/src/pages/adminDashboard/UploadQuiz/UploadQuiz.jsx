@@ -54,17 +54,25 @@ const UploadQuiz = () => {
             type="file"
             onChange={handleFileChange}
             className="file-input"
+            accept=".xlsx, .xls"
           />
-          <button onClick={handleUpload} className="upload-button">
+          <button
+            onClick={handleUpload}
+            className="upload-button"
+            disabled={!selectedFile}
+          >
             Upload
           </button>
+          {selectedFile && (
+            <p className="file-selected">Selected File: {selectedFile.name}</p>
+          )}
         </div>
         <div className="instruction-box">
           <h2 className="instruction-heading">Instructions:</h2>
           <ul className="instruction-list">
-            <li>File should be Excel Sheet.</li>
-            <li>Should only upload one sheet at a time</li>
-            <li>Rule 3 goes here.</li>
+            <li>File should be Excel Sheet (.xlsx or .xls).</li>
+            <li>Only one sheet can be uploaded at a time.</li>
+            <li>Additional rules or instructions can be added here.</li>
           </ul>
         </div>
       </div>
