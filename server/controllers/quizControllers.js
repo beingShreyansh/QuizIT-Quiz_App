@@ -90,107 +90,87 @@ const getQuizData = (req, res) => {
   }
 };
 
-const submitQuizData = async (req, res) => {
-  const { quizId } = req.params;
-  const { timeTaken, quizData, categoryName, userID } = req.body;
+const submitQuizData = (req, res) => {
+  const { userId, quizId, answers } = req.body;
+  console.log(answers);
+  
+  // Initialize score
+  let score = 0;
 
   try {
-    console.log("Processing quiz submission...");
-
-    const insertUserHistoryQuery =
-      "INSERT INTO user_history (history_record_id, user_id, quiz_id, marks_obtained, date_played, num_of_questions_attempted, total_time_taken_in_sec) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-    let totalScore = 0;
-    const numQuestionsAttempted = quizData.length;
-
-    const promises = quizData.map(async (userResponse) => {
-      const { questionId, selectedOptions } = userResponse;
-
-      try {
-        console.log(`Processing question ${questionId}...`);
-
-        const getCorrectOptionsQuery = `SELECT option_id FROM options WHERE quiz_id = ? AND question_id = ? AND correct_01 = 1`;
-
-        const [correctOptions] = await db
-          .promise()
-          .query(getCorrectOptionsQuery, [quizId, questionId]);
-
-        const correctOptionIds = correctOptions.map((row) => row.option_id);
-
-        console.log("Correct options:", correctOptionIds);
-
-        // Check if the user's selected options match the correct options
-        const isCorrect =
-          correctOptionIds.length === selectedOptions.length &&
-          correctOptionIds.every((optionId) =>
-            selectedOptions.includes(optionId)
-          );
-
-        // If the answer is correct, increment the total score
-        if (isCorrect) {
-          totalScore += 1;
-        }
-
-        console.log(
-          `Question ${questionId} processed. Is correct: ${isCorrect}`
-        );
-
-        return {
-          questionId,
-          isCorrect,
-        };
-      } catch (error) {
-        console.error(`Error in processing question ${questionId}:`, error);
-        throw error; // Re-throw the error to be caught by the outer catch block
+    // Query to retrieve quiz questions
+    const questionQuery = "SELECT * FROM quiz_question WHERE quiz_id = ?";
+    
+    db.query(questionQuery, [quizId], (err, rows) => {
+      if (err) {
+        console.error("Error retrieving questions for quiz: ", err);
+        res.status(500).json({ error: "Error retrieving questions for quiz" });
+        return;
       }
-    });
 
-    // Wait for all promises to resolve before inserting into the database
-    Promise.all(promises).then(async (results) => {
-      console.log(
-        "All questions processed. Inserting into the user_history table..."
-      );
+      // Mapping quiz questions
+      const quizData = rows.map((row) => ({
+        questionId: row.question_id,
+        questionContent: row.question_content,
+        options: [],
+      }));
 
-      // Calculate the date played (assuming it's the current date)
-      const currentDate = new Date();
-      const formattedDate = currentDate.toISOString().split("T")[0];
+      // Query to retrieve options for each question
+      const optionsQuery = "SELECT * FROM options WHERE quiz_id = ? AND question_id = ?";
 
-      db.query(
-        insertUserHistoryQuery,
-        [
-          uuidv4(),
-          userID,
-          quizId,
-          totalScore,
-          formattedDate,
-          numQuestionsAttempted,
-          timeTaken,
-        ],
-        (err) => {
+      quizData.forEach((quiz, index) => {
+        db.query(optionsQuery, [quizId, quiz.questionId], (err, optionRows) => {
           if (err) {
-            console.error(
-              "Error inserting quiz data into the user_history table:",
-              err
-            );
-            res.status(500).json({ error: "Error submitting quiz data" });
+            console.error("Error retrieving options for quiz: ", err);
+            res.status(500).json({ error: "Error retrieving options for quiz" });
             return;
           }
 
-          console.log(
-            "Quiz data inserted into the user_history table successfully."
-          );
-          res.status(200).json({
-            success: true,
-            message: "Quiz data submitted successfully",
-            totalScore,
+          // Assign options to the current quiz question
+          quiz.options = optionRows.map((option) => option.option_value);
+
+          // Query to retrieve correct options for the current question
+          const correctOptionQuery = "SELECT option_value FROM options WHERE quiz_id = ? AND question_id = ? AND correct_01 = '1'";
+          db.query(correctOptionQuery, [quizId, quiz.questionId], (err, correctOptionsRows) => {
+            if (err) {
+              console.error("Error retrieving correct options for quiz: ", err);
+              res.status(500).json({ error: "Error retrieving correct options for quiz" });
+              return;
+            }
+
+            // Mapping correct options
+            const correctOptions = correctOptionsRows.map((row) => row.option_value);
+            const userAnswer = answers[quiz.questionId];
+
+            // Checking if there is only one correct option
+            if (correctOptions.length === 1) {
+              // Comparing user's answer with the correct option
+              if (correctOptions[0].toString() === userAnswer) {
+                score += 1;
+              }
+            } else if (userAnswer !== undefined) {
+              // Check if both arrays are equal regardless of order
+              const sortedCorrectOptions = correctOptions.slice().sort().toString();
+              const sortedUserAnswer = userAnswer.slice().sort().toString();
+              if (sortedCorrectOptions === sortedUserAnswer) {
+                score += 1;
+              }
+            } 
+            
+
+            // If this is the last question, send the score as response
+            if (index === quizData.length - 1) {
+              console.log("Score:", score); // Output the calculated score
+              res.json(score);
+            }
           });
-        }
-      );
+        });
+      });
     });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
+    
 module.exports = { getQuizData, submitQuizData };

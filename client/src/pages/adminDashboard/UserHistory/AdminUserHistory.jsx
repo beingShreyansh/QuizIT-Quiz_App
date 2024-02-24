@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./UserHistory.css";
 import Navbar from "../../../components/Navbar/Navbar";
-import Modal from "../../../components/Modal/Modal";
+
 
 const pageLimit = 12;
 const AdminUserHistory = () => {
+  const navigate = useNavigate();
   const [userHistory, setUserHistory] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [open, setOpen] = React.useState(false);
 
-  3;
   useEffect(() => {
     // Fetch user history data from the API
     const fetchUserHistory = async () => {
@@ -38,13 +39,11 @@ const AdminUserHistory = () => {
 
   const startIndex = (pageNumber - 1) * pageLimit;
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleNavigate = (userId) => {
+
+    navigate(`/user-history/${userId}`); 
   };
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
 
   return (
     <>
@@ -59,13 +58,19 @@ const AdminUserHistory = () => {
             <div className="table-cell">Average Score</div>
             <div className="table-cell">Last Played on</div>
           </div>
-          <div className="table-row" onClick={handleOpen}>
-            <div className="table-cell">1</div>
-            <div className="table-cell">Shreyansh</div>
-            <div className="table-cell">10</div>
-            <div className="table-cell">45</div>
-            <div className="table-cell">23/02/2024</div>
-          </div>
+          {userHistory.map((user, index) => (
+            <div
+              key={user.userId}
+              className="table-row"
+              onClick={() => handleNavigate(user.userId)}
+            >
+              <div className="table-cell">{startIndex + index + 1}</div>
+              <div className="table-cell">{user.name}</div>
+              <div className="table-cell">{user.numQuizzesPlayed}</div>
+              <div className="table-cell">{user.averageScore}</div>
+              <div className="table-cell">{user.lastPlayedOn}</div>
+            </div>
+          ))}
         </div>
 
         {pageNumber > 1 && (
@@ -81,7 +86,7 @@ const AdminUserHistory = () => {
           </div>
         )}
       </div>
-      <Modal isOpen={open} onClose={handleClose} />
+
     </>
   );
 };

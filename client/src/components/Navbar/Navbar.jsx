@@ -4,7 +4,7 @@ import Logo from "../../assets/logo.png";
 import { NavLink } from "react-router-dom";
 import toast from "react-hot-toast";
 
-const userId = 12;
+const userId = localStorage.getItem('userId');
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const isAdmin = localStorage.getItem("role") === "admin" ? true : false;
@@ -26,9 +26,6 @@ export default function Navbar() {
 
           {isAdmin ? (
             <div id="navLinks" className={`${menuOpen ? "open" : ""}`}>
-              <NavLink to="/admin#home" className="navlink">
-                Admin Home
-              </NavLink>
               <NavLink to="/admin/add-quiz" className="navlink">
                 Add Quiz
               </NavLink>

@@ -2,7 +2,6 @@ import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import {
-  AdminDashboard,
   Login,
   PageNotFound,
   Register,
@@ -43,7 +42,7 @@ function App() {
     },
     {
       path: "/admin",
-      element: <AdminDashboard />,
+      element: <UploadQuiz />,
     },
     {
       path: "/admin/add-quiz",
