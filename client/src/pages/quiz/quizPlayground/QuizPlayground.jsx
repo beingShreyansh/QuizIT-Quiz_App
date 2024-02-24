@@ -5,7 +5,7 @@ import ReviewPanel from "./ReviewPanel/ReviewPanel";
 import "./QuizPlayground.css";
 import toast from "react-hot-toast";
 import Modal from "react-modal";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 Modal.setAppElement("#root");
 
@@ -19,6 +19,7 @@ function QuizPlayground() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [selctedOption, setSelectedOption] = useState([]);
+  const [formData, setFormData] = useState({});
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -80,10 +81,8 @@ function QuizPlayground() {
         }));
       } else {
         setAnswers((prevAnswers) => {
-          // Check if the selected option already exists in the array of selected options
           const isSelected = prevAnswers[questionId]?.includes(option);
           if (isSelected) {
-            // If the option is already selected, remove it from the array
             const updatedOptions = prevAnswers[questionId].filter(
               (prevOption) => prevOption !== option
             );
@@ -92,7 +91,6 @@ function QuizPlayground() {
               [questionId]: updatedOptions,
             };
           } else {
-            // If the option is not selected, add it to the array
             return {
               ...prevAnswers,
               [questionId]: [...(prevAnswers[questionId] || []), option],
@@ -113,12 +111,30 @@ function QuizPlayground() {
   };
 
   const handleSubmitQuiz = () => {
-    stopTimer();
-    setQuizSubmitted(true);
-    setIsModalOpen(true);
-    console.log(answers);
+    const underReview = Object.values(answers).some(
+      (answer) => answer === "review"
+    );
+    if (!underReview) {
+      stopTimer();
+      setQuizSubmitted(true);
+      openModal();
+      setFormData({
+        ...formData, // Spread the previous formData
+        timeTaken: timer,
+        quizData: answers,
+        categoryName: id,
+        userID: localStorage.getItem("userId"),
+      });
+    } else {
+      toast.error(
+        "One or more questions are under review. Please complete all reviews before submitting."
+      );
+    }
+    console.log(formData);
   };
-
+  
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   return (
     <div className="quiz-playground-container">
       <div className="review-panel">
