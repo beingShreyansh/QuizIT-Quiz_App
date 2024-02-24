@@ -4,15 +4,28 @@ import { Form } from "react-bootstrap";
 import "./QuizCard.css";
 
 const QuizCard = ({
-  key,
   question,
   questionNo,
   options,
+  questionType,
   selectedOption,
-  setSelectedOption,
+  handleSelectedOption,
 }) => {
   const handleOptionChange = (e) => {
-    setSelectedOption(e.target.value);
+    const value = e.target.value;
+    if (questionType === "MCQ") {
+      handleSelectedOption(value); // For MCQ, set the selected option as a single value
+    } else {
+      const isChecked = e.target.checked;
+      if (isChecked) {
+        handleSelectedOption(value); // Add the selected option to the array of selected options
+      } else {
+        handleSelectedOption((prevSelectedOptions) =>
+          prevSelectedOptions.filter((option) => option !== value)
+        ); // Remove the deselected option from the array of selected options
+      }
+    }
+  
   };
 
   return (
@@ -27,11 +40,15 @@ const QuizCard = ({
           {options.map((option, index) => (
             <Form.Check
               key={index}
-              type="radio"
+              type={questionType === "MCQ" ? "radio" : "checkbox"}
               id={`option-${index}`}
               label={option}
               value={option}
-              checked={selectedOption === option}
+              checked={
+                questionType === "MCQ"
+                  ? option === selectedOption
+                  : selectedOption && selectedOption.includes(option)
+              }
               onChange={handleOptionChange}
             />
           ))}
@@ -41,13 +58,17 @@ const QuizCard = ({
   );
 };
 
-// Add prop types validation to address ESLint errors
 QuizCard.propTypes = {
   question: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.string).isRequired,
   questionNo: PropTypes.number.isRequired,
-  selectedOption: PropTypes.string,
-  setSelectedOption: PropTypes.func.isRequired,
+  questionType: PropTypes.oneOf(["MCQ", "MSQ"]).isRequired,
+  selectedOption: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.arrayOf(PropTypes.string), // Ensure selectedOption can be treated as an array
+  ]),
+  handleSelectedOption: PropTypes.func.isRequired, // Corrected prop name
 };
+
 
 export default QuizCard;

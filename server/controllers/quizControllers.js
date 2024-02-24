@@ -45,7 +45,6 @@ const getQuizData = (req, res) => {
         "SELECT * FROM options WHERE quiz_id = ? AND question_id = ?";
 
       let completedRequests = 0;
-      let isMCQ = true; // Declare isMCQ variable outside the loop
 
       quizData.forEach((quiz, index) => {
         db.query(optionsQuery, [quizId, quiz.questionId], (err, optionRows) => {
@@ -74,13 +73,20 @@ const getQuizData = (req, res) => {
                   JSON.stringify(correctAnswerCount)
                 );
                 const correctOptionCount = answerCount[0].correct_cnt;
-                console.log(correctOptionCount);
 
+                let questionType = "MCQ"; // Assume by default it's a MCQ
                 if (correctOptionCount > 1) {
-                  isMCQ = false; // Update isMCQ based on the query results
+                  questionType = "MSQ"; // If correctOptionCount is more than 1, it's MSQ
                 }
-              }
-              console.log(quizData);
+                quiz.questionType = questionType; // Add questionType property to the quiz
+
+                const updatedQuizData = quizData.map((data) => ({
+                  ...data,
+                  isMCQ: questionType === "MCQ",
+                  questionType,
+                }));
+                }
+
               quiz.options = optionRows.map((option) => option.option_value);
 
               completedRequests++;
@@ -92,7 +98,7 @@ const getQuizData = (req, res) => {
                   (quiz) => quiz.options.length > 1
                 );
                 // Send response after filtering
-                res.json(filteredQuizData.map((item) => ({ ...item, isMCQ })));
+                res.json(filteredQuizData);
               }
             }
           );
@@ -104,6 +110,7 @@ const getQuizData = (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+  
 
 module.exports = { getQuizData };
 

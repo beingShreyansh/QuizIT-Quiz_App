@@ -55,7 +55,7 @@ CREATE TABLE user_history
 );
 
 /* TO get all quiz names */
-SELECT quiz_name, quiz_id  
+SELECT quiz_name
 FROM quiz;
 
 /* To get the complete history of user on basis of user_id */

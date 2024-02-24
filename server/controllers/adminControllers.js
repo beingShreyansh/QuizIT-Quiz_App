@@ -102,7 +102,6 @@ const uploadFileToDB = async (quizData) => {
         }
       }
 
-      console.log("Quiz uploaded:", quizName);
     }
   } catch (error) {
     throw new Error("Error uploading quiz data to DB: " + error.message);
