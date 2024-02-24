@@ -17,7 +17,7 @@
 }
 
 input[type="text"] {
-  width:90%;
+  width: 90%;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
@@ -32,7 +32,7 @@ input[type="text"] {
   background-color: #2c2b2b;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Add shadow for dropdown effect */
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2); /* Add shadow for dropdown effect */
   z-index: 1; /* Ensure dropdown appears above other content */
 }
 
@@ -70,7 +70,50 @@ input[type="text"] {
 }
 
 .start-quiz-button:hover {
+  background-color: #0056b3; 
+}
+.show-quiz-name-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /
+}
+
+.show-quiz-name-button{
+  background-color: #007bff; 
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+}
+.show-quiz-name-button:hover{
   background-color: #0056b3; /* Darker shade of primary color on hover */
+}
+
+.ReactModal__Content .modal-category-name {
+  margin: 10px 5px;
+  border: 1px solid grey;
+  padding: 10px;
+  border-radius: 6px;
+}
+.ReactModal__Content .modal-category-name:hover {
+  background-color: rgb(146, 146, 146);
+  cursor: pointer;
+}
+.ReactModal__Content button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px auto; /* Adjusted margin for better centering */
+  display: block;
+}
+.ReactModal__Content button:hover {
+  background-color: #0056b3;
 }
 
 @media only screen and (min-width: 768px) {

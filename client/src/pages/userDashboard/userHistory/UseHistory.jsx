@@ -2,16 +2,17 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./UserHistory.css";
 import Navbar from "../../../components/Navbar/Navbar";
+import { useParams } from "react-router-dom";
 
 const pageLimit = 12;
 const UserHistory = () => {
+  let { userId } = useParams();
   const [userHistory, setUserHistory] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
 
   useEffect(() => {
     // Fetch user history data from the API
-    const userId = 12;  
-    console.log("user",userId);
+    
     const fetchUserHistory = async () => {
       try {
         const response = await axios.post(
@@ -36,8 +37,6 @@ const UserHistory = () => {
   };
 
   const startIndex = (pageNumber - 1) * pageLimit;
-
-
 
   return (
     <>

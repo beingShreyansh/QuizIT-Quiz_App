@@ -36,16 +36,17 @@
   }
   
   .upload-button {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #007bff;
+    color: #fff;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    margin: 10px auto; /* Adjusted margin for better centering */
+    display: block;
   }
   
   .upload-button:hover {
-    background-color: #45a049;
+    background-color: #0056b3;
   }
   

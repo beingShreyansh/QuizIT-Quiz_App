@@ -18,6 +18,10 @@ function QuizPlayground() {
   const [timer, setTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [selectedOption, setSelectedOption] = useState({});
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -32,7 +36,7 @@ function QuizPlayground() {
     const fetchQuizData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3001/quiz/getQuiz/${id}`
+          `${import.meta.env.VITE_API_URL}/quiz/getQuiz/${id}`
         );
         if (response.status === 200 && response.data.length > 0) {
           setQuizData(response.data);
@@ -72,31 +76,26 @@ function QuizPlayground() {
     if (!quizSubmitted) {
       const questionId = quizData[questionIndex]?.questionId;
       const questionType = quizData[questionIndex]?.questionType;
-      if (questionType === "MCQ") {
-        setAnswers((prevAnswers) => ({
-          ...prevAnswers,
-          [questionId]: option,
-        }));
-      } else {
-        setAnswers((prevAnswers) => {
-          const isSelected = prevAnswers[questionId]?.includes(option);
-          if (isSelected) {
-            const updatedOptions = prevAnswers[questionId].filter(
-              (prevOption) => prevOption !== option
-            );
-            return {
-              ...prevAnswers,
-              [questionId]: updatedOptions,
-            };
-          } else {
-            return {
-              ...prevAnswers,
-              [questionId]: [...(prevAnswers[questionId] || []), option],
-            };
-          }
-        });
-      }
+      setAnswers((prevAnswers) => ({
+        ...prevAnswers,
+        [questionId]: option,
+      }));
+      setSelectedOption(option);
     }
+    console.log(selectedOptions);
+  };
+
+  const handleNewSelectedOption = (option) => {
+    if (!quizSubmitted) {
+      const questionId = quizData[questionIndex]?.questionId;
+      const questionType = quizData[questionIndex]?.questionType;
+      setAnswers((prevAnswers) => ({
+        ...prevAnswers,
+        [questionId]: option,
+      }));
+      setSelectedOption(option);
+    }
+    console.log(selectedOptions);
   };
 
   const markAsReview = (questionId) => {
@@ -107,22 +106,46 @@ function QuizPlayground() {
       }));
     }
   };
-
-  const handleSubmitQuiz = () => {
+  const handleSubmitQuiz = async () => {
     const underReview = Object.values(answers).some(
       (answer) => answer === "review"
     );
+  
     if (!underReview) {
       stopTimer();
-      setQuizSubmitted(true);
-      openModal();
+  
+      try {
+        // Prepare data for quiz submission
+        const updatedFormData = {
+          userId: localStorage.getItem("userId"),
+          quizId: id,
+          answers,
+        };
+  
+        // Log the updatedFormData for debugging
+        console.log("Updated FormData:", updatedFormData);
+  
+        // Submit quiz data
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/quiz/get-results`,
+          updatedFormData
+        );
+  
+        if (response.status === 200) {
+          setScore(response.data);
+          openModal();
+          setQuizSubmitted(true);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     } else {
       toast.error(
         "One or more questions are under review. Please complete all reviews before submitting."
       );
     }
-    console.log(FormData);
   };
+  
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -149,8 +172,11 @@ function QuizPlayground() {
               question={quizData[questionIndex]?.questionContent}
               options={quizData[questionIndex]?.options}
               questionType={quizData[questionIndex]?.questionType}
-              selectedOption={answers[quizData[questionIndex]?.questionId]}
+              selectedOption={selectedOption}
               handleSelectedOption={handleSelectedOption}
+              handleSelectedOptions={setSelectedOptions}
+              selectedOptions={selectedOptions}
+              handleNewSelectedOption={handleNewSelectedOption}
             />
           )}
           <div className="prev-next-buttons">
@@ -198,6 +224,9 @@ function QuizPlayground() {
         <p>Attempted Questions: {Object.keys(answers).length}</p>
         <p>
           Unattempted Questions: {quizData.length - Object.keys(answers).length}
+        </p>
+        <p>
+          Score {score}
         </p>
         <button onClick={() => setIsModalOpen(false)}>Close</button>
       </Modal>
