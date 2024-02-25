@@ -1,3 +1,4 @@
+// App.js
 import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
@@ -12,12 +13,16 @@ import {
   UserHistoryStats,
   QuizPlayground,
 } from "./pages";
+import ProtectedRoute from './ProtectedRoute.jsx';
 
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/",
-      element: <UserHome />,
+      path: "/", // Root path
+      element: <ProtectedRoute />,
+      children: [
+        { path: "", element: <UserHome /> },
+      ],
       errorElement: <PageNotFound />,
     },
     {
@@ -42,15 +47,12 @@ function App() {
     },
     {
       path: "/admin",
-      element: <UploadQuiz />,
-    },
-    {
-      path: "/admin/add-quiz",
-      element: <UploadQuiz />,
-    },
-    {
-      path: "/admin/user-history",
-      element: <AdminUserHistory />,
+      element: <ProtectedRoute adminOnly={true} />, // Wrap admin routes with ProtectedRoute and specify adminOnly prop
+      children: [
+        { path: "", element: <UploadQuiz /> }, // Admin Home route
+        { path: "add-quiz", element: <UploadQuiz /> }, // Add Quiz route
+        { path: "user-history", element: <AdminUserHistory /> }, // User History route
+      ],
     },
   ]);
 

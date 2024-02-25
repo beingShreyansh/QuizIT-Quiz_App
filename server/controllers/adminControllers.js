@@ -3,17 +3,24 @@ const { v4: uuidv4 } = require("uuid");
 const { db } = require("../dbConfig");
 
 const addQuiz = async (req, res) => {
-  const { file } = req;
-
+  const {file} = req;
+  const quizName = req.body.quizName;
   if (!file) {
     return res.status(400).send("No file uploaded.");
   }
+
   try {
+    // Check if quizName already exists
+    const existingQuiz = await getQuizByName(quizName);
+    if (existingQuiz) {
+      return res.status(410).send("Quiz name already exists.");
+    }
+
     const workbook = xlsx.read(file.buffer, { type: "buffer" });
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const quizData = xlsx.utils.sheet_to_json(worksheet);
 
-    await uploadFileToDB(quizData);
+    await uploadFileToDB(quizData, quizName);
 
     res.send("Quiz data uploaded successfully.");
   } catch (error) {
@@ -21,40 +28,36 @@ const addQuiz = async (req, res) => {
     res.status(500).send("An error occurred while uploading quiz data.");
   }
 };
-
 const getUserQuizHistory = async (req, res) => {
-  const userId = req.params.userId;
   try {
-    const query = `SELECT u.name, COUNT(*) AS no_of_times_played, AVG(uh.marks_obtained) AS avg_score, MAX(uh.date_played) as last_date_played
-    FROM user_history AS uh, user AS u
-    WHERE uh.user_id = u.id
-    AND u.id = ?
-    GROUP BY uh.user_id; `;
+    const query = `
+      SELECT u.id AS user_id, u.name, COUNT(*) AS no_of_times_played, AVG(uh.marks_obtained) AS avg_score, MAX(uh.date_played) as last_date_played
+      FROM user_history AS uh
+      JOIN user AS u ON uh.user_id = u.id
+      GROUP BY uh.user_id;
+    `;
 
-    db.query(query, [userId], (err, rows) => {
+    db.query(query, (err, rows) => {
       if (err) {
         console.error("Error fetching user quiz history:", err);
-        res.status(500).json({
+        return res.status(500).json({
           error: "An error occurred while fetching user quiz history.",
         });
-        return;
       }
 
-      res.send(rows);
+      res.json(rows);
     });
   } catch (error) {
     console.error("Error fetching user quiz history:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while fetching user quiz history." });
+    res.status(500).json({ error: "An error occurred while fetching user quiz history." });
   }
 };
 
-const uploadFileToDB = async (quizData) => {
+
+const uploadFileToDB = async (quizData, quizName) => {
   try {
     const quizId = uuidv4();
     for (const quiz of quizData) {
-      const quizName = quiz["Quiz Name"] || "HTML";
       const questions = [];
 
       // Iterate over each row to extract questions and options
@@ -63,7 +66,10 @@ const uploadFileToDB = async (quizData) => {
         const options = Object.keys(quizData[i])
           .filter((key) => key.startsWith("option_"))
           .map((key) => quizData[i][key]);
-        const correctAnswers = (quizData[i]["correct_answer"] || "").toString().split(",").map(Number);
+        const correctAnswers = (quizData[i]["correct_answer"] || "")
+          .toString()
+          .split(",")
+          .map(Number);
 
         questions.push({ content: questionContent, options, correctAnswers });
       }
@@ -101,14 +107,31 @@ const uploadFileToDB = async (quizData) => {
           ]);
         }
       }
-
     }
   } catch (error) {
     throw new Error("Error uploading quiz data to DB: " + error.message);
   }
 };
 
-
+const getQuizByName = async (quizName) => {
+  return new Promise((resolve, reject) => {
+    // Prepare the SQL query
+    const query = "SELECT * FROM quiz WHERE quiz_name = ?";
+    // Execute the query
+    db.query(query, [quizName], (error, results) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      // If a quiz with the same name exists, return the quiz object
+      if (results.length > 0) {
+        resolve(results[0]); // Assuming quiz_name is unique, so only one result is expected
+      } else {
+        resolve(null); // If no quiz with the same name exists, return null
+      }
+    });
+  });
+};
 
 const executeQuery = async (query, params) => {
   try {
@@ -118,5 +141,5 @@ const executeQuery = async (query, params) => {
     throw new Error("Error executing SQL query: " + error.message);
   }
 };
-module.exports = { addQuiz, getUserQuizHistory };
 
+module.exports = { addQuiz, getUserQuizHistory };

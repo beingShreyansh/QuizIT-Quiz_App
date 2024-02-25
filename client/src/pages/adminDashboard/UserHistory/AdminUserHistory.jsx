@@ -60,15 +60,15 @@ const AdminUserHistory = () => {
           </div>
           {userHistory.map((user, index) => (
             <div
-              key={user.userId}
+              key={user.user_id}
               className="table-row"
-              onClick={() => handleNavigate(user.userId)}
+              onClick={() => handleNavigate(user.user_id)}
             >
               <div className="table-cell">{startIndex + index + 1}</div>
               <div className="table-cell">{user.name}</div>
-              <div className="table-cell">{user.numQuizzesPlayed}</div>
-              <div className="table-cell">{user.averageScore}</div>
-              <div className="table-cell">{user.lastPlayedOn}</div>
+              <div className="table-cell">{user.no_of_times_played}</div>
+              <div className="table-cell">{user.avg_score}</div>
+              <div className="table-cell">{user.last_date_played.slice(0,10)}</div>
             </div>
           ))}
         </div>

@@ -7,9 +7,14 @@ import Navbar from "../../../components/Navbar/Navbar";
 
 const UploadQuiz = () => {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [quizName, setQuizName] = useState("");
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
+  };
+
+  const handleQuizNameChange = (event) => {
+    setQuizName(event.target.value);
   };
 
   const handleUpload = async () => {
@@ -18,9 +23,16 @@ const UploadQuiz = () => {
       return;
     }
 
+    if (!quizName) {
+      toast.error("Please enter a quiz name");
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
+      formData.append("quizName", quizName); // Append quiz name to form data
+
       if (
         selectedFile.type ===
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -34,13 +46,19 @@ const UploadQuiz = () => {
             },
           }
         );
-        toast.success("File uploa ded successfully.");
+        if (response.status === 410) {
+          toast.error("File Name Already Exists");
+        } else {
+          toast.success("File uploaded successfully.");
+        }
       } else {
-        toast.error("File Type not allowed! ");
+        toast.error("File type not allowed!");
       }
     } catch (error) {
       console.error(error);
-      toast.error("File not submitted");
+      if (error.response.status === 410) {
+        toast.error("Quiz Name already exists");
+      } else toast.error("File not submitted");
     }
   };
 
@@ -56,10 +74,17 @@ const UploadQuiz = () => {
             className="file-input"
             accept=".xlsx, .xls"
           />
+          <input
+            type="text"
+            placeholder="Enter quiz name"
+            value={quizName}
+            onChange={handleQuizNameChange}
+            className="quiz-name-input"
+          />
           <button
             onClick={handleUpload}
             className="upload-button"
-            disabled={!selectedFile}
+            disabled={!selectedFile || !quizName}
           >
             Upload
           </button>

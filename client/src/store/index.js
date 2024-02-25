@@ -1,10 +1,9 @@
 const isAuthenticated = () => {
   const accessToken = localStorage.getItem("accessToken");
-  const expirationTime = localStorage.getItem("expirationTime");
+  const userId = localStorage.getItem("userId");
 
-  if (accessToken && expirationTime) {
-    const currentTime = Date.now();
-    return currentTime < parseInt(expirationTime, 10);
+  if (accessToken && userId) {
+    return true;
   }
 
   return false;

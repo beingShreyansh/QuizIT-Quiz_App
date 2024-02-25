@@ -91,10 +91,9 @@ const getQuizData = (req, res) => {
 };
 
 const submitQuizData = (req, res) => {
-  const { userId, quizId, answers } = req.body;
+  const { userId, quizId, answers,timeTaken,attemptedQuestions } = req.body;
   console.log(answers);
   
-  // Initialize score
   let score = 0;
 
   try {
@@ -157,11 +156,28 @@ const submitQuizData = (req, res) => {
               }
             } 
             
-
-            // If this is the last question, send the score as response
+            // If this is the last question, save the user history and send the score as response
             if (index === quizData.length - 1) {
               console.log("Score:", score); // Output the calculated score
-              res.json(score);
+              
+              // Save user history
+              const history_record_id = uuidv4(); // Generate history record id
+              const date_played = new Date().toISOString().split('T')[0]; // Get current date
+              const num_of_questions_attempted = attemptedQuestions; // Total number of questions attempted
+              
+              // Insert user history record into database
+              const insertUserHistoryQuery = "INSERT INTO user_history (history_record_id, user_id, quiz_id, marks_obtained, date_played, num_of_questions_attempted,total_time_taken_in_sec) VALUES (?, ?, ?, ?, ?, ?,?)";
+              db.query(insertUserHistoryQuery, [history_record_id, userId, quizId, score, date_played, num_of_questions_attempted,timeTaken], (err, result) => {
+                if (err) {
+                  console.error("Error inserting user history:", err);
+                  res.status(500).json({ error: "Error inserting user history" });
+                  return;
+                }
+                console.log("User history inserted successfully");
+                
+                // Send the score as response
+                res.json(score);
+              });
             }
           });
         });
@@ -172,5 +188,6 @@ const submitQuizData = (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
     
 module.exports = { getQuizData, submitQuizData };

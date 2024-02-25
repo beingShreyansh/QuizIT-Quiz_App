@@ -11,6 +11,7 @@ Modal.setAppElement("#root");
 
 function QuizPlayground() {
   let { id } = useParams();
+  const navigate = useNavigate();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [quizData, setQuizData] = useState([]);
@@ -42,6 +43,7 @@ function QuizPlayground() {
           setQuizData(response.data);
           startTimer();
         } else {
+          navigate('/')
           toast.error("No quiz found");
         }
       } catch (error) {
@@ -120,6 +122,9 @@ function QuizPlayground() {
           userId: localStorage.getItem("userId"),
           quizId: id,
           answers,
+          timeTaken:timer,
+          date:Date.now(),
+          attemptedQuestions:Object.keys(answers).length
         };
   
         // Log the updatedFormData for debugging
@@ -228,7 +233,7 @@ function QuizPlayground() {
         <p>
           Score {score}
         </p>
-        <button onClick={() => setIsModalOpen(false)}>Close</button>
+        <button onClick={() =>{ setIsModalOpen(false); navigate('/')}}>Close</button>
       </Modal>
     </div>
   );
