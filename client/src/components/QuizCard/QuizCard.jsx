@@ -30,7 +30,6 @@ const QuizCard = ({
         );
       }
     }
-    console.log(selectedOption);
   };
 
   const handleCheckboxChange = (option) => {
@@ -45,7 +44,6 @@ const QuizCard = ({
     setSelectedOptions(newSelectedOptions);
     handleSelectedOptions(newSelectedOptions)
     handleNewSelectedOption(newSelectedOptions)
-    console.log(selectedOptions);
   };
 
   const renderRadioForm = () => (

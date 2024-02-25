@@ -49,7 +49,6 @@ function Register() {
         formData
       );
 
-      console.log("Registration successful. Response:", response.data);
 
       if (response.status === 201) {
         // Show a success toast upon successful registration
