@@ -1,27 +1,27 @@
 // ProtectedRoute.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import toast from "react-hot-toast";
 import { isAuthenticated, loggedInRole } from "./store";
 
-const ProtectedRoute = () => {
-  try {
-    if (isAuthenticated()) {
-      const userRole = loggedInRole();
-      if (userRole === "admin") {
-        return <Navigate to="/admin" replace />;
-      } else {
-        return <Outlet />;
-      }
-    } else {
-      toast.error("User not logged in!");
-      return <Navigate to="/login" replace />;
-    }
-  } catch (error) {
-    console.error("Error checking authentication:", error);
-    toast.error("Failed to check authentication");
-    return <Navigate to="/login" replace />;
-  }
+const ProtectedRoute = ({ adminOnly }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    if (isAuthenticated()) setIsLoggedIn(true);
+    else toast.error("User not logged in!");
+  }, [isLoggedIn]);
+
+  const role = loggedInRole(); // Get the logged-in user's role
+
+  return isAuthenticated() ? (
+    adminOnly && role !== "admin" ? ( // Check if admin role is required and user is not admin
+      <Navigate to="/" replace /> // Redirect to home if user is not admin
+    ) : (
+      <Outlet />
+    )
+  ) : (
+    <Navigate to="/login" replace />
+  );
 };
 
 export default ProtectedRoute;

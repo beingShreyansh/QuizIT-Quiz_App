@@ -99,6 +99,7 @@ const getCategories = async (req, res) => {
 
 const getUserQuizHistory = async (req, res) => {
   const userId = req.params.id;
+  console.log(userId);
   try {
     const query = `
     SELECT q.quiz_name, uh.marks_obtained, uh.date_played, uh.num_of_questions_attempted, uh.total_time_taken_in_sec
@@ -109,15 +110,13 @@ const getUserQuizHistory = async (req, res) => {
     db.query(query, [userId], (err, rows) => {
       if (err) {
         console.error("Error fetching the user history: ", err);
-        res
-          .status(500)
-          .json({
-            error: "An error occurred while fetching the user history.",
-          });
+        res.status(500).json({
+          error: "An error occurred while fetching the user history.",
+        });
         return;
       }
       const userHistory = JSON.parse(JSON.stringify(rows));
-
+      console.log(userHistory);
       res.send(userHistory);
     });
   } catch (error) {

@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 
 const pageLimit = 12;
 const UserHistory = () => {
-  let { userId } = useParams();
+  let { id } = useParams();
   const [userHistory, setUserHistory] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
 
@@ -16,7 +16,7 @@ const UserHistory = () => {
     const fetchUserHistory = async () => {
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/user/getHistory/${userId}`,
+          `${import.meta.env.VITE_API_URL}/user/getHistory/${id}`,
           {
             pagination: {
               pageLimit,
@@ -24,6 +24,7 @@ const UserHistory = () => {
             },
           }
         );
+        console.log(id);
         setUserHistory(response.data);
       } catch (error) {
         console.error("Error fetching user history:", error);
@@ -46,18 +47,18 @@ const UserHistory = () => {
             <div className="table-cell">S. No.</div>
             <div className="table-cell">Category</div>
             <div className="table-cell">Score</div>
-            <div className="table-cell">Out of</div>
-            <div className="table-cell">Date</div>
+            <div className="table-cell">Last Date Played</div>
+            <div className="table-cell">Question Attempted</div>
             <div className="table-cell">Time Taken</div>
           </div>
           {userHistory.map((historyItem, index) => (
             <div key={index} className="table-row">
               <div className="table-cell">{index + 1}</div>
-              <div className="table-cell">{historyItem.category}</div>
-              <div className="table-cell">{historyItem.score}</div>
-              <div className="table-cell">{historyItem.outOf}</div>
-              <div className="table-cell">{historyItem.date}</div>
-              <div className="table-cell">{historyItem.timeTaken}</div>
+              <div className="table-cell">{historyItem.quiz_name}</div>
+              <div className="table-cell">{historyItem.marks_obtained}</div>
+              <div className="table-cell">{historyItem.date_played.slice(0,10)}</div>
+              <div className="table-cell">{historyItem.num_of_questions_attempted}</div>
+              <div className="table-cell">{historyItem.total_time_taken_in_sec}</div>
             </div>
           ))}
         </div>
