@@ -12,7 +12,6 @@ const ReviewPanel = ({
 }) => {
   const handleQuestionNavigation = (index) => {
     setQuestionIndex(index);
-    console.log(quizData);
   };
 
   return (

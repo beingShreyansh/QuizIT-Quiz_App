@@ -132,3 +132,32 @@ input[type="text"] {
     width: 150px;
   }
 }
+.modal-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  outline: none;
+  border: none;
+}
+
+.modal-category-name {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #ff6347;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  background-color: #e74c3c;
+}

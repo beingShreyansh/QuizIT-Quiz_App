@@ -92,7 +92,6 @@ const getQuizData = (req, res) => {
 
 const submitQuizData = (req, res) => {
   const { userId, quizId, answers,timeTaken,attemptedQuestions } = req.body;
-  console.log(answers);
   
   let score = 0;
 
@@ -158,7 +157,6 @@ const submitQuizData = (req, res) => {
             
             // If this is the last question, save the user history and send the score as response
             if (index === quizData.length - 1) {
-              console.log("Score:", score); // Output the calculated score
               
               // Save user history
               const history_record_id = uuidv4(); // Generate history record id
@@ -173,7 +171,6 @@ const submitQuizData = (req, res) => {
                   res.status(500).json({ error: "Error inserting user history" });
                   return;
                 }
-                console.log("User history inserted successfully");
                 
                 // Send the score as response
                 res.json(score);
