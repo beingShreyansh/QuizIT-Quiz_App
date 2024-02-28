@@ -8,25 +8,48 @@ CREATE TABLE user
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
-  role VARCHAR(255) DEFAULT 'user'
+  role VARCHAR(255) DEFAULT 'user',
+  profile_img_url VARCHAR(1500)
 );
 
 CREATE TABLE quiz
 (
   quiz_id CHAR(36) PRIMARY KEY,
+  quiz_category VARCHAR(255) NOT NULL,
   quiz_name VARCHAR(255) NOT NULL UNIQUE,
-  no_of_questions INT
+  no_of_questions INT,
+  no_of_times_played INT
 );
+
+/*
+  ques_proficiency_level field:
+    0 --> beginner question
+    1 --> intermediate question
+    2 --> advanced question
+
+  ques_type field:
+    0 --> general
+    1 --> scenario
+*/
 
 CREATE TABLE quiz_question
 (
   question_id CHAR(36),
   quiz_id CHAR(36),
   question_content VARCHAR(1000),
+  ques_diagram_url VARCHAR (1500),
+  ques_proficiency_level CHAR(1),
+  ques_type CHAR(2),
   PRIMARY KEY (question_id, quiz_id),
-  FOREIGN KEY (quiz_id) REFERENCES quiz(quiz_id)
+  FOREIGN KEY (quiz_id) REFERENCES quiz(quiz_id),
+  CHECK ques_proficiency_level( IN ("0","1", "2"))
 );
 
+/*
+  correct_01:
+    0 --> it is a correct option
+    1 --> it is not a correct option
+*/
 CREATE TABLE options
 (
    option_id CHAR(36),
@@ -53,6 +76,13 @@ CREATE TABLE user_history
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (quiz_id) REFERENCES quiz(quiz_id)
 );
+
+CREATE VIEW question_distribution_cnt
+AS 
+SELECT qq.ques_proficiency_level, COUNT(*) AS number_of_ques
+FROM quiz_question AS qq
+GROUP BY qq.ques_proficiency_level; 
+
 
 /* TO get all quiz names */
 SELECT quiz_name
