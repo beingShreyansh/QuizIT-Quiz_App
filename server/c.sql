@@ -9,7 +9,8 @@ CREATE TABLE user
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   role VARCHAR(255) DEFAULT 'user',
-  profile_img_url VARCHAR(1500)
+  profile_img_url VARCHAR(1500),
+  access_token VARCHAR(255)
 );
 
 CREATE TABLE quiz
