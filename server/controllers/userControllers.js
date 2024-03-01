@@ -99,12 +99,13 @@ const getCategories = async (req, res) => {
 
 const getUserQuizHistory = async (req, res) => {
   const userId = req.params.id;
-  console.log(userId);
   try {
     const query = `
-    SELECT q.quiz_name, uh.marks_obtained, uh.date_played, uh.num_of_questions_attempted, uh.total_time_taken_in_sec
-    FROM quiz AS q, user_history AS uh
-    WHERE q.quiz_id = uh.quiz_id AND uh.user_id = ?;
+      SELECT q.quiz_name, uh.marks_obtained, 
+      DATE_FORMAT(uh.date_played, '%Y-%m-%d') as date_played, 
+      uh.num_of_questions_attempted, uh.total_time_taken_in_sec
+      FROM quiz AS q, user_history AS uh
+      WHERE q.quiz_id = uh.quiz_id AND uh.user_id = ?;
     `;
 
     db.query(query, [userId], (err, rows) => {

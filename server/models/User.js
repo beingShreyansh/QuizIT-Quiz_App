@@ -1,8 +1,6 @@
 const mysql = require("mysql2");
 const { v4: uuidv4 } = require("uuid");
 
-
-
 const pool = mysql.createPool({
   host: process.env.DATABASE_HOST,
   user: process.env.DATABASE_USER,
@@ -31,7 +29,7 @@ class User {
         }
 
         const query =
-          "INSERT INTO user (id, name, email, password, role) VALUES (?,?, ?, ?, ?)";
+          "INSERT INTO user (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)";
 
         connection.query(
           query,
