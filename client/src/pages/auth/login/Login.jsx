@@ -9,6 +9,7 @@ function Login() {
   const navigate = useNavigate();
   const [formValidation, setFormValidation] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [passwordValidationResult, setPasswordValidationResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -21,16 +22,18 @@ function Login() {
       [e.target.name]: e.target.value,
     });
   };
-
   const validator = () => {
     const validPasswordString = passwordValidations.validatePassword(
       formData.password
     );
-    const validEmailString = passwordValidations.validateEmail(formData.email);
 
-    if (validPasswordString === true && validEmailString === true) {
+    if (validPasswordString === true) {
       setFormValidation(true);
-    } else setPasswordError(validPasswordString);
+      setPasswordValidationResult("");
+    } else {
+      setFormValidation(false);
+      setPasswordValidationResult(validPasswordString);
+    }
   };
 
   const handleLogin = async (e) => {
@@ -61,14 +64,18 @@ function Login() {
       } catch (error) {
         if (error.response.status === 402) {
           toast.error("User doesn't Exist");
+          setIsLoading(false);
         } else if (error.response.status === 401) {
           toast.error(error.response.data.error);
+          setIsLoading(false);
         } else {
           toast.error("An unexpected error occurred");
+          setIsLoading(false);
         }
       }
     } else {
       toast.error("Validation Error");
+      setIsLoading(false);
     }
   };
 
@@ -96,13 +103,10 @@ function Login() {
                     />
                   </div>
 
-                  {passwordError && (
-                    <span style={{ color: "#FF4B4B", fontSize: "10px" }}>
-                      {passwordError}
-                    </span>
-                  )}
-
                   <div className="wrap-input validate-input">
+                    {passwordValidationResult && (
+                      <font color="#FF4B4B">{passwordValidationResult}</font>
+                    )}
                     <input
                       className="input100"
                       type="password"
