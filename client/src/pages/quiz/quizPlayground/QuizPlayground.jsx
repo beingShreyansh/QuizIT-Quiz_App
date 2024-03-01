@@ -7,7 +7,6 @@ import toast from "react-hot-toast";
 import Modal from "react-modal";
 import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../../../components/spinner/Spinner";
-import { PieChart, Pie, Cell, ResponsiveContainer, Label } from "recharts";
 
 Modal.setAppElement("#root");
 
@@ -27,16 +26,6 @@ function QuizPlayground() {
   const [score, setScore] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalLoading, setIsModalLoading] = useState(false);
-
-  const getPieChartData = () => {
-    const attemptedQuestions = Object.keys(answers).length;
-    const unattemptedQuestions = quizData.length - attemptedQuestions;
-
-    return [
-      { name: "Attempted", value: attemptedQuestions },
-      { name: "Unattempted", value: unattemptedQuestions },
-    ];
-  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -95,12 +84,15 @@ function QuizPlayground() {
       const questionId = quizData[questionIndex]?.questionId;
       const questionType = quizData[questionIndex]?.questionType;
 
+      // Check if there is already an answer for the current question ID
       if (answers[questionId]) {
+        // If an answer exists, create a new entry with the updated option
         setAnswers((prevAnswers) => ({
           ...prevAnswers,
           [questionId]: option,
         }));
       } else {
+        // If no answer exists, directly set the answer for the current question ID
         setAnswers((prevAnswers) => ({
           ...prevAnswers,
           [questionId]: option,
@@ -115,12 +107,15 @@ function QuizPlayground() {
       const questionId = quizData[questionIndex]?.questionId;
       const questionType = quizData[questionIndex]?.questionType;
 
+      // Check if there is already an answer for the current question ID
       if (answers[questionId]) {
+        // If an answer exists, update it with the new selected options
         setAnswers((prevAnswers) => ({
           ...prevAnswers,
           [questionId]: option,
         }));
       } else {
+        // If no answer exists, directly set the answer for the current question ID
         setAnswers((prevAnswers) => ({
           ...prevAnswers,
           [questionId]: option,
@@ -138,7 +133,6 @@ function QuizPlayground() {
       }));
     }
   };
-
   const handleSubmitQuiz = async () => {
     setIsModalLoading(true);
     const underReview = Object.values(answers).some(
@@ -149,6 +143,7 @@ function QuizPlayground() {
       stopTimer();
 
       try {
+        // Prepare data for quiz submission
         const updatedFormData = {
           userId: localStorage.getItem("userId"),
           quizId: id,
@@ -158,6 +153,9 @@ function QuizPlayground() {
           attemptedQuestions: Object.keys(answers).length,
         };
 
+        // Log the updatedFormData for debugging
+
+        // Submit quiz data
         const response = await axios.post(
           `${import.meta.env.VITE_API_URL}/quiz/get-results`,
           updatedFormData
@@ -208,54 +206,13 @@ function QuizPlayground() {
           }}
         >
           <h2>Quiz Summary</h2>
-          <div>
-            {/* Pie Chart Section */}
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={getPieChartData()}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, value }) => `${name}: ${value}`}
-                >
-                  {/* <Label value="Attempted" position="insideTopLeft" />
-                  <Label value="Unattempted" position="insideTopRight" /> */}
-                  <Cell fill="#0056b3" />
-                  <Cell fill="#FFFF" />
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Score Card */}
-          <div className="score-card">
-            <p className="card-title">Total Score</p>
-            <p className="card-number">{score}</p>
-          </div>
-
-          {/* Attempted Questions Card */}
-          <div className="attempted-card">
-            <p className="card-title">Attempted Questions</p>
-            <p className="card-number">{Object.keys(answers).length}</p>
-          </div>
-
-          {/* Unattempted Questions Card */}
-          <div className="unattempted-card">
-            <p className="card-title">Unattempted Questions</p>
-            <p className="card-number">
-              {quizData.length - Object.keys(answers).length}
-            </p>
-          </div>
-
-          {/* Total Questions Card */}
-          <div className="total-questions-card">
-            <p className="card-title">Total Questions</p>
-            <p className="card-number">{quizData.length}</p>
-          </div>
-
+          <p>Total Questions: {quizData.length}</p>
+          <p>Attempted Questions: {Object.keys(answers).length}</p>
+          <p>
+            Unattempted Questions:
+            {quizData.length - Object.keys(answers).length}
+          </p>
+          <p>Score {score}</p>
           <button
             onClick={() => {
               setIsModalOpen(false);

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Navbar.css";
 import Logo from "../../assets/logo.png";
 import { NavLink } from "react-router-dom";
 import toast from "react-hot-toast";
 
-const userId = localStorage.getItem('userId');
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const isAdmin = localStorage.getItem("role") === "admin" ? true : false;
+  const [isAdmin, setIsAdmin] = useState();
+  const [userId, setUserId] = useState();
   const handleLogout = () => {
     // Clear localStorage items on logout
     toast.success("logged out");
@@ -15,6 +15,13 @@ export default function Navbar() {
     localStorage.removeItem("userId");
     localStorage.removeItem("accessToken");
   };
+
+  useEffect(() => {
+    const role = localStorage.getItem("role") === "admin" ? true : false;
+    const id = localStorage.getItem("userId");
+    setIsAdmin(role);
+    setUserId(id);
+  }, []);
 
   return (
     <>
