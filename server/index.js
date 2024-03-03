@@ -15,7 +15,7 @@ dbConnection()
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:3000", // Replace with your frontend's URL
+    origin: "http://localhost:3000", 
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     optionsSuccessStatus: 204,
