@@ -4,23 +4,18 @@ const { db } = require('../dbConfig');
 
 const addQuiz = async (req, res) => {
   const { file } = req;
-  const quizName = req.body.quizName;
   if (!file) {
     return res.status(400).send('No file uploaded.');
   }
 
   try {
     // Check if quizName already exists
-    const existingQuiz = await getQuizByName(quizName);
-    if (existingQuiz) {
-      return res.status(410).send('Quiz name already exists.');
-    }
 
     const workbook = xlsx.read(file.buffer, { type: 'buffer' });
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const quizData = xlsx.utils.sheet_to_json(worksheet);
 
-    await uploadFileToDB(quizData, quizName);
+    await uploadFileToDB(quizData);
 
     res.send('Quiz data uploaded successfully.');
   } catch (error) {
@@ -57,20 +52,19 @@ const getUserQuizHistory = async (req, res) => {
 
 const uploadFileToDB = async (quizData) => {
   try {
-    // Define the expected field names
     const expectedFields = [
+      'Quiz Name',
       'QuestionText',
       'Choice1',
       'Choice2',
       'Choice3',
       'Choice4',
-      'Choice5',
-      'Choice6',
       'RightChoices',
-      'Quiz Name',
+      'Category',
+      'MCQ/Scenario',
+      'ProficiencyLevel(Intermediate/Advanced)',
     ];
 
-    // Check if all expected fields are present
     const missingFields = expectedFields.filter(
       (field) => !Object.keys(quizData[0]).includes(field)
     );
@@ -80,50 +74,86 @@ const uploadFileToDB = async (quizData) => {
       );
     }
 
-    // Iterate over each row to extract quiz data
-    for (let j = 0; j < quizData.length; j++) {
-      const quizName = quizData[j]['Quiz Name'];
-      const quizId = uuidv4(); // Generate quiz ID for each quiz
+    // Iterate over each distinct quizName
+    const uniqueQuizNames = [
+      ...new Set(quizData.map((data) => data['Quiz Name'])),
+    ];
+    for (const quizName of uniqueQuizNames) {
+      let quizId;
+
+      // Check if quiz with the same name exists
+      const existingQuizQuery = 'SELECT quiz_id FROM quiz WHERE quiz_name = ?';
+      const existingQuizResult = await executeQuery(existingQuizQuery, [
+        quizName,
+      ]);
+
+      if (existingQuizResult.length > 0) {
+        quizId = existingQuizResult[0].quiz_id;
+      } else {
+        quizId = uuidv4(); // Generate quiz ID for new quiz
+        // Insert new quiz data
+        const quizInsertQuery =
+          'INSERT INTO quiz (quiz_id, quiz_name, quiz_category, no_of_questions, no_of_times_played) VALUES (?, ?, ?, ?, 0)';
+        await executeQuery(quizInsertQuery, [
+          quizId,
+          quizName,
+          quizData[0]['Category'], // Assuming all questions under the same quiz have the same category
+          0, // Initial number of questions is 0, will be updated later
+        ]);
+      }
 
       const questions = [];
 
-      // Iterate over each row to extract questions and options for the current quiz
-      for (let i = 0; i < quizData.length; i++) {
-        if (quizData[i]['Quiz Name'] === quizName) {
-          const questionContent = quizData[i]['QuestionText'];
-          const options = Object.keys(quizData[i])
+      // Extract questions and options for the current quizName
+      for (const data of quizData) {
+        if (data['Quiz Name'] === quizName) {
+          // Extract question details
+          const questionContent = data['QuestionText'];
+          const ques_type = data['MCQ/Scenario'] === 'MCQ' ? 0 : 1;
+          const ques_proficiency_level =
+            data['ProficiencyLevel(Intermediate/Advanced)'] === 'Intermediate'
+              ? 1
+              : data['ProficiencyLevel(Intermediate/Advanced)'] === 'Beginner'
+              ? 0
+              : 2;
+
+          const options = Object.keys(data)
             .filter((key) => key.startsWith('Choice'))
-            .map((key) => quizData[i][key]);
-          const correctAnswers = (quizData[i]['RightChoices'] || '')
+            .map((key) => data[key]);
+
+          const correctAnswers = (data['RightChoices'] || '')
             .toString()
             .split(',')
             .map(Number);
 
-          questions.push({ content: questionContent, options, correctAnswers });
+          questions.push({
+            content: questionContent,
+            options,
+            correctAnswers,
+            ques_type,
+            ques_proficiency_level,
+          });
         }
       }
 
-      // Insert quiz data
-      const quizInsertQuery =
-        'INSERT INTO quiz (quiz_id, quiz_name, no_of_questions) VALUES (?, ?, ?)';
-      await executeQuery(quizInsertQuery, [quizId, quizName, questions.length]);
-
-      // Insert question and options data
+      // Insert questions and options data
       for (const question of questions) {
         const questionId = uuidv4();
 
         // Insert question data
         const questionInsertQuery =
-          'INSERT INTO quiz_question (quiz_id, question_id, question_content) VALUES (?, ?, ?)';
+          'INSERT INTO quiz_question (question_id, quiz_id, question_content, ques_proficiency_level, ques_type) VALUES (?, ?, ?, ?, ?)';
         await executeQuery(questionInsertQuery, [
-          quizId,
           questionId,
+          quizId,
           question.content,
+          question.ques_proficiency_level,
+          question.ques_type,
         ]);
 
         for (let i = 0; i < question.options.length; i++) {
           const optionValue = question.options[i];
-          const isCorrect = question.correctAnswers.includes(i + 1) ? 1 : 0;
+          const isCorrect = question.correctAnswers.includes(i + 1) ? 0 : 1;
 
           const optionInsertQuery =
             'INSERT INTO options (option_id, quiz_id, question_id, option_value, correct_01) VALUES (?, ?, ?, ?, ?)';
@@ -140,26 +170,6 @@ const uploadFileToDB = async (quizData) => {
   } catch (error) {
     throw new Error('Error uploading quiz data to DB: ' + error.message);
   }
-};
-
-const getQuizByName = async (quizName) => {
-  return new Promise((resolve, reject) => {
-    // Prepare the SQL query
-    const query = 'SELECT * FROM quiz WHERE quiz_name = ?';
-    // Execute the query
-    db.query(query, [quizName], (error, results) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      // If a quiz with the same name exists, return the quiz object
-      if (results.length > 0) {
-        resolve(results[0]); // Assuming quiz_name is unique, so only one result is expected
-      } else {
-        resolve(null); // If no quiz with the same name exists, return null
-      }
-    });
-  });
 };
 
 const executeQuery = async (query, params) => {

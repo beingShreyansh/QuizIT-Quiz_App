@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import passwordValidations from '../../../validations/passwordValidation';
-import Spinner from '../../../components/spinner/Spinner';
+import React, { useState } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import passwordValidations from "../../../validations/passwordValidation";
+import Spinner from "../../../components/spinner/Spinner";
 
 function Login() {
   const navigate = useNavigate();
   const [formValidation, setFormValidation] = useState(false);
-  const [passwordError, setPasswordError] = useState('');
-  const [passwordValidationResult, setPasswordValidationResult] = useState('');
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordValidationResult, setPasswordValidationResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const handleChange = (e) => {
@@ -29,7 +29,7 @@ function Login() {
 
     if (validPasswordString === true) {
       setFormValidation(true);
-      setPasswordValidationResult('');
+      setPasswordValidationResult("");
     } else {
       setFormValidation(false);
       setPasswordValidationResult(validPasswordString);
@@ -48,18 +48,18 @@ function Login() {
         );
 
         if (response.status === 201) {
-          localStorage.setItem('accessToken', response.data.accessToken);
-          localStorage.setItem('role', response.data.role);
-          localStorage.setItem('userId', response.data.userId);
+          localStorage.setItem("accessToken", response.data.accessToken);
+          localStorage.setItem("role", response.data.role);
+          localStorage.setItem("userId", response.data.userId);
           setIsLoading(false);
-          if (response.data.role === 'admin') {
-            navigate('/admin');
+          if (response.data.role === "admin") {
+            navigate("/admin");
           } else {
-            navigate('/');
+            navigate("/");
           }
 
           // Show success toast upon successful login
-          toast.success('Successfully logged in!');
+          toast.success("Successfully logged in!");
         }
       } catch (error) {
         if (error.response.status === 402) {
@@ -69,12 +69,12 @@ function Login() {
           toast.error(error.response.data.error);
           setIsLoading(false);
         } else {
-          toast.error('An unexpected error occurred');
+          toast.error("An unexpected error occurred");
           setIsLoading(false);
         }
       }
     } else {
-      toast.error('Validation Error');
+      toast.error("Validation Error");
       setIsLoading(false);
     }
   };

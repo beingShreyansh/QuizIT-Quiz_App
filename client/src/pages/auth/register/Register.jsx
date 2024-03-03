@@ -1,33 +1,41 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { Link, useNavigate } from 'react-router-dom';
-import passwordValidations from '../../../validations/passwordValidation';
-import './Register.css';
+// Register.jsx
+import React, { useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
+import passwordValidations from "../../../validations/passwordValidation";
+import "./Register.css";
 
 function Register() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
+    name: "",
+    email: "",
+    password: "",
+    otp: "",
+    isEmailVerified: false,
   });
 
-  const [passwordValidationResult, setPasswordValidationResult] = useState('');
+  const [passwordValidationResult, setPasswordValidationResult] = useState("");
+  const [emailValidationResult, setEmailValidationResult] = useState("");
   const [formValidation, setFormValidation] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showOTPInput, setShowOTPInput] = useState(false);
   const navigate = useNavigate();
 
   const validator = () => {
     const validPasswordString = passwordValidations.validatePassword(
       formData.password
     );
+    const validEmailString = passwordValidations.validateEmail(formData.email);
 
-    if (validPasswordString === true) {
+    if (validPasswordString === true && validEmailString === true) {
       setFormValidation(true);
-      setPasswordValidationResult('');
+      setPasswordValidationResult("");
+      setEmailValidationResult("");
     } else {
       setFormValidation(false);
       setPasswordValidationResult(validPasswordString);
+      setEmailValidationResult(validEmailString);
     }
   };
 
@@ -38,37 +46,92 @@ function Register() {
     }));
   };
 
+  const handleSendOTP = async () => {
+    try {
+      setLoading(true);
+
+      // Send request to server to send OTP to the provided email
+      await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
+        email: formData.email,
+      });
+
+      toast.success("OTP sent successfully");
+      setShowOTPInput(true); // Show OTP input after sending OTP
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      toast.error("Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    try {
+      setLoading(true);
+
+      // Send request to server to verify the provided OTP
+      await axios.post(`${import.meta.env.VITE_API_URL}/auth/verify-otp`, {
+        email: formData.email,
+        otp: formData.otp,
+      });
+
+      toast.success("OTP verified successfully");
+      setFormData((prevData) => ({
+        ...prevData,
+        isEmailVerified: true,
+      }));
+      setFormValidation(true); // Enable registration after successful OTP verification
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      toast.error("Invalid not Verified");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
       setLoading(true);
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/register`,
-        formData
-      );
+      validator();
 
-      if (response.status === 201) {
-        // Show a success toast upon successful registration
-        toast.success('Registered Successfully!');
+      if (formValidation) {
+        // Check if email is verified before registering
+        if (!formData.isEmailVerified) {
+          toast.error("Please verify your email address");
+          return;
+        }
 
-        // Redirect to the login page after successful registration
-        navigate('/login');
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/auth/register`,
+          formData
+        );
+
+        console.log("Registration successful. Response:", response.data);
+
+        if (response.status === 201) {
+          // Show a success toast upon successful registration
+          toast.success("Registered Successfully!");
+
+          // Redirect to the login page after successful registration
+          navigate("/login");
+        }
       }
     } catch (error) {
-      console.error('Error during registration:', error);
+      console.error("Error during registration:", error);
 
       if (error.response) {
-        console.error('Server responded with an error:', error.response.data);
+        console.error("Server responded with an error:", error.response.data);
         // Show a user-friendly error message
-        toast.error(error.response.data.error || 'Registration failed');
+        toast.error(error.response.data.error || "Registration failed");
       } else if (error.request) {
-        console.error('No response received from the server');
-        toast.error('Registration failed');
+        console.error("No response received from the server");
+        toast.error("Registration failed");
       } else {
-        console.error('Error setting up the request:', error.message);
-        toast.error('Registration failed');
+        console.error("Error setting up the request:", error.message);
+        toast.error("Registration failed");
       }
     } finally {
       setLoading(false);
@@ -99,8 +162,50 @@ function Register() {
                 name="email"
                 placeholder="john@gmail.com"
                 value={formData.email}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  setEmailValidationResult("");
+                  setShowOTPInput(false); // Hide OTP input when email changes
+                }}
               />
+              {emailValidationResult && (
+                <font color="#FF4B4B">{emailValidationResult}</font>
+              )}
+
+              {/* Add OTP input and buttons */}
+              {showOTPInput && (
+                <div>
+                  <input
+                    className="input100"
+                    type="text"
+                    name="otp"
+                    placeholder="Enter OTP"
+                    value={formData.otp}
+                    onChange={handleChange}
+                  />
+                  <button
+                    className="btn"
+                    onClick={handleVerifyOTP}
+                    disabled={!formData.otp || loading}
+                  >
+                    Verify OTP
+                  </button>
+                </div>
+              )}
+
+              {formValidation ? (
+                <>{/* Rendered when OTP is verified */}</>
+              ) : (
+                <>
+                  <button
+                    className="btn"
+                    onClick={handleSendOTP}
+                    disabled={!formData.email || loading}
+                  >
+                    Send OTP
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="wrap-input validate-input">
@@ -115,21 +220,23 @@ function Register() {
                 value={formData.password}
                 onChange={(e) => {
                   handleChange(e);
-                  validator();
+                  setPasswordValidationResult("");
+                  validator(); // Call validator on password change
                 }}
               />
             </div>
+
             <div className="btn-container">
               <button
                 className="btn login-btn"
                 onClick={handleRegister}
                 disabled={!formValidation || loading}
               >
-                {loading ? 'Registering...' : 'Register'}
+                {loading ? "Registering..." : "Register"}
               </button>
             </div>
             <div className="text-center p-t-115">
-              <span className="txt1">Don't have an account? </span>{' '}
+              <span className="txt1">Already have an account? </span>{" "}
               <Link to="/login" className="txt2">
                 Login
               </Link>

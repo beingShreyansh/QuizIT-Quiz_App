@@ -124,7 +124,7 @@ const UploadQuiz = () => {
             <input
               type="checkbox"
               onChange={(e) => setRequiresImages(e.target.checked)}
-            />{' '}
+            />
             Yes
           </label>
           {requiresImages && (
