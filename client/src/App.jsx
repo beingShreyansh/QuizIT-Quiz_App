@@ -13,7 +13,8 @@ import {
   UserHistoryStats,
   QuizPlayground,
 } from "./pages";
-import ProtectedRoute from './ProtectedRoute.jsx';
+import ProtectedRoute from './ProtectedRoute.jsx'
+import AdminDashboard from "./pages/adminDashboard/AdminDashboard.jsx";
 
 function App() {
   const router = createBrowserRouter([
@@ -49,7 +50,7 @@ function App() {
       path: "/admin",
       element: <ProtectedRoute adminOnly={true} />, // Wrap admin routes with ProtectedRoute and specify adminOnly prop
       children: [
-        { path: "", element: <UploadQuiz /> }, // Admin Home route
+        { path: "", element: <AdminDashboard /> }, // Admin Home route
         { path: "add-quiz", element: <UploadQuiz /> }, // Add Quiz route
         { path: "user-history", element: <AdminUserHistory /> }, // User History route
       ],
