@@ -33,6 +33,7 @@ CREATE TABLE quiz
     1 --> scenario
 */
 
+
 CREATE TABLE quiz_question (
     question_id CHAR(36),
     quiz_id CHAR(36),
@@ -43,7 +44,7 @@ CREATE TABLE quiz_question (
     PRIMARY KEY (question_id, quiz_id),
     FOREIGN KEY (quiz_id) REFERENCES quiz(quiz_id),
     CHECK (ques_proficiency_level IN ('0', '1', '2'))
-);
+
 
 /*
   correct_01:
