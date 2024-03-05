@@ -33,18 +33,18 @@ CREATE TABLE quiz
     1 --> scenario
 */
 
-CREATE TABLE quiz_question
-(
-  question_id CHAR(36),
-  quiz_id CHAR(36),
-  question_content VARCHAR(1000),
-  ques_diagram_url VARCHAR (1500),
-  ques_proficiency_level CHAR(1),
-  ques_type CHAR(2),
-  PRIMARY KEY (question_id, quiz_id),
-  FOREIGN KEY (quiz_id) REFERENCES quiz(quiz_id),
-  CHECK (ques_proficiency_level IN ("0","1", "2"))
-);
+
+CREATE TABLE quiz_question (
+    question_id CHAR(36),
+    quiz_id CHAR(36),
+    question_content VARCHAR(1000),
+    ques_diagram_url VARCHAR(1500),
+    ques_proficiency_level CHAR(1),
+    ques_type CHAR(2),
+    PRIMARY KEY (question_id, quiz_id),
+    FOREIGN KEY (quiz_id) REFERENCES quiz(quiz_id),
+    CHECK (ques_proficiency_level IN ('0', '1', '2'))
+
 
 /*
   correct_01:
