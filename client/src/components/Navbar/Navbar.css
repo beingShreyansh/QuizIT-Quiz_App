@@ -1,174 +1,185 @@
 #admin-navbar {
-    top: 0;
-    height: 60px;
-    line-height: 60px;
-    width: 90vw;
-    margin: auto;
-    z-index: 10;
-    border-bottom: 1px solid #69696d;
-  }
-  
+  top: 0;
+  height: 60px;
+  line-height: 60px;
+  width: 90vw;
+  margin: auto;
+  z-index: 10;
+  border-bottom: 1px solid #69696d;
+}
+
+.nav-wrapper {
+  margin: auto;
+  text-align: center;
+  width: 70%;
+}
+
+@media (max-width: 768px) {
   .nav-wrapper {
-    margin: auto;
-    text-align: center;
-    width: 70%;
+    width: 90%;
   }
-  
-  @media (max-width: 768px) {
-    .nav-wrapper {
-      width: 90%;
-    }
+}
+
+@media (max-width: 638px) {
+  .nav-wrapper {
+    width: 100%;
   }
-  
-  @media (max-width: 638px) {
-    .nav-wrapper {
-      width: 100%;
-    }
-  }
-  
+}
+
+.logo {
+  float: left;
+  margin-left: 28px;
+  height: 30px;
+  letter-spacing: 1px;
+  color: #ffffffde; /* Secondary color for text */
+  margin: auto;
+}
+
+@media (max-width: 768px) {
   .logo {
-    float: left;
-    margin-left: 28px;
-    height: 30px;
-    letter-spacing: 1px;
-    color: #ffffffde; /* Secondary color for text */
-    margin: auto;
+    margin-left: 100px;
   }
-  
-  @media (max-width: 768px) {
-    .logo {
-      margin-left: 100px;
-    }
-  }
-  
-  #navLinks {
-    display: inline-block;
-    float: right;
-    list-style: none;
-    text-align: right;
-    transition: transform 0.5s ease-out;
-  }
-  
-  #navLinks a {
-    color: #ffffffde; /* Secondary color for text */
-    display: inline-block;
-    font-size: 0.8em;
-    height: 50px;
-    letter-spacing: 1px;
-    margin: 0 20px;
-    padding: 0 4px;
-    position: relative;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: all 0.5s ease;
-    -webkit-transition: all 0.5s ease;
-  }
-  
-  #navLinks a:hover {
-    color: #8b8b8b; /* Updated color on hover */
-    transition: all 1s ease;
-    -webkit-transition: all 0.5s ease;
-  }
-  
-  /* Animated Bottom Line */
-  #navLinks a:before,
-  #navLinks a:after {
-    content: "";
-    position: absolute;
-    width: 0%;
-    height: 1px;
-    bottom: -1px;
-    background: #222222; /* Updated color for bottom line */
-  }
-  
-  #navLinks a:before {
-    left: 0;
-    transition: 0.5s;
-  }
-  
-  #navLinks a:after {
-    background: #222222; /* Updated color for bottom line */
-    right: 0;
-  }
-  
-  #navLinks a:hover:before {
-    background: #222222; /* Updated color for bottom line */
-    width: 100%;
-    transition: width 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
-  }
-  
-  #navLinks a:hover:after {
-    background: transparent;
-    width: 100%;
-  }
-  
-  .menu-toggle {
+}
+
+#navLinks {
+  display: inline-block;
+  float: right;
+  list-style: none;
+  text-align: right;
+  transition: transform 0.5s ease-out;
+}
+
+#navLinks a {
+  color: #ffffffde; /* Secondary color for text */
+  display: inline-block;
+  font-size: 0.8em;
+  height: 50px;
+  letter-spacing: 1px;
+  margin: 0 20px;
+  padding: 0 4px;
+  position: relative;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+}
+
+#navLinks a:hover {
+  color: #8b8b8b; /* Updated color on hover */
+  transition: all 1s ease;
+  -webkit-transition: all 0.5s ease;
+}
+
+/* Animated Bottom Line */
+#navLinks a:before,
+#navLinks a:after {
+  content: '';
+  position: absolute;
+  width: 0%;
+  height: 1px;
+  bottom: -1px;
+  background: #222222; /* Updated color for bottom line */
+}
+
+#navLinks a:before {
+  left: 0;
+  transition: 0.5s;
+}
+
+#navLinks a:after {
+  background: #222222; /* Updated color for bottom line */
+  right: 0;
+}
+
+#navLinks a:hover:before {
+  background: #222222; /* Updated color for bottom line */
+  width: 100%;
+  transition: width 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+#navLinks a:hover:after {
+  background: transparent;
+  width: 100%;
+}
+
+.menu-toggle {
+  display: none;
+  cursor: pointer;
+  padding: 15px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transition: transform 0.5s ease; /* Added transition for hamburger menu */
+}
+
+button.btn {
+  background-color: #007bff; /* Primary color */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button.btn :hover {
+  background-color: #0056b3;
+}
+
+.menu-toggle .bar {
+  background-color: #6b696d; /* Updated color for the toggle bar */
+  height: 3px;
+  width: 25px;
+  margin: 5px 0;
+  transition: 0.3s;
+}
+
+/* Add this to your AdminNavbar.css */
+
+/* ... existing styles ... */
+@media (max-width: 768px) {
+  #admin-navbar #navLinks {
     display: none;
-    cursor: pointer;
-    padding: 15px;
-    position: absolute;
-    top: 0;
-    right: 0;
-    transition: transform 0.5s ease; /* Added transition for hamburger menu */
   }
-  
-  .menu-toggle .bar {
-    background-color: #6b696d; /* Updated color for the toggle bar */
-    height: 3px;
-    width: 25px;
-    margin: 5px 0;
-    transition: 0.3s;
-  }
-  
-  /* Add this to your AdminNavbar.css */
-  
-  /* ... existing styles ... */
-  @media (max-width: 768px) {
-   
-    #admin-navbar #navLinks {
-      display: none;
-    }
   .logo {
     align-items: center;
     /* margin: auto; */
   }
-    #admin-navbar #navLinks.open {
-      display: block;
-      background-color: #1c1c1c; /* Background color on mobile menu */
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 100%;
-      text-align: center;
-      box-shadow: 2px 2px 10px #1c1c1c;
-      transition: opacity 0.5s ease; /* Added transition for opening the hamburger menu */
-    }
-  
-    #admin-navbar #navLinks.open li {
-      display: block;
-      margin: 10px 0;
-    }
-  
-    #admin-navbar #navLinks.open a {
-      font-size: 1.1em;
-      display: block;
-      color: #69696d; /* Secondary color for text */
-      transition: opacity 0.5s ease; /* Added transition for closing the hamburger menu */
-    }
-  
-    #admin-navbar #navLinks.open a:before,
-    #admin-navbar #navLinks.open a:after {
-      display: none;
-    }
-  
-    #admin-navbar .menu-toggle {
-      display: block;
-    }
-  
-    #admin-navbar .menu-toggle.open {
-      transform: rotate(
-        90deg
-      ); /* Added rotation for the hamburger icon when the menu is open */
-    }
-  
+  #admin-navbar #navLinks.open {
+    display: block;
+    background-color: #1c1c1c; /* Background color on mobile menu */
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    text-align: center;
+    box-shadow: 2px 2px 10px #1c1c1c;
+    transition: opacity 0.5s ease; /* Added transition for opening the hamburger menu */
   }
+
+  #admin-navbar #navLinks.open li {
+    display: block;
+    margin: 10px 0;
+  }
+
+  #admin-navbar #navLinks.open a {
+    font-size: 1.1em;
+    display: block;
+    color: #69696d; /* Secondary color for text */
+    transition: opacity 0.5s ease; /* Added transition for closing the hamburger menu */
+  }
+
+  #admin-navbar #navLinks.open a:before,
+  #admin-navbar #navLinks.open a:after {
+    display: none;
+  }
+
+  #admin-navbar .menu-toggle {
+    display: block;
+  }
+
+  #admin-navbar .menu-toggle.open {
+    transform: rotate(
+      90deg
+    ); /* Added rotation for the hamburger icon when the menu is open */
+  }
+}

@@ -19,6 +19,7 @@ const validatePassword = (password, automaticLogin = false) => {
   return true;
 };
 
+// passwordValidation.js
 const validateEmail = (email) => {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -29,6 +30,7 @@ const validateEmail = (email) => {
   // If the email is valid
   return true;
 };
+
 
 const passwordValidations = {
   validatePassword,

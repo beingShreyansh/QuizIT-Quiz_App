@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import QuizCard from "../../../components/QuizCard/QuizCard";
-import ReviewPanel from "./ReviewPanel/ReviewPanel";
-import "./QuizPlayground.css";
-import toast from "react-hot-toast";
-import Modal from "react-modal";
-import { useNavigate, useParams } from "react-router-dom";
-import Spinner from "../../../components/spinner/Spinner";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import QuizCard from '../../../components/QuizCard/QuizCard';
+import ReviewPanel from './ReviewPanel/ReviewPanel';
+import './QuizPlayground.css';
+import toast from 'react-hot-toast';
+import Modal from 'react-modal';
+import { useNavigate, useParams } from 'react-router-dom';
+import Spinner from '../../../components/spinner/Spinner';
+import { PieChart, Pie, ResponsiveContainer } from 'recharts';
 
-Modal.setAppElement("#root");
+Modal.setAppElement('#root');
 
 function QuizPlayground() {
-  let { id } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,24 +21,11 @@ function QuizPlayground() {
   const [timer, setTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [formData, setFormData] = useState({});
-  const [selectedOption, setSelectedOption] = useState({});
-  const [selectedOptions, setSelectedOptions] = useState([]);
   const [score, setScore] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isModalLoading, setIsModalLoading] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (isTimerRunning) {
-        setTimer((prevTimer) => prevTimer + 1);
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isTimerRunning]);
-
-  useEffect(() => {
-    setIsLoading(true);
     const fetchQuizData = async () => {
       try {
         const response = await axios.get(
@@ -48,15 +36,24 @@ function QuizPlayground() {
           setIsLoading(false);
           startTimer();
         } else {
-          navigate("/");
-          toast.error("No quiz found");
+          navigate('/');
+          toast.error('No quiz found');
         }
       } catch (error) {
-        console.error("Error fetching quiz data:", error);
+        console.error('Error fetching quiz data:', error);
       }
     };
     fetchQuizData();
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isTimerRunning) {
+        setTimer((prevTimer) => prevTimer + 1);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isTimerRunning]);
 
   const startTimer = () => {
     setIsTimerRunning(true);
@@ -80,72 +77,39 @@ function QuizPlayground() {
   };
 
   const handleSelectedOption = (option) => {
-    if (!quizSubmitted) {
-      const questionId = quizData[questionIndex]?.questionId;
-      const questionType = quizData[questionIndex]?.questionType;
-
-      // Check if there is already an answer for the current question ID
-      if (answers[questionId]) {
-        // If an answer exists, create a new entry with the updated option
-        setAnswers((prevAnswers) => ({
-          ...prevAnswers,
-          [questionId]: option,
-        }));
-      } else {
-        // If no answer exists, directly set the answer for the current question ID
-        setAnswers((prevAnswers) => ({
-          ...prevAnswers,
-          [questionId]: option,
-        }));
-      }
-      setSelectedOption(option);
-    }
+    handleOptionSelection(option);
   };
 
   const handleNewSelectedOption = (option) => {
+    handleOptionSelection(option);
+  };
+
+  const handleOptionSelection = (option) => {
     if (!quizSubmitted) {
       const questionId = quizData[questionIndex]?.questionId;
-      const questionType = quizData[questionIndex]?.questionType;
-
-      // Check if there is already an answer for the current question ID
-      if (answers[questionId]) {
-        // If an answer exists, update it with the new selected options
-        setAnswers((prevAnswers) => ({
-          ...prevAnswers,
-          [questionId]: option,
-        }));
-      } else {
-        // If no answer exists, directly set the answer for the current question ID
-        setAnswers((prevAnswers) => ({
-          ...prevAnswers,
-          [questionId]: option,
-        }));
-      }
-      setSelectedOption(option);
+      const updatedAnswers = { ...answers, [questionId]: option };
+      setAnswers(updatedAnswers);
     }
   };
 
   const markAsReview = (questionId) => {
     if (!quizSubmitted) {
-      setAnswers((prevAnswers) => ({
-        ...prevAnswers,
-        [questionId]: "review",
-      }));
+      setAnswers((prevAnswers) => ({ ...prevAnswers, [questionId]: 'review' }));
     }
   };
+
   const handleSubmitQuiz = async () => {
     setIsModalLoading(true);
     const underReview = Object.values(answers).some(
-      (answer) => answer === "review"
+      (answer) => answer === 'review'
     );
 
     if (!underReview) {
       stopTimer();
 
       try {
-        // Prepare data for quiz submission
         const updatedFormData = {
-          userId: localStorage.getItem("userId"),
+          userId: localStorage.getItem('userId'),
           quizId: id,
           answers,
           timeTaken: timer,
@@ -153,9 +117,6 @@ function QuizPlayground() {
           attemptedQuestions: Object.keys(answers).length,
         };
 
-        // Log the updatedFormData for debugging
-
-        // Submit quiz data
         const response = await axios.post(
           `${import.meta.env.VITE_API_URL}/quiz/get-results`,
           updatedFormData
@@ -172,13 +133,23 @@ function QuizPlayground() {
       }
     } else {
       toast.error(
-        "One or more questions are under review. Please complete all reviews before submitting."
+        'One or more questions are under review. Please complete all reviews before submitting.'
       );
     }
   };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  const getPieChartData = () => {
+    const attemptedQuestions = Object.keys(answers).length;
+    const unattemptedQuestions = quizData.length - attemptedQuestions;
+
+    return [
+      { name: 'Attempted', value: attemptedQuestions },
+      { name: 'Unattempted', value: unattemptedQuestions },
+    ];
+  };
 
   return (
     <>
@@ -187,36 +158,65 @@ function QuizPlayground() {
       ) : (
         <Modal
           isOpen={isModalOpen}
-          onRequestClose={() => setIsModalOpen(false)}
+          onRequestClose={closeModal}
           contentLabel="Quiz Summary"
           style={{
-            overlay: {
-              backgroundColor: "rgba(128, 128, 128, 0.5)",
-            },
+            overlay: { backgroundColor: 'rgba(128, 128, 128, 0.5)' },
             content: {
-              backgroundColor: "lightgrey",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              outline: "none",
-              padding: "20px",
-              maxWidth: "600px",
-              margin: "auto",
-              color: "black",
+              backgroundColor: 'lightgrey',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              outline: 'none',
+              padding: '20px',
+              maxWidth: '600px',
+              margin: 'auto',
+              color: 'black',
             },
           }}
         >
           <h2>Quiz Summary</h2>
-          <p>Total Questions: {quizData.length}</p>
-          <p>Attempted Questions: {Object.keys(answers).length}</p>
-          <p>
-            Unattempted Questions:
-            {quizData.length - Object.keys(answers).length}
-          </p>
-          <p>Score {score}</p>
+          <div>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={getPieChartData()}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}`}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="score-card">
+            <p className="card-title">Total Score</p>
+            <p className="card-number">{score}%</p>
+          </div>
+
+          <div className="attempted-card">
+            <p className="card-title">Attempted Questions</p>
+            <p className="card-number">{Object.keys(answers).length}</p>
+          </div>
+
+          <div className="unattempted-card">
+            <p className="card-title">Unattempted Questions</p>
+            <p className="card-number">
+              {quizData.length - Object.keys(answers).length}
+            </p>
+          </div>
+
+          <div className="total-questions-card">
+            <p className="card-title">Total Questions</p>
+            <p className="card-number">{quizData.length}</p>
+          </div>
+
           <button
             onClick={() => {
               setIsModalOpen(false);
-              navigate("/");
+              navigate('/');
             }}
           >
             Close
@@ -242,21 +242,15 @@ function QuizPlayground() {
             </div>
             <div className="quiz-container">
               {quizData.length > 0 && (
-                <>
-                  <QuizCard
-                    questionNo={questionIndex + 1}
-                    question={quizData[questionIndex]?.questionContent}
-                    options={quizData[questionIndex]?.options}
-                    questionType={quizData[questionIndex]?.questionType}
-                    selectedOption={answers[quizData[questionIndex].questionId]}
-                    handleSelectedOption={handleSelectedOption}
-                    handleSelectedOptions={setSelectedOptions}
-                    selectedOptionsMSQ={
-                      answers[quizData[questionIndex].questionId]
-                    }
-                    handleNewSelectedOption={handleNewSelectedOption}
-                  />
-                </>
+                <QuizCard
+                  questionNo={questionIndex + 1}
+                  question={quizData[questionIndex]?.questionContent}
+                  options={quizData[questionIndex]?.options}
+                  questionType={quizData[questionIndex]?.questionType}
+                  selectedOption={answers[quizData[questionIndex]?.questionId]}
+                  handleSelectedOption={handleSelectedOption}
+                  handleNewSelectedOption={handleNewSelectedOption}
+                />
               )}
               <div className="prev-next-buttons">
                 <button

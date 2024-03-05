@@ -1,3 +1,4 @@
+// Register.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -10,24 +11,31 @@ function Register() {
     name: "",
     email: "",
     password: "",
+    otp: "",
+    isEmailVerified: false,
   });
 
   const [passwordValidationResult, setPasswordValidationResult] = useState("");
+  const [emailValidationResult, setEmailValidationResult] = useState("");
   const [formValidation, setFormValidation] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showOTPInput, setShowOTPInput] = useState(false);
   const navigate = useNavigate();
 
   const validator = () => {
     const validPasswordString = passwordValidations.validatePassword(
       formData.password
     );
+    const validEmailString = passwordValidations.validateEmail(formData.email);
 
-    if (validPasswordString === true) {
+    if (validPasswordString === true && validEmailString === true) {
       setFormValidation(true);
       setPasswordValidationResult("");
+      setEmailValidationResult("");
     } else {
       setFormValidation(false);
       setPasswordValidationResult(validPasswordString);
+      setEmailValidationResult(validEmailString);
     }
   };
 
@@ -38,24 +46,78 @@ function Register() {
     }));
   };
 
+  const handleSendOTP = async () => {
+    try {
+      setLoading(true);
+
+      // Send request to server to send OTP to the provided email
+      await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
+        email: formData.email,
+      });
+
+      toast.success("OTP sent successfully");
+      setShowOTPInput(true); // Show OTP input after sending OTP
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      toast.error("Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    try {
+      setLoading(true);
+
+      // Send request to server to verify the provided OTP
+      await axios.post(`${import.meta.env.VITE_API_URL}/auth/verify-otp`, {
+        email: formData.email,
+        otp: formData.otp,
+      });
+
+      toast.success("OTP verified successfully");
+      setFormData((prevData) => ({
+        ...prevData,
+        isEmailVerified: true,
+      }));
+      setFormValidation(true); // Enable registration after successful OTP verification
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      toast.error("Invalid not Verified");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
       setLoading(true);
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/register`,
-        formData
-      );
+      validator();
 
+      if (formValidation) {
+        // Check if email is verified before registering
+        if (!formData.isEmailVerified) {
+          toast.error("Please verify your email address");
+          return;
+        }
 
-      if (response.status === 201) {
-        // Show a success toast upon successful registration
-        toast.success("Registered Successfully!");
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/auth/register`,
+          formData
+        );
 
-        // Redirect to the login page after successful registration
-        navigate("/login");
+        console.log("Registration successful. Response:", response.data);
+
+        if (response.status === 201) {
+          // Show a success toast upon successful registration
+          toast.success("Registered Successfully!");
+
+          // Redirect to the login page after successful registration
+          navigate("/login");
+        }
       }
     } catch (error) {
       console.error("Error during registration:", error);
@@ -100,13 +162,55 @@ function Register() {
                 name="email"
                 placeholder="john@gmail.com"
                 value={formData.email}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  setEmailValidationResult("");
+                  setShowOTPInput(false); // Hide OTP input when email changes
+                }}
               />
+              {emailValidationResult && (
+                <font color="#FF4B4B">{emailValidationResult}</font>
+              )}
+
+              {/* Add OTP input and buttons */}
+              {showOTPInput && (
+                <div>
+                  <input
+                    className="input100"
+                    type="text"
+                    name="otp"
+                    placeholder="Enter OTP"
+                    value={formData.otp}
+                    onChange={handleChange}
+                  />
+                  <button
+                    className="btn"
+                    onClick={handleVerifyOTP}
+                    disabled={!formData.otp || loading}
+                  >
+                    Verify OTP
+                  </button>
+                </div>
+              )}
+
+              {formValidation ? (
+                <>{/* Rendered when OTP is verified */}</>
+              ) : (
+                <>
+                  <button
+                    className="btn"
+                    onClick={handleSendOTP}
+                    disabled={!formData.email || loading}
+                  >
+                    Send OTP
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="wrap-input validate-input">
               {passwordValidationResult && (
-                <font color="white">{passwordValidationResult}</font>
+                <font color="#FF4B4B">{passwordValidationResult}</font>
               )}
               <input
                 className="input100"
@@ -116,10 +220,12 @@ function Register() {
                 value={formData.password}
                 onChange={(e) => {
                   handleChange(e);
-                  validator();
+                  setPasswordValidationResult("");
+                  validator(); // Call validator on password change
                 }}
               />
             </div>
+
             <div className="btn-container">
               <button
                 className="btn login-btn"
@@ -130,7 +236,7 @@ function Register() {
               </button>
             </div>
             <div className="text-center p-t-115">
-              <span className="txt1">Don't have an account? </span>{" "}
+              <span className="txt1">Already have an account? </span>{" "}
               <Link to="/login" className="txt2">
                 Login
               </Link>

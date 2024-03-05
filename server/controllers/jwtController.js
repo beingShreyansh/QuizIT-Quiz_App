@@ -9,12 +9,12 @@ const signAccessToken = (userId) => {
       return;
     }
 
-    const payload = {}; // Use const to declare payload
+    const payload = {};
 
     const options = {
       expiresIn: "1h",
-      issuer: "quiz_it", // Set issuer directly in options
-      audience: userId.toString(), // Convert userId to string
+      issuer: "quiz_it",
+      audience: userId.toString(),
     };
 
     jwt.sign(payload, SECRET, options, (err, token) => {
@@ -25,17 +25,30 @@ const signAccessToken = (userId) => {
 };
 
 const verifyAccessToken = (req, res, next) => {
-  if (!req.headers["authorization"]) return next("Not Authorized");
-  const authHeader = req.headers["authorization"];
-  const bearerToken = authHeader.split(" ");
-  const token = bearerToken[1];
+  try {
+    if (!req.headers["authorization"]) {
+      throw new Error("Not Authorized");
+    }
 
-  jwt.verify(token, SECRET, (err, payload) => {
-    if (err) return next("Not authorized1");
-    req.payload = payload;
-    next();
-  });
+    const authHeader = req.headers["authorization"];
+    const bearerToken = authHeader.split(" ");
+
+    if (bearerToken.length !== 2 || bearerToken[0] !== "Bearer") {
+      throw new Error("Invalid Authorization Header");
+    }
+
+    const token = bearerToken[1];
+
+    jwt.verify(token, SECRET, (err, payload) => {
+      if (err) {
+        throw new Error("Not Authorized");
+      }
+      req.payload = payload;
+      next();
+    });
+  } catch (error) {
+    next(error); // Pass the error to the next middleware (error handler)
+  }
 };
-
 
 module.exports = { signAccessToken, verifyAccessToken };
