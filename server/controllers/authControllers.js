@@ -67,7 +67,6 @@ const handleSendOTP = async (req, res) => {
     const randomOTP = generateRandomOTP(6);
 
     // Log the generated OTP
-    console.log("Generated OTP:", randomOTP);
 
     // Send OTP to the user's email
     let mailSubject = "OTP for Email Verification";
@@ -148,7 +147,6 @@ const handleSendOTP = async (req, res) => {
     // Now use this 'content' variable in your sendMail function
 
     // Log the content before sending
-    console.log("Email Content:", content);
 
     // Ensure email is defined before sending
     await sendMail(email, mailSubject, content);
@@ -160,8 +158,6 @@ const handleSendOTP = async (req, res) => {
       expiryTime: Date.now() + 5 * 60 * 1000, // 5 minutes expiry time
     };
     otpMemory[email] = otpData;
-
-    console.log("OTP sent successfully: 3", otpMemory);
 
     res.status(200).json({
       success: true,
@@ -176,7 +172,6 @@ const handleSendOTP = async (req, res) => {
 
 const handleVerifyOTP = async (req, res) => {
   const { email, otp } = req.body;
-  console.log(email, "it is m=email", otp);
   try {
     // Check if the user exists
 

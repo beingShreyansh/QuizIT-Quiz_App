@@ -7,7 +7,6 @@ const sendMail = async (email, mailSubject, content) => {
       throw new Error("Recipient's email is not defined");
     }
 
-    console.log("Attempting to send mail to:", email);
 
     const transport = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -27,7 +26,6 @@ const sendMail = async (email, mailSubject, content) => {
     // Use async/await directly without a callback
     const info = await transport.sendMail(mailOptions);
 
-    console.log("Mail sent successfully", info.response);
   } catch (error) {
     console.error("Error in sendMail function:", error.message);
     throw error;

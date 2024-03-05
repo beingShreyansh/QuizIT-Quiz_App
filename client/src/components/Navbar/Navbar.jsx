@@ -41,7 +41,7 @@ export default function Navbar() {
               </NavLink>
               <NavLink to="/login" className="navlink">
                 <button className="btn" onClick={handleLogout}>
-                  Logout
+                  Logout  
                 </button>
               </NavLink>
             </div>
