@@ -2,7 +2,6 @@ const xlsx = require('xlsx');
 const { v4: uuidv4 } = require('uuid');
 const { db } = require('../dbConfig');
 
-
 const addQuiz = async (req, res) => {
   const { file } = req;
   if (!file) {
