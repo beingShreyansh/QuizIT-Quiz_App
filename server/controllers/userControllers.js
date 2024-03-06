@@ -116,8 +116,16 @@ const getUserQuizHistory = async (req, res) => {
         });
         return;
       }
-      const userHistory = JSON.parse(JSON.stringify(rows));
-      console.log(userHistory);
+      
+      // Convert rows to a plain JavaScript array
+      const userHistory = Array.from(rows).map(row => ({
+        quiz_name: row.quiz_name,
+        marks_obtained: row.marks_obtained,
+        date_played: row.date_played,
+        num_of_questions_attempted: row.num_of_questions_attempted,
+        total_time_taken_in_sec: row.total_time_taken_in_sec
+      }));
+      
       res.send(userHistory);
     });
   } catch (error) {

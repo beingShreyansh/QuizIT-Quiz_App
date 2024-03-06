@@ -7,7 +7,7 @@ const QuizCard = ({
   question,
   questionNo,
   options,
-  questionType,
+  isMCQ,
   selectedOption,
   handleSelectedOption,
 }) => {
@@ -15,7 +15,7 @@ const QuizCard = ({
     const value = e.target.value;
     const isChecked = e.target.checked;
 
-    if (questionType === 'MCQ') {
+    if (isMCQ) {
       handleSelectedOption(value);
     } else {
       const updatedOptions = isChecked
@@ -37,12 +37,12 @@ const QuizCard = ({
           {options.map((option, index) => (
             <Form.Check
               key={index}
-              type={questionType === 'MCQ' ? 'radio' : 'checkbox'}
+              type={isMCQ ? 'radio' : 'checkbox'}
               id={`option-${index}`}
               label={option}
               value={option}
               checked={
-                questionType === 'MCQ'
+                isMCQ 
                   ? option === selectedOption
                   : (selectedOption || []).includes(option)
               }
@@ -59,7 +59,7 @@ QuizCard.propTypes = {
   question: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.string).isRequired,
   questionNo: PropTypes.number.isRequired,
-  questionType: PropTypes.oneOf(['MCQ', 'MSQ']).isRequired,
+  isMCQ: PropTypes.oneOf(['MCQ', 'MSQ']).isRequired,
   selectedOption: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.arrayOf(PropTypes.string),
