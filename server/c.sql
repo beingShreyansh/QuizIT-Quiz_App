@@ -31,6 +31,10 @@ CREATE TABLE quiz
   ques_type field:
     0 --> general
     1 --> scenario
+
+  ISmcaq field:
+    0 --> False
+    1 --> True
 */
 
 
@@ -41,10 +45,12 @@ CREATE TABLE quiz_question (
     ques_diagram_url VARCHAR(1500),
     ques_proficiency_level CHAR(1),
     ques_type CHAR(2),
+    isMCQ CHAR(1),
     PRIMARY KEY (question_id, quiz_id),
     FOREIGN KEY (quiz_id) REFERENCES quiz(quiz_id),
     CHECK (ques_proficiency_level IN ('0', '1', '2'))
-
+    CHECK (isMCQ IN ('0', '1'))
+);
 
 /*
   correct_01:
