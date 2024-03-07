@@ -1,5 +1,6 @@
 const xlsx = require("xlsx");
 const { db } = require("../dbConfig");
+const User = require("../models/User");
 
 
 const getCategories = async (req, res) => {
@@ -54,5 +55,9 @@ const getUserQuizHistory = async (req, res) => {
       .json({ error: "An error occurred while fetching user quiz history." });
   }
 };
+const getUserDetails = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
 
-module.exports = { getUserQuizHistory, getCategories };
+module.exports = { getUserQuizHistory, getCategories,getUserDetails };

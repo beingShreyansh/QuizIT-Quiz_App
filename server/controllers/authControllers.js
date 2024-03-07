@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const { signAccessToken } = require("./jwtController");
 const sendMail = require("../helpers/sendMail");
-const randomstring = require("randomstring");
 
 // Memory storage for OTPs
 const otpMemory = {};
@@ -16,9 +15,15 @@ const createUser = async (req, res) => {
     if (existingUser) {
       return res.status(409).json({ error: "User already exists" });
     }
-    if (!isEmailVerified)
+
+    if (!isEmailVerified) {
       return res.status(410).json({ error: "Email not Verified" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Access the profile photo from req.file.buffer
+    const profilePhoto = req.file ? req.file.buffer : null;
 
     // Create a new User instance with role based on request or default to 'user'
     const newUser = new User({
@@ -26,6 +31,7 @@ const createUser = async (req, res) => {
       email,
       password: hashedPassword,
       role: role || "user",
+      profile_img_url: profilePhoto || null, // Save profile image URL or null if not provided
     });
 
     // Save the user to the database
@@ -39,6 +45,22 @@ const createUser = async (req, res) => {
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ error: "Failed to register user" });
+  }
+};
+
+const handleProfileImageUpload = (req, res) => {
+  try {
+    // Access the profile photo from req.file.buffer
+    const profilePhoto = req.file.buffer;
+
+    // Now you can save the profile photo in the database or perform other operations
+
+    res
+      .status(200)
+      .json({ success: true, message: "Profile photo uploaded successfully" });
+  } catch (error) {
+    console.error("Error uploading profile photo:", error);
+    res.status(500).json({ error: "Failed to upload profile photo" });
   }
 };
 
@@ -255,4 +277,5 @@ module.exports = {
   redirectToDashboard,
   handleSendOTP,
   handleVerifyOTP,
+  handleProfileImageUpload
 };

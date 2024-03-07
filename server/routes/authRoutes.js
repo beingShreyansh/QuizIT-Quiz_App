@@ -1,28 +1,35 @@
 const express = require("express");
-const cors = require("cors"); // Import the CORS middleware
+const cors = require("cors");
+const multer = require("multer");
 const router = express.Router();
-const { redirectToDashboard } = require("../controllers/authControllers");
-
 const {
+  redirectToDashboard,
   createUser,
   loginUser,
   logoutUser,
   handleSendOTP,
   handleVerifyOTP,
+  handleProfileImageUpload,
 } = require("../controllers/authControllers");
 
 const { verifyAccessToken } = require("../controllers/jwtController");
 
 const app = express();
 
-// Enable CORS for all routes
 app.use(cors());
 
-// Define your authentication routes here
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 router.post("/login", loginUser);
-router.post("/register", createUser);
+router.post("/register", upload.single("profileImage"), createUser);
 router.post("/send-otp", handleSendOTP);
 router.post("/verify-otp", handleVerifyOTP);
+router.post(
+  "/upload-profile-image",
+  upload.single("profileImage"),
+  handleProfileImageUpload
+);
 router.get("/logout", logoutUser);
 router.get("/", verifyAccessToken, redirectToDashboard);
 

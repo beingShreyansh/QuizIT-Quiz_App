@@ -1,3 +1,5 @@
+/* Navbar.css */
+
 #admin-navbar {
   top: 0;
   height: 60px;
@@ -73,7 +75,7 @@
 /* Animated Bottom Line */
 #navLinks a:before,
 #navLinks a:after {
-  content: '';
+  content: "";
   position: absolute;
   width: 0%;
   height: 1px;

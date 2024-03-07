@@ -1,4 +1,3 @@
-// Register.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -13,6 +12,7 @@ function Register() {
     password: "",
     otp: "",
     isEmailVerified: false,
+    profilePhoto: null,
   });
 
   const [passwordValidationResult, setPasswordValidationResult] = useState("");
@@ -46,17 +46,23 @@ function Register() {
     }));
   };
 
+  const handleFileChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      profilePhoto: e.target.files[0],
+    }));
+  };
+
   const handleSendOTP = async () => {
     try {
       setLoading(true);
 
-      // Send request to server to send OTP to the provided email
       await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
         email: formData.email,
       });
 
       toast.success("OTP sent successfully");
-      setShowOTPInput(true); // Show OTP input after sending OTP
+      setShowOTPInput(true);
     } catch (error) {
       console.error("Error sending OTP:", error);
       toast.error("Failed to send OTP");
@@ -69,7 +75,6 @@ function Register() {
     try {
       setLoading(true);
 
-      // Send request to server to verify the provided OTP
       await axios.post(`${import.meta.env.VITE_API_URL}/auth/verify-otp`, {
         email: formData.email,
         otp: formData.otp,
@@ -80,7 +85,7 @@ function Register() {
         ...prevData,
         isEmailVerified: true,
       }));
-      setFormValidation(true); // Enable registration after successful OTP verification
+      setFormValidation(true);
     } catch (error) {
       console.error("Error verifying OTP:", error);
       toast.error("Invalid not Verified");
@@ -94,27 +99,34 @@ function Register() {
 
     try {
       setLoading(true);
-
       validator();
 
       if (formValidation) {
-        // Check if email is verified before registering
         if (!formData.isEmailVerified) {
           toast.error("Please verify your email address");
           return;
         }
 
+        const formDataWithImage = new FormData();
+        formDataWithImage.append("name", formData.name);
+        formDataWithImage.append("email", formData.email);
+        formDataWithImage.append("password", formData.password);
+        formDataWithImage.append("otp", formData.otp);
+        formDataWithImage.append("isEmailVerified", formData.isEmailVerified);
+
+        // Append the profilePhoto only if it exists
+        if (formData.profilePhoto) {
+          formDataWithImage.append("profileImage", formData.profilePhoto);
+        }
+
         const response = await axios.post(
           `${import.meta.env.VITE_API_URL}/auth/register`,
-          formData
+          formDataWithImage
         );
 
 
         if (response.status === 201) {
-          // Show a success toast upon successful registration
           toast.success("Registered Successfully!");
-
-          // Redirect to the login page after successful registration
           navigate("/login");
         }
       }
@@ -123,7 +135,6 @@ function Register() {
 
       if (error.response) {
         console.error("Server responded with an error:", error.response.data);
-        // Show a user-friendly error message
         toast.error(error.response.data.error || "Registration failed");
       } else if (error.request) {
         console.error("No response received from the server");
@@ -143,6 +154,7 @@ function Register() {
         <div className="wrap-login100">
           <div className="login100-form">
             <span className="login100-form-title p-b-26">Welcome</span>
+
             <div className="wrap-input validate-input">
               <input
                 className="input100"
@@ -164,14 +176,13 @@ function Register() {
                 onChange={(e) => {
                   handleChange(e);
                   setEmailValidationResult("");
-                  setShowOTPInput(false); // Hide OTP input when email changes
+                  setShowOTPInput(false);
                 }}
               />
               {emailValidationResult && (
                 <font color="#FF4B4B">{emailValidationResult}</font>
               )}
 
-              {/* Add OTP input and buttons */}
               {showOTPInput && (
                 <div>
                   <input
@@ -220,8 +231,17 @@ function Register() {
                 onChange={(e) => {
                   handleChange(e);
                   setPasswordValidationResult("");
-                  validator(); // Call validator on password change
+                  validator();
                 }}
+              />
+            </div>
+
+            <div className="wrap-input validate-input">
+              <input
+                type="file"
+                name="profilePhoto"
+                accept="image/*"
+                onChange={handleFileChange}
               />
             </div>
 
@@ -234,6 +254,7 @@ function Register() {
                 {loading ? "Registering..." : "Register"}
               </button>
             </div>
+
             <div className="text-center p-t-115">
               <span className="txt1">Already have an account? </span>{" "}
               <Link to="/login" className="txt2">
