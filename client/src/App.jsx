@@ -34,7 +34,7 @@ function App() {
       element: <Results />,
     },
     {
-      path: "/user-history/router:id",
+      path: "/user-history/:id",
       element: <UserHistoryStats />,
     },
     {
