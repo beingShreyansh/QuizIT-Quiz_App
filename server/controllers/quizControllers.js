@@ -45,7 +45,6 @@ const getQuizData = (req, res) => {
 
           // Check if all options requests are completed
           if (completedRequests === quizData.length) {
-            console.log(quizData);
             // Send response after filtering
             res.json(quizData);
           }

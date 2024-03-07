@@ -1,78 +1,6 @@
 const xlsx = require("xlsx");
 const { db } = require("../dbConfig");
 
-const rows = [
-  {
-    category: "IT",
-    score: 85,
-    outOf: 100,
-    date: "2024-02-15",
-    timeTaken: "45 minutes",
-  },
-  {
-    category: "Cloud",
-    score: 90,
-    outOf: 100,
-    date: "2024-02-16",
-    timeTaken: "40 minutes",
-  },
-  {
-    category: "Docker",
-    score: 95,
-    outOf: 100,
-    date: "2024-02-17",
-    timeTaken: "50 minutes",
-  },
-  {
-    category: "IT",
-    score: 80,
-    outOf: 100,
-    date: "2024-02-18",
-    timeTaken: "50 minutes",
-  },
-  {
-    category: "Cloud",
-    score: 85,
-    outOf: 100,
-    date: "2024-02-19",
-    timeTaken: "55 minutes",
-  },
-  {
-    category: "Docker",
-    score: 90,
-    outOf: 100,
-    date: "2024-02-20",
-    timeTaken: "45 minutes",
-  },
-  {
-    category: "IT",
-    score: 75,
-    outOf: 100,
-    date: "2024-02-21",
-    timeTaken: "60 minutes",
-  },
-  {
-    category: "Cloud",
-    score: 95,
-    outOf: 100,
-    date: "2024-02-22",
-    timeTaken: "35 minutes",
-  },
-  {
-    category: "Docker",
-    score: 92,
-    outOf: 100,
-    date: "2024-02-23",
-    timeTaken: "48 minutes",
-  },
-  {
-    category: "IT",
-    score: 88,
-    outOf: 100,
-    date: "2024-02-24",
-    timeTaken: "42 minutes",
-  },
-];
 
 const getCategories = async (req, res) => {
   try {
@@ -116,16 +44,7 @@ const getUserQuizHistory = async (req, res) => {
         });
         return;
       }
-      
-      // Convert rows to a plain JavaScript array
-      const userHistory = Array.from(rows).map(row => ({
-        quiz_name: row.quiz_name,
-        marks_obtained: row.marks_obtained,
-        date_played: row.date_played,
-        num_of_questions_attempted: row.num_of_questions_attempted,
-        total_time_taken_in_sec: row.total_time_taken_in_sec
-      }));
-      
+      const userHistory = JSON.parse(JSON.stringify(rows));
       res.send(userHistory);
     });
   } catch (error) {

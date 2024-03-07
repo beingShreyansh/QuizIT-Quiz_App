@@ -25,29 +25,30 @@ const addQuiz = async (req, res) => {
 const getUserQuizHistory = async (req, res) => {
   try {
     const query = `
-      SELECT u.id AS user_id, u.name, COUNT(*) AS no_of_times_played, AVG(uh.marks_obtained) AS avg_score, MAX(uh.date_played) as last_date_played
-      FROM user_history AS uh
-      JOIN user AS u ON uh.user_id = u.id
-    `;
+    SELECT u.id AS user_id, u.name, COUNT(*) AS no_of_times_played, 
+    AVG(uh.marks_obtained) AS avg_score, 
+    MAX(DATE_FORMAT(uh.date_played, '%Y-%m-%d')) AS last_date_played
+    FROM user_history AS uh
+    JOIN user AS u ON uh.user_id = u.id
+    GROUP BY uh.user_id;
+  `;
+  
 
-    const rows = await executeQuery(query);
-    console.log("rows",rows);
-    // Convert rows to a plain JavaScript array
-    const userHistory = rows.map(row => ({
-      user_id: row.user_id,
-      name: row.name,
-      no_of_times_played: row.no_of_times_played,
-      avg_score: row.avg_score,
-      last_date_played: row.last_date_played
-    }));
-    
-    res.json(userHistory);
+    db.query(query, (err, rows) => {
+      if (err) {
+        console.error("Error fetching user quiz history:", err);
+        return res.status(500).json({
+          error: "An error occurred while fetching user quiz history.",
+        });
+      }
+
+      res.json(rows);
+    });
   } catch (error) {
-    console.error('Error fetching user quiz history:', error);
-    res.status(500).json({ error: 'An error occurred while fetching user quiz history.' });
+    console.error("Error fetching user quiz history:", error);
+    res.status(500).json({ error: "An error occurred while fetching user quiz history." });
   }
 };
-
 
 const uploadQuizDataToDB = async (quizData) => {
   try {
@@ -118,18 +119,15 @@ const uploadQuizDataToDB = async (quizData) => {
   }
 };
 
-
-
-
 const executeQuery = async (query, params) => {
   try {
     const result = await db.query(query, params);
-    // Ensure the result is always an array
-    return Array.isArray(result) ? result : [];
+    return result;
   } catch (error) {
-    console.error('Error executing SQL query:', error);
-    throw new Error('Error executing SQL query: ' + error.message);
+    throw new Error("Error executing SQL query: " + error.message);
   }
+
+
 };
 
 
