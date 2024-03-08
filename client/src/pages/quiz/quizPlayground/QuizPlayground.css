@@ -1,0 +1,134 @@
+.quiz-playground-container {
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+}
+
+/* Timer styles */
+.timer {
+  margin: auto;
+  font-size: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Review and quiz container */
+.review-quiz-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Review panel styles */
+.review-panel {
+  margin-bottom: 20px;
+}
+
+/* Previous and next buttons styles */
+.prev-next-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.prev-next-buttons button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px; /* Adjusted margin for better spacing */
+}
+
+.prev-next-buttons button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.prev-next-buttons button:hover {
+  background-color: #0056b3;
+}
+
+/* Submission note styles */
+.submission-note {
+  margin-top: 20px;
+  font-style: italic;
+  color: #888;
+  text-align: center;
+}
+
+/* Modal styles */
+.ReactModal__Overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ReactModal__Content {
+  background-color: #fff;
+  border-radius: 10px;
+  outline: none;
+  padding: 20px;
+  max-width: 80%;
+  margin: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.ReactModal__Content h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.ReactModal__Content p {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.ReactModal__Content button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px auto; /* Adjusted margin for better centering */
+  display: block;
+}
+
+.ReactModal__Content button:hover {
+  background-color: #0056b3;
+}
+.submission-note {
+  margin-top: 20px;
+  color: #888;
+}
+
+.score-card,
+.attempted-card,
+.unattempted-card,
+.total-questions-card {
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  text-align: center;
+  width: 200px;
+  display: inline-block;
+  margin-right: 10px;
+  color: black;
+  background-color: #c3c0c0;
+}
+
+.card-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.card-number {
+  font-size: 18px;
+  color: #050404;
+}

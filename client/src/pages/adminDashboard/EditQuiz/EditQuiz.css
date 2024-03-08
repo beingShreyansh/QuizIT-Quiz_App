@@ -1,0 +1,22 @@
+.edit-quiz-container {
+    margin: 20px;
+}
+
+.edit-quiz-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.edit-quiz-table th, .edit-quiz-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.edit-quiz-table th {
+    background-color: #007bff;
+}
+
+.edit-quiz-table tr:hover {
+    background-color: #ddd;
+}
