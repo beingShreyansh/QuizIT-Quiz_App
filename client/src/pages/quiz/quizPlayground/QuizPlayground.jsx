@@ -246,7 +246,7 @@ function QuizPlayground() {
                   questionNo={questionIndex + 1}
                   question={quizData[questionIndex]?.questionContent}
                   options={quizData[questionIndex]?.options}
-                  questionType={quizData[questionIndex]?.questionType}
+                  isMCQ={quizData[questionIndex]?.isMCQ}
                   selectedOption={answers[quizData[questionIndex]?.questionId]}
                   handleSelectedOption={handleSelectedOption}
                   handleNewSelectedOption={handleNewSelectedOption}

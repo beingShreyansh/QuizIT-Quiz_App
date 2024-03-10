@@ -68,7 +68,13 @@ const fetchQuestionsAndOptions = (req, res) => {
 
 // In quizController.js
 // Controller to update a specific question and its options
+// quizController.js
+
+// ... (existing code)
+
+// Controller to update a specific question and its options
 const updateQuestionAndOptions = (req, res) => {
+    console.log(req.params);
     const { questionId } = req.params;
     const { questionContent, diagramUrl, proficiencyLevel, questionType, optionValue } = req.body;
     const query = `

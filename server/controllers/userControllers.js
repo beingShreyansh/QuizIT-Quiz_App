@@ -1,78 +1,6 @@
 const xlsx = require("xlsx");
 const { db } = require("../dbConfig");
 
-const rows = [
-  {
-    category: "IT",
-    score: 85,
-    outOf: 100,
-    date: "2024-02-15",
-    timeTaken: "45 minutes",
-  },
-  {
-    category: "Cloud",
-    score: 90,
-    outOf: 100,
-    date: "2024-02-16",
-    timeTaken: "40 minutes",
-  },
-  {
-    category: "Docker",
-    score: 95,
-    outOf: 100,
-    date: "2024-02-17",
-    timeTaken: "50 minutes",
-  },
-  {
-    category: "IT",
-    score: 80,
-    outOf: 100,
-    date: "2024-02-18",
-    timeTaken: "50 minutes",
-  },
-  {
-    category: "Cloud",
-    score: 85,
-    outOf: 100,
-    date: "2024-02-19",
-    timeTaken: "55 minutes",
-  },
-  {
-    category: "Docker",
-    score: 90,
-    outOf: 100,
-    date: "2024-02-20",
-    timeTaken: "45 minutes",
-  },
-  {
-    category: "IT",
-    score: 75,
-    outOf: 100,
-    date: "2024-02-21",
-    timeTaken: "60 minutes",
-  },
-  {
-    category: "Cloud",
-    score: 95,
-    outOf: 100,
-    date: "2024-02-22",
-    timeTaken: "35 minutes",
-  },
-  {
-    category: "Docker",
-    score: 92,
-    outOf: 100,
-    date: "2024-02-23",
-    timeTaken: "48 minutes",
-  },
-  {
-    category: "IT",
-    score: 88,
-    outOf: 100,
-    date: "2024-02-24",
-    timeTaken: "42 minutes",
-  },
-];
 
 const getCategories = async (req, res) => {
   try {
@@ -117,7 +45,6 @@ const getUserQuizHistory = async (req, res) => {
         return;
       }
       const userHistory = JSON.parse(JSON.stringify(rows));
-      console.log(userHistory);
       res.send(userHistory);
     });
   } catch (error) {

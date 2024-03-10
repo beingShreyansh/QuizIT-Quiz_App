@@ -1,41 +1,42 @@
-import React, { useState } from 'react';
-
+// Modal.jsx
+ 
+import React from "react";
+import UserHistory from "../../pages/userDashboard/userHistory/UseHistory";
+ 
 const Modal = ({ isOpen, onClose, children }) => {
-  return (
-    <>
-      {isOpen && (
-        <div className="modal-overlay" onClick={onClose}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            {children}
-          </div>
+    if (!isOpen) return null;
+ 
+    return (
+        <div
+            onClick={onClose}
+            style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                background: "rgba(0, 0, 0, 0.5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+        >
+            <div
+                style={{
+                    background: "white",
+                    height:"50 vh",
+                    width: "60 vw",
+                    margin: "auto",
+                    padding: "2%",
+                    border: "2px solid #000",
+                    borderRadius: "10px",
+                    boxShadow: "2px solid black",
+                }}
+            >
+                <UserHistory/>
+            </div>
         </div>
-      )}
-    </>
-  );
+    );
 };
-
-const App = () => {
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  const openModal = () => {
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-  };
-
-  return (
-    <div>
-      <h1>Your App</h1>
-      <button onClick={openModal}>Open Modal</button>
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <h2>This is your modal content</h2>
-        <p>Any other content you want to display goes here.</p>
-        <button onClick={closeModal}>Close Modal</button>
-      </Modal>
-    </div>
-  );
-};
-
-export default App;
+ 
+export default Modal;

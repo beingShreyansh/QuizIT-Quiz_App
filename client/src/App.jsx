@@ -13,11 +13,8 @@ import {
   UserHistoryStats,
   QuizPlayground,
   EditQuiz,
- 
-  
 } from "./pages";
 import ProtectedRoute from './ProtectedRoute.jsx';
-
 
 function App() {
   const router = createBrowserRouter([
@@ -49,6 +46,11 @@ function App() {
       path: "/register",
       element: <Register />,
     },
+    
+    {
+      path: "/edit",
+      element:<EditQuiz/>,
+    },
     {
       path: "/admin",
       element: <ProtectedRoute adminOnly={true} />, // Wrap admin routes with ProtectedRoute and specify adminOnly prop
@@ -58,12 +60,6 @@ function App() {
         { path: "user-history", element: <AdminUserHistory /> }, // User History route
       ],
     },
-
-    {
-      path: "/edit",
-      element:<EditQuiz/>,
-    },
-    
   ]);
 
   return (
