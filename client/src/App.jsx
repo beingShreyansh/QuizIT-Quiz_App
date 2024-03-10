@@ -12,6 +12,7 @@ import {
   AdminUserHistory,
   UserHistoryStats,
   QuizPlayground,
+  EditQuiz,
 } from "./pages";
 import ProtectedRoute from './ProtectedRoute.jsx';
 
@@ -44,6 +45,11 @@ function App() {
     {
       path: "/register",
       element: <Register />,
+    },
+    
+    {
+      path: "/edit",
+      element:<EditQuiz/>,
     },
     {
       path: "/admin",

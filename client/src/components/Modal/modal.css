@@ -1,0 +1,111 @@
+/* modal.css */
+
+/* Modal container */
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal content */
+
+
+/* Modal title */
+.modal-title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: black; /* Text color */
+}
+
+/* Modal body */
+.modal-body {
+  color: black; 
+  max-height: 60vh; /* Adjust as needed */
+overflow-y: auto; /* Text color */
+}
+
+/* Modal list */
+.modal-list {
+  list-style: none;
+  padding: 0;
+}
+
+/* Modal list item */
+.modal-list-item {
+  margin-bottom: 10px;
+  color: black; /* Text color */
+}
+.modal-content {
+  border: none; 
+  text-align: center;
+ /* Remove outer border */
+  width: 80%; /* Adjust as needed */
+  max-width: 800px; /* Adjust as needed */
+  margin: 0 auto;
+  overflow: auto; /* Enable scrolling if content overflows */
+}
+
+
+.modal-table {
+border-collapse: collapse;
+width: 100%;
+}
+.modal-table th{
+background-color: #007bff;
+}
+.modal-table td{
+background-color: #252121;
+
+}
+
+.modal-table th, .modal-table td {
+border: 1px solid white;
+padding: 8px;
+text-align: center;
+
+color:white;
+}
+
+
+.modal-question {
+max-height: 40vh; /* Adjust as needed */
+overflow-y: auto; /* Enable vertical scrolling for the question content */
+}
+
+.close-button {
+background: none ;
+border: none;
+cursor: pointer;
+color: #eeebfd;
+background-color: #007bff;
+}
+
+
+.modal-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 20px;
+}
+
+
+
+@media only screen and (max-width: 768px) {
+/* Adjust font size for smaller devices */
+.modal-title {
+  font-size: 18px;
+}
+}
+
+@media only screen and (max-width: 480px) {
+/* Further adjust font size for even smaller devices */
+.modal-title {
+  font-size: 16px;
+}
+}
