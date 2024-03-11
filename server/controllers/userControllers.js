@@ -30,7 +30,7 @@ const getUserQuizHistory = async (req, res) => {
   try {
     const query = `
       SELECT q.quiz_name, uh.marks_obtained, 
-      DATE_FORMAT(uh.date_played, '%Y-%m-%d') as date_played, 
+      DATE_FORMAT(uh.date_played, '%d-%m-%Y') as date_played, 
       uh.num_of_questions_attempted, uh.total_time_taken_in_sec
       FROM quiz AS q, user_history AS uh
       WHERE q.quiz_id = uh.quiz_id AND uh.user_id = ?;

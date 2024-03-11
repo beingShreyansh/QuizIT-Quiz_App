@@ -1,20 +1,20 @@
 // UploadExcelController.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import "./UploadQuiz.css"; // Import CSS file for styling
 import Navbar from "../../../components/Navbar/Navbar";
-
+import Modal from "react-modal";
+import { useNavigate } from "react-router-dom";
 const UploadQuiz = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [quizName, setQuizName] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
-  };
-
-  const handleQuizNameChange = (event) => {
-    setQuizName(event.target.value);
   };
 
   const handleUpload = async () => {
@@ -23,15 +23,9 @@ const UploadQuiz = () => {
       return;
     }
 
-    if (!quizName) {
-      toast.error("Please enter a quiz name");
-      return;
-    }
-
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
-      formData.append("quizName", quizName); // Append quiz name to form data
 
       if (
         selectedFile.type ===
@@ -61,6 +55,24 @@ const UploadQuiz = () => {
       } else toast.error("File not submitted");
     }
   };
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/user/getCategories`
+        );
+        setCategories(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching quiz data:", error);
+        setError("Error fetching quiz data. Please try again later.");
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   return (
     <>
@@ -74,13 +86,7 @@ const UploadQuiz = () => {
             className="file-input"
             accept=".xlsx, .xls"
           />
-          <input
-            type="text"
-            placeholder="Enter quiz name"
-            value={quizName}
-            onChange={handleQuizNameChange}
-            className="quiz-name-input"
-          />
+
           <button
             onClick={handleUpload}
             className="upload-button"
@@ -92,6 +98,53 @@ const UploadQuiz = () => {
             <p className="file-selected">Selected File: {selectedFile.name}</p>
           )}
         </div>
+        <div className="show-quiz-name-button-container">
+          <button className="show-quiz-name-button" onClick={openModal}>
+            Show All Quiz Names
+          </button>
+          <button
+            className="show-quiz-name-button"
+            onClick={() => {
+              navigate("/edit");
+            }}
+          >
+            Edit Quizes
+          </button>
+        </div>
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={() => setIsModalOpen(false)}
+          contentLabel="All Quiz Names"
+          style={{
+            overlay: {
+              backgroundColor: "rgba(128, 128, 128, 0.4)",
+            },
+            content: {
+              backgroundColor: "lightgrey",
+              border: "1px solid #ccc",
+              outline: "none",
+              padding: "20px",
+              maxWidth: "600px",
+              margin: "auto",
+              color: "black",
+            },
+          }}
+        >
+          <h2>All Quiz Names</h2>
+          <div className="modal-categories">
+            {categories.map((category) => (
+              <div key={category.quiz_id} className="modal-category-name">
+                {category.quiz_name}
+              </div>
+            ))}
+          </div>
+          <button
+            className="close-button"
+            onClick={() => setIsModalOpen(false)}
+          >
+            Close
+          </button>
+        </Modal>
         <div className="instruction-box">
           <h2 className="instruction-heading">Instructions:</h2>
           <ul className="instruction-list">
