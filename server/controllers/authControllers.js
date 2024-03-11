@@ -3,13 +3,14 @@ const User = require("../models/User");
 const { signAccessToken } = require("./jwtController");
 const sendMail = require("../helpers/sendMail");
 const randomstring = require("randomstring");
+const { getObjectUrl } = require("../awsConfig");
+const { v4: uuidv4 } = require("uuid");
 
 // Memory storage for OTPs
 const otpMemory = {};
 
 const createUser = async (req, res) => {
-  const { name, email, password, role, isEmailVerified } = req.body;
-
+  const { name, email, password,  isEmailVerified } = req.body.formData;
   try {
     // Check if user with the same email already exists
     const existingUser = await User.findOneByEmail(email);
@@ -30,6 +31,7 @@ const createUser = async (req, res) => {
 
     // Save the user to the database
     const userId = await newUser.save();
+
 
     // Generate JWT access token
     const accessToken = await signAccessToken(userId);
@@ -220,6 +222,7 @@ const loginUser = async (req, res) => {
         userId: existingUser.id,
         role: existingUser.role,
         accessToken,
+        
       });
     } else {
       // Password does not match
@@ -248,6 +251,18 @@ const redirectToDashboard = (req, res) => {
   }
 };
 
+const getSignedObjectUrlToPut = async (req, res) => {
+  try {
+    const { fileName, contentType } = req.query;
+    const key = uuidv4();
+    const signedUrl = await getObjectUrl(key, contentType);
+    res.json({ signedUrl, imageId: key });
+  } catch (error) {
+    console.error("Error registering user:", error);
+    res.status(500).json({ error: "Failed to register user" });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -255,4 +270,5 @@ module.exports = {
   redirectToDashboard,
   handleSendOTP,
   handleVerifyOTP,
+  getSignedObjectUrlToPut,
 };
