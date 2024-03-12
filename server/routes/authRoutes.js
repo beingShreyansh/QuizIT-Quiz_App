@@ -9,7 +9,7 @@ const {
   logoutUser,
   handleSendOTP,
   handleVerifyOTP,
-  handleProfileImageUpload,
+  getSignedObjectUrlToPut
 } = require("../controllers/authControllers");
 
 const { verifyAccessToken } = require("../controllers/jwtController");
@@ -31,6 +31,7 @@ router.post(
   handleProfileImageUpload
 );
 router.get("/logout", logoutUser);
+router.get("/get-signed-url",getSignedObjectUrlToPut)
 router.get("/", verifyAccessToken, redirectToDashboard);
 
 module.exports = router;

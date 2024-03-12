@@ -17,6 +17,12 @@ const UserHome = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [numOfQues, setNumOfQues] = useState(10);
+  let qProfMap = new Map();
+  qProfMap.set('beg', 10);
+  qProfMap.set('imed', 80);
+  qProfMap.set('adv', 10);
+  const [quesProficiencyPerMap, setQuesProficiencyPer] = useState(qProfMap);
   const navigate = useNavigate();
 
   const handleInputChange = (event) => {
@@ -24,6 +30,35 @@ const UserHome = () => {
     setSearchTerm(value);
     setShowDropdown(true);
   };
+
+  const handleNumOfQuesInpt = (event) => {
+    const value = event.target.value;
+    setNumOfQues(value);
+  };
+
+  const handleBegProficInptChange = (event) => {
+    const value = event.target.value;
+    qProfMap.set('beg', value);
+    var imedVal = qProfMap.get('imed');
+    var advVal = qProfMap.get('adv');
+    setQuesProficiencyPer(qProfMap);
+    if ((value + imedVal + advVal) != 100)
+    {
+      toast.error("Sum of Percentage is not equal to 100");
+    } 
+  }
+
+  const handleImedProficInptChange = (event) => {
+    const value = event.target.value;
+    qProfMap.set('imed', value);
+    setQuesProficiencyPer(qProfMap);
+  }
+
+  const handleAdvProficInptChange = (event) => {
+    const value = event.target.value;
+    qProfMap.set('adv', value);
+    setQuesProficiencyPer(qProfMap);
+  }
 
   const handleCategorySelect = (category) => {
     setSearchTerm("");
@@ -38,11 +73,12 @@ const UserHome = () => {
 
   const handleStartQuiz = () => {
     if (selectedCategory.quiz_id) {
-      navigate(`/quiz/${selectedCategory.quiz_id}`);
+      navigate(`/quiz/${selectedCategory.quiz_id}/${numOfQues}/${qProfMap.get('beg')}/${qProfMap.get('imed')}/${qProfMap.get('adv')}`);
     } else {
       toast.error("Select a Category");
     }
   };
+  
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -61,6 +97,7 @@ const UserHome = () => {
     fetchCategories();
   }, []);
 
+  
   const filteredCategories = categories?.filter((category) =>
     category.quiz_name.toLowerCase().includes(searchTerm.toLowerCase().trim())
   );
@@ -99,6 +136,55 @@ const UserHome = () => {
                 )}
               </div>
             )}
+          </div>
+        </div>
+
+        <div className="no-ques-txtbox-div">
+            <p>Enter the number of questions to be played:</p>
+            <input
+              type="text"
+              placeholder="Enter number of questions to be played"
+              value={numOfQues}
+              onChange={handleNumOfQuesInpt}
+            />       
+        </div>
+
+        <div className="set-proficiency-level-div">
+          <p>Enter the percentage of questions to be played from different proficieny level:</p>
+          <div className="proficiency-lev-inpts-sec">
+            <div>
+              <label htmlFor="beg-inpt">Beginner</label>
+              <input 
+                className="proficiency-lev-inpts"
+                id="beg-inpt"
+                type="text"
+                placeholder="Enter beginner percentage"
+                value={quesProficiencyPerMap.get('beg')}
+                onChange={handleBegProficInptChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="imed-inpt">Intermediate</label>
+              <input 
+                className="proficiency-lev-inpts"
+                id="imed-inpt"
+                type="text"
+                placeholder="Enter intermediate percentage"
+                value={quesProficiencyPerMap.get('imed')}
+                onChange={handleImedProficInptChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="adv-inpt">Advanced</label>
+              <input 
+                className="proficiency-lev-inpts"
+                id="adv-inpt"
+                type="text"
+                placeholder="Enter advanced percentage"
+                value={quesProficiencyPerMap.get('adv')}
+                onChange={handleAdvProficInptChange}
+              />
+            </div>
           </div>
         </div>
 

@@ -7,8 +7,9 @@ dotenv.config({ path: "./.env" });
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const { authRouter, adminRouter, userRouter, quizRouter } = require("./routes");
+const { authRouter, adminRouter, userRouter, quizRouter,editRouter } = require("./routes");
 const { dbConnection } = require("./dbConfig");
+
 
 dbConnection()
 
@@ -26,6 +27,7 @@ app.use("/auth", authRouter);
 app.use("/admin", adminRouter);
 app.use("/user", userRouter);
 app.use("/quiz", quizRouter);
+app.use('/edit', editRouter);
 
 app.listen(PORT, () => {
   console.log(`Server started at http://localhost:${PORT}`);

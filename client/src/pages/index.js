@@ -10,3 +10,4 @@ export { default as Results } from './quiz/results/Results';
 export { default as UserHistoryStats } from './userDashboard/userHistory/UserHistoryStats';
 
 export { default as PageNotFound } from './pageNotFound/pageNotFound';
+export { default as EditQuiz } from './adminDashboard/EditQuiz/EditQuiz';

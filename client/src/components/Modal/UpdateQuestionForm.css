@@ -1,0 +1,76 @@
+/* UpdateQuestionForm.css */
+
+/* Modal container */
+.update-form-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+}
+
+/* Modal content */
+.update-form-content {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    color: #333; /* Text color */
+}
+
+/* Modal title */
+.update-form-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+/* Modal body */
+.update-form-body {
+    color: #333;
+}
+
+/* Form label */
+.update-form-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333; /* Text color */
+}
+
+/* Form input */
+.update-form-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Form submit button */
+.update-form-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Close button */
+.update-form-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 1.2rem;
+}

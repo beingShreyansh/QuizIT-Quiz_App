@@ -5,7 +5,8 @@ const {
 
 const router = require("express").Router();
 
-router.get("/getQuiz/:quizId", getQuizData);
+router.get("/getQuiz/:quizId/:totalQuestions/:beginnerRatio/:intermediateRatio/:advancedRatio", getQuizData);
+
 router.post("/get-results", submitQuizData);
 
 

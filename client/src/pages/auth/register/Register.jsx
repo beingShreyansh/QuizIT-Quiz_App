@@ -21,6 +21,7 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [showOTPInput, setShowOTPInput] = useState(false);
   const navigate = useNavigate();
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const validator = () => {
     const validPasswordString = passwordValidations.validatePassword(
@@ -123,7 +124,6 @@ function Register() {
           `${import.meta.env.VITE_API_URL}/auth/register`,
           formDataWithImage
         );
-
 
         if (response.status === 201) {
           toast.success("Registered Successfully!");

@@ -12,6 +12,7 @@ import {
   AdminUserHistory,
   UserHistoryStats,
   QuizPlayground,
+  EditQuiz,
 } from "./pages";
 import ProtectedRoute from './ProtectedRoute.jsx';
 
@@ -26,9 +27,9 @@ function App() {
       errorElement: <PageNotFound />,
     },
     {
-      path: "/quiz/:id",
-      element:<QuizPlayground/>,
-    },
+      path: "/quiz/:id/:totalQuestions/:beginnerRatio/:intermediateRatio/:advancedRatio",
+      element: <QuizPlayground />,
+    },      
     {
       path: "/quiz-result",
       element: <Results />,
@@ -44,6 +45,11 @@ function App() {
     {
       path: "/register",
       element: <Register />,
+    },
+    
+    {
+      path: "/edit",
+      element:<EditQuiz/>,
     },
     {
       path: "/admin",

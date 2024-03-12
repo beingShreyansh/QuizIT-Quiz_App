@@ -1,6 +1,6 @@
 const mysql = require("mysql2");
 const { v4: uuidv4 } = require("uuid");
-const bcrypt = require("bcrypt");
+const { getObjectUrl } = require("../awsConfig");
 
 const pool = mysql.createPool({
   host: process.env.DATABASE_HOST,
@@ -12,19 +12,20 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+
 class User {
   constructor({
     name,
     email,
     password,
-    role = "user",
-    profile_img_url = null,
+    role = "user",  
+    imageId = 'profile-default',
   }) {
     this.name = name;
     this.email = email;
-    this.password = password; // Consider hashing this using bcrypt
-    this.role = role;
-    this.profile_img_url = profile_img_url;
+    this.password = password;
+    this.role = role; // Default role is 'user'
+    this.imageId = imageId;
     this.pool = pool;
   }
 
@@ -40,21 +41,14 @@ class User {
             return;
           }
 
-          const query =
-            "INSERT INTO user (id, name, email, password, role, profile_img_url) VALUES (?, ?, ?, ?, ?, ?)";
+        const query =
+          "INSERT INTO user (id, name, email, password, role, imageId) VALUES (?, ?, ?, ?, ?,?)";
 
-          connection.query(
-            query,
-            [
-              uuidv4(),
-              this.name,
-              this.email,
-              this.password,
-              this.role,
-              this.profile_img_url,
-            ],
-            (error, results) => {
-              connection.release();
+        connection.query(
+          query,
+          [uuidv4(), this.name, this.email, this.password, this.role, this.imageId],
+          (error, results) => {
+            connection.release();
 
               if (error) {
                 reject(error);
