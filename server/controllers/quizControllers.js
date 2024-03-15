@@ -2,10 +2,11 @@ const { v4: uuidv4 } = require("uuid");
 const { db } = require("../dbConfig");
 
 const getQuizData = (req, res) => {
-  const { quizId } = req.params;
-  try {
-    const query = "SELECT * FROM quiz_question WHERE quiz_id = ?";
+  const { quizId, beginnerRatio, intermediateRatio, advancedRatio, totalQuestions  } = req.params;
 
+  try {
+    const query =
+      "SELECT * FROM quiz_question WHERE quiz_id = ? ORDER BY ques_proficiency_level";
     db.query(query, [quizId], (err, rows) => {
       if (err) {
         console.error("Error retrieving questions for quiz: ", err);
@@ -13,43 +14,21 @@ const getQuizData = (req, res) => {
         return;
       }
 
-      const quizData = rows.map((row) => {
-        return {
-          questionId: row.question_id,
-          questionContent: row.question_content,
-          options: [],
-          isMCQ: row.isMCQ === '0' // Set isMCQ to true if isMCQ is '0'
-        };
-      });
-      const optionsQuery =
-        "SELECT * FROM options WHERE quiz_id = ? AND question_id = ?";
+      const shuffledQuestions = shuffleQuestions(rows);
 
-      let completedRequests = 0;
+      const groupedQuestions = groupQuestionsByProficiency(shuffledQuestions);
 
-      quizData.forEach((quiz, index) => {
-        db.query(optionsQuery, [quizId, quiz.questionId], (err, optionRows) => {
-          if (err) {
-            console.error("Error retrieving options for quiz: ", err);
-            res
-              .status(500)
-              .json({ error: "Error retrieving options for quiz" });
-            return;
-          }
-          
-          // Filter out null options
-          quiz.options = optionRows
-            .filter(option => option.option_value !== null)
-            .map(option => option.option_value);
-
-          completedRequests++;
-
-          // Check if all options requests are completed
-          if (completedRequests === quizData.length) {
-            // Send response after filtering
-            res.json(quizData);
-          }
-        });
-      });
+      const selectedQuestions = selectQuestions(
+        groupedQuestions,
+        beginnerRatio,
+        intermediateRatio,
+        advancedRatio,
+        totalQuestions
+      );
+console.log(selectQuestions
+  
+  );
+      res.json(selectedQuestions);
     });
   } catch (error) {
     console.error("Error:", error);
@@ -57,6 +36,55 @@ const getQuizData = (req, res) => {
   }
 };
 
+
+const selectQuestions = (
+  groupedQuestions,
+  beginnerRatio,
+  intermediateRatio,
+  advancedRatio,
+  totalQuestions
+) => {
+  const selectedQuestions = [];
+  const ratiosSum = beginnerRatio + intermediateRatio + advancedRatio;
+  const advancedQuestions = Math.ceil(
+    (advancedRatio / ratiosSum) * totalQuestions
+  );
+  const intermediateQuestions = Math.ceil(
+    (intermediateRatio / ratiosSum) * totalQuestions
+  );
+  const beginnerQuestions =
+    totalQuestions - advancedQuestions - intermediateQuestions;
+
+  [beginnerQuestions, intermediateQuestions, advancedQuestions].forEach(
+    (numQuestions, proficiencyLevel) => {
+      const questionsForLevel = groupedQuestions[proficiencyLevel] || [];
+      selectedQuestions.push(...questionsForLevel.slice(0, numQuestions));
+    }
+  );
+
+  return selectedQuestions;
+};
+
+const shuffleQuestions = (questions) => {
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  return questions;
+};
+
+
+const groupQuestionsByProficiency = (questions) => {
+  const groupedQuestions = {};
+  questions.forEach((question) => {
+    const proficiencyLevel = question.ques_proficiency_level;
+    if (!groupedQuestions[proficiencyLevel]) {
+      groupedQuestions[proficiencyLevel] = [];
+    }
+    groupedQuestions[proficiencyLevel].push(question);
+  });
+  return groupedQuestions;
+};
 
 const submitQuizData = (req, res) => {
   const {
@@ -180,18 +208,22 @@ const submitQuizData = (req, res) => {
                     // Update the no_of_times_played counter for the quiz
                     const updateQuizCounterQuery =
                       "UPDATE quiz SET no_of_times_played = no_of_times_played + 1 WHERE quiz_id = ?";
-                    db.query(updateQuizCounterQuery, [quizId], (err, result) => {
-                      if (err) {
-                        console.error("Error updating quiz counter:", err);
-                        res
-                          .status(500)
-                          .json({ error: "Error updating quiz counter" });
-                        return;
-                      }
+                    db.query(
+                      updateQuizCounterQuery,
+                      [quizId],
+                      (err, result) => {
+                        if (err) {
+                          console.error("Error updating quiz counter:", err);
+                          res
+                            .status(500)
+                            .json({ error: "Error updating quiz counter" });
+                          return;
+                        }
 
-                      // Send the score as response
-                      res.json(percentage);
-                    });
+                        // Send the score as response
+                        res.json(percentage);
+                      }
+                    );
                   }
                 );
               }

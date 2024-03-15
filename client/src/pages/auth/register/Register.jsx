@@ -1,4 +1,3 @@
-// Register.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -21,6 +20,7 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [showOTPInput, setShowOTPInput] = useState(false);
   const navigate = useNavigate();
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const validator = () => {
     const validPasswordString = passwordValidations.validatePassword(
@@ -94,11 +94,9 @@ function Register() {
 
     try {
       setLoading(true);
-
       validator();
 
       if (formValidation) {
-        // Check if email is verified before registering
         if (!formData.isEmailVerified) {
           toast.error("Please verify your email address");
           return;
@@ -109,12 +107,8 @@ function Register() {
           formData
         );
 
-
         if (response.status === 201) {
-          // Show a success toast upon successful registration
           toast.success("Registered Successfully!");
-
-          // Redirect to the login page after successful registration
           navigate("/login");
         }
       }
@@ -123,7 +117,6 @@ function Register() {
 
       if (error.response) {
         console.error("Server responded with an error:", error.response.data);
-        // Show a user-friendly error message
         toast.error(error.response.data.error || "Registration failed");
       } else if (error.request) {
         console.error("No response received from the server");

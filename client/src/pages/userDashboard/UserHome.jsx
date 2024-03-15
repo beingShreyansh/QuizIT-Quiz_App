@@ -19,9 +19,9 @@ const UserHome = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [numOfQues, setNumOfQues] = useState(10);
   let qProfMap = new Map();
-  qProfMap.set('beg', 30);
-  qProfMap.set('imed', 50);
-  qProfMap.set('adv', 20);
+  qProfMap.set('beg', 10);
+  qProfMap.set('imed', 80);
+  qProfMap.set('adv', 10);
   const [quesProficiencyPerMap, setQuesProficiencyPer] = useState(qProfMap);
   const navigate = useNavigate();
 
@@ -78,6 +78,7 @@ const UserHome = () => {
       toast.error("Select a Category");
     }
   };
+  
 
   useEffect(() => {
     const fetchCategories = async () => {

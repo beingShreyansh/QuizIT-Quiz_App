@@ -9,6 +9,7 @@ const {
   logoutUser,
   handleSendOTP,
   handleVerifyOTP,
+  getSignedObjectUrlToPut
 } = require("../controllers/authControllers");
 
 const { verifyAccessToken } = require("../controllers/jwtController");
@@ -24,6 +25,7 @@ router.post("/register", createUser);
 router.post("/send-otp", handleSendOTP);
 router.post("/verify-otp", handleVerifyOTP);
 router.get("/logout", logoutUser);
+router.get("/get-signed-url",getSignedObjectUrlToPut)
 router.get("/", verifyAccessToken, redirectToDashboard);
 
 module.exports = router;
