@@ -39,6 +39,9 @@ export default function Navbar() {
               <NavLink to="/admin/user-history" className="navlink">
                 User Statistics
               </NavLink>
+              <NavLink to="/editQuiz" className="navlink"> {/* Add this NavLink */}
+    Edit Quiz
+  </NavLink>
               <NavLink to="/login" className="navlink">
                 <button className="btn" onClick={handleLogout}>
                   Logout  

@@ -48,7 +48,7 @@ function App() {
     },
     
     {
-      path: "/edit",
+      path: "/editQuiz",
       element:<EditQuiz/>,
     },
     {

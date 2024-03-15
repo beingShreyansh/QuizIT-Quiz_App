@@ -27,8 +27,8 @@ const Modal1 = ({ isOpen, onClose, children }) => {
         onClick={handleModalClick}
         style={{
           background: "white",
-          height: "50vh",
-          width: "60vw",
+          height: "90vh",
+          width: "90vw",
           margin: "auto",
           padding: "2%",
           border: "2px solid #000",
