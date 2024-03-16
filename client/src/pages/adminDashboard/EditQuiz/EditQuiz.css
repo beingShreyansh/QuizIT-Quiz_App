@@ -7,16 +7,23 @@
     border-collapse: collapse;
 }
 
-.edit-quiz-table th, .edit-quiz-table td {
+.edit-quiz-table th,
+.edit-quiz-table td {
     border: 1px solid #ddd;
     padding: 8px;
-    text-align: left;
+    text-align: center; /* Center align table data */
 }
 
 .edit-quiz-table th {
     background-color: #007bff;
 }
 
-.edit-quiz-table tr:hover {
-    background-color: #ddd;
+
+
+/* Style for icons in table */
+.edit-quiz-table td .icon {
+    cursor: pointer;
+    
 }
+
+/* Align edit icon to the left */

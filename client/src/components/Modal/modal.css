@@ -13,6 +13,7 @@
   justify-content: center;
 }
 
+
 /* Modal content */
 
 
@@ -26,8 +27,18 @@
 /* Modal body */
 .modal-body {
   color: black; 
-  max-height: 60vh; /* Adjust as needed */
+  max-height: calc(100% - 60px); /* Adjust as needed */
 overflow-y: auto; /* Text color */
+border: none;
+  text-align: center;
+  width: 100%;
+  max-width: 90vw;
+  max-height: 80vh;
+  margin: auto;
+
+
+
+
 }
 
 /* Modal list */
@@ -41,30 +52,21 @@ overflow-y: auto; /* Text color */
   margin-bottom: 10px;
   color: black; /* Text color */
 }
-.modal-content {
-  border: none; 
-  text-align: center;
- /* Remove outer border */
-  width: 80%; /* Adjust as needed */
-  max-width: 800px; /* Adjust as needed */
-  margin: 0 auto;
-  overflow: auto; /* Enable scrolling if content overflows */
-}
 
 
-.modal-table {
-border-collapse: collapse;
-width: 100%;
+table.modal-table {
+  border-collapse: collapse;
+  width: 100%;
 }
-.modal-table th{
+table.modal-table th{
 background-color: #007bff;
 }
-.modal-table td{
+table.modal-table td{
 background-color: #252121;
 
 }
 
-.modal-table th, .modal-table td {
+table.modal-table th, table.modal-table td {
 border: 1px solid white;
 padding: 8px;
 text-align: center;
@@ -74,7 +76,8 @@ color:white;
 
 
 .modal-question {
-max-height: 40vh; /* Adjust as needed */
+max-height: 40vh; 
+ 
 overflow-y: auto; /* Enable vertical scrolling for the question content */
 }
 
