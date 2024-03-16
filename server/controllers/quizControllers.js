@@ -1,13 +1,18 @@
 const { v4: uuidv4 } = require("uuid");
 const { db } = require("../dbConfig");
+const { getObjectUrl } = require("../awsConfig");
 
-const getQuizData = (req, res) => {
-  const { quizId, beginnerRatio, intermediateRatio, advancedRatio, totalQuestions  } = req.params;
+const getQuizData = async (req, res) => {
+  const { quizId } = req.params;
+  const totalQuestions = parseInt(req.params.totalQuestions);
+  const beginnerRatio = parseInt(req.params.beginnerRatio);
+  const intermediateRatio = parseInt(req.params.intermediateRatio);
+  const advancedRatio = parseInt(req.params.advancedRatio);
 
   try {
     const query =
       "SELECT * FROM quiz_question WHERE quiz_id = ? ORDER BY ques_proficiency_level";
-    db.query(query, [quizId], (err, rows) => {
+    db.query(query, [quizId], async (err, rows) => {
       if (err) {
         console.error("Error retrieving questions for quiz: ", err);
         res.status(500).json({ error: "Error retrieving questions for quiz" });
@@ -25,17 +30,64 @@ const getQuizData = (req, res) => {
         advancedRatio,
         totalQuestions
       );
-console.log(selectQuestions
-  
-  );
-      res.json(selectedQuestions);
+      console.log("Selected questions:", selectedQuestions);
+      const quizData = await Promise.all(selectedQuestions.map(async (row) => {
+        if (row.imageId !== null) {
+          const imageUrl = await getObjectUrl(`.uploads/questions/${row.imageId}.jpg`);
+          console.log("imageUrl", row.imageId)
+          return {
+            questionId: row.question_id,
+            questionContent: row.question_content,
+            options: [],
+            isMCQ: row.isMCQ === 1,
+            imageUrl: imageUrl
+          };
+        } else {
+          return {
+            questionId: row.question_id,
+            questionContent: row.question_content,
+            options: [],
+            isMCQ: row.isMCQ === 1
+          };
+        }
+      }));
+
+      const optionsQuery =
+        "SELECT * FROM options WHERE quiz_id = ? AND question_id = ?";
+
+      let completedRequests = 0;
+
+      quizData.forEach((quiz, index) => {
+        db.query(optionsQuery, [quizId, quiz.questionId], (err, optionRows) => {
+          if (err) {
+            console.error("Error retrieving options for quiz: ", err);
+            res
+              .status(500)
+              .json({ error: "Error retrieving options for quiz" });
+            return;
+          }
+
+          quiz.options = optionRows.map((option) => option.option_value);
+
+          completedRequests++;
+
+          // Check if all options requests are completed
+          if (completedRequests === quizData.length) {
+            // Filter quizData to include only questions with more than one option
+            const filteredQuizData = quizData.filter(
+              (quiz) => quiz.options.length > 1
+            );
+            // Send response after filtering
+            res.json(filteredQuizData);
+          }
+        });
+      });
     });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 const selectQuestions = (
   groupedQuestions,
@@ -46,21 +98,38 @@ const selectQuestions = (
 ) => {
   const selectedQuestions = [];
   const ratiosSum = beginnerRatio + intermediateRatio + advancedRatio;
-  const advancedQuestions = Math.ceil(
-    (advancedRatio / ratiosSum) * totalQuestions
+
+  const numBeginnerQuestions = Math.floor(
+    (beginnerRatio / ratiosSum) * totalQuestions
   );
-  const intermediateQuestions = Math.ceil(
+  const numIntermediateQuestions = Math.floor(
     (intermediateRatio / ratiosSum) * totalQuestions
   );
-  const beginnerQuestions =
-    totalQuestions - advancedQuestions - intermediateQuestions;
-
-  [beginnerQuestions, intermediateQuestions, advancedQuestions].forEach(
-    (numQuestions, proficiencyLevel) => {
-      const questionsForLevel = groupedQuestions[proficiencyLevel] || [];
-      selectedQuestions.push(...questionsForLevel.slice(0, numQuestions));
-    }
+  const numAdvancedQuestions = Math.floor(
+    (advancedRatio / ratiosSum) * totalQuestions
   );
+
+  console.log("Num beginner questions:", numBeginnerQuestions);
+  console.log("Num intermediate questions:", numIntermediateQuestions);
+  console.log("Num advanced questions:", numAdvancedQuestions);
+
+  if (groupedQuestions[0]) {
+    selectedQuestions.push(
+      ...groupedQuestions[0].slice(0, numBeginnerQuestions)
+    );
+  }
+  if (groupedQuestions[1]) {
+    selectedQuestions.push(
+      ...groupedQuestions[1].slice(0, numIntermediateQuestions)
+    );
+  }
+  if (groupedQuestions[2]) {
+    selectedQuestions.push(
+      ...groupedQuestions[2].slice(0, numAdvancedQuestions)
+    );
+  }
+
+  console.log("Selected questions:", selectedQuestions);
 
   return selectedQuestions;
 };
@@ -72,7 +141,6 @@ const shuffleQuestions = (questions) => {
   }
   return questions;
 };
-
 
 const groupQuestionsByProficiency = (questions) => {
   const groupedQuestions = {};

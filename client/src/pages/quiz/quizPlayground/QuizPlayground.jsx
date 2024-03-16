@@ -274,7 +274,8 @@ function QuizPlayground() {
               {quizData.length > 0 && (
                 <QuizCard
                 questionNo={questionIndex + 1}
-                question={quizData[questionIndex]?.question_content} // Pass the question_content property
+                questionImageUrl={quizData[questionIndex]?.imageUrl}
+                question={quizData[questionIndex]?.questionContent} // Pass the question_content property
                 options={quizData[questionIndex]?.options}
                 isMCQ={quizData[questionIndex]?.isMCQ}
                 selectedOption={answers[quizData[questionIndex]?.question_id]}

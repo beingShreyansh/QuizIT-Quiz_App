@@ -6,11 +6,14 @@ import "./UploadQuiz.css"; // Import CSS file for styling
 import Navbar from "../../../components/Navbar/Navbar";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../../../components/spinner/Spinner";
+
 const UploadQuiz = () => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [quizName, setQuizName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
 
   const handleFileChange = (event) => {
@@ -24,6 +27,7 @@ const UploadQuiz = () => {
     }
 
     try {
+      setIsUploading(true);
       const formData = new FormData();
       formData.append("file", selectedFile);
 
@@ -43,6 +47,7 @@ const UploadQuiz = () => {
         if (response.status === 410) {
           toast.error("File Name Already Exists");
         } else {
+          setIsUploading(false);
           toast.success("File uploaded successfully.");
         }
       } else {
@@ -65,7 +70,7 @@ const UploadQuiz = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching quiz data:", error);
-        setError("Error fetching quiz data. Please try again later.");
+        toast.error("Error fetching quiz data. Please try again later.");
         setLoading(false);
       }
     };
@@ -75,86 +80,87 @@ const UploadQuiz = () => {
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <>
-      <Navbar />
-      <div className="upload-container">
-        <div className="upload-box">
-          <h1 className="upload-heading">Upload Excel File</h1>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            className="file-input"
-            accept=".xlsx, .xls"
-          />
+ 
+      <>
+        <Navbar />
+        {isUploading && <Spinner />}
+        <div className="upload-container">
+          <div className="upload-box">
+            <h1 className="upload-heading">Upload Excel File</h1>
+            <input
+              type="file"
+              onChange={handleFileChange}
+              className="file-input"
+              accept=".xlsx, .xls"
+            />
 
-          <button
-            onClick={handleUpload}
-            className="upload-button"
-            disabled={!selectedFile || !quizName}
-          >
-            Upload
-          </button>
-          {selectedFile && (
-            <p className="file-selected">Selected File: {selectedFile.name}</p>
-          )}
-        </div>
-        <div className="show-quiz-name-button-container">
-          <button className="show-quiz-name-button" onClick={openModal}>
-            Show All Quiz Names
-          </button>
-          <button
-            className="show-quiz-name-button"
-            onClick={() => {
-              navigate("/edit");
+            <button onClick={handleUpload} className="upload-button">
+              Upload
+            </button>
+            {selectedFile && (
+              <p className="file-selected">
+                Selected File: {selectedFile.name}
+              </p>
+            )}
+          </div>
+          <div className="show-quiz-name-button-container">
+            <button className="show-quiz-name-button" onClick={openModal}>
+              Show All Quiz Names
+            </button>
+            <button
+              className="show-quiz-name-button"
+              onClick={() => {
+                navigate("/editQuiz");
+              }}
+            >
+              Edit Quizes
+            </button>
+          </div>
+          <Modal
+            isOpen={isModalOpen}
+            onRequestClose={() => setIsModalOpen(false)}
+            contentLabel="All Quiz Names"
+            style={{
+              overlay: {
+                backgroundColor: "rgba(128, 128, 128, 0.4)",
+              },
+              content: {
+                backgroundColor: "lightgrey",
+                border: "1px solid #ccc",
+                outline: "none",
+                padding: "20px",
+                maxWidth: "600px",
+                margin: "auto",
+                color: "black",
+              },
             }}
           >
-            Edit Quizes
-          </button>
-        </div>
-        <Modal
-          isOpen={isModalOpen}
-          onRequestClose={() => setIsModalOpen(false)}
-          contentLabel="All Quiz Names"
-          style={{
-            overlay: {
-              backgroundColor: "rgba(128, 128, 128, 0.4)",
-            },
-            content: {
-              backgroundColor: "lightgrey",
-              border: "1px solid #ccc",
-              outline: "none",
-              padding: "20px",
-              maxWidth: "600px",
-              margin: "auto",
-              color: "black",
-            },
-          }}
-        >
-          <h2>All Quiz Names</h2>
-          <div className="modal-categories">
-            {categories.map((category) => (
-              <div key={category.quiz_id} className="modal-category-name">
-                {category.quiz_name}
-              </div>
-            ))}
+            <h2>All Quiz Names</h2>
+            <div className="modal-categories">
+              {categories.map((category) => (
+                <div key={category.quiz_id} className="modal-category-name">
+                  {category.quiz_name}
+                </div>
+              ))}
+            </div>
+            <button
+              className="close-button"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Close
+            </button>
+          </Modal>
+          <div className="instruction-box">
+            <h2 className="instruction-heading">Instructions:</h2>
+            <ul className="instruction-list">
+              <li>File should be Excel Sheet (.xlsx or .xls).</li>
+              <li>Only one sheet can be uploaded at a time.</li>
+              <li>Additional rules or instructions can be added here.</li>
+            </ul>
           </div>
-          <button
-            className="close-button"
-            onClick={() => setIsModalOpen(false)}
-          >
-            Close
-          </button>
-        </Modal>
-        <div className="instruction-box">
-          <h2 className="instruction-heading">Instructions:</h2>
-          <ul className="instruction-list">
-            <li>File should be Excel Sheet (.xlsx or .xls).</li>
-            <li>Only one sheet can be uploaded at a time.</li>
-            <li>Additional rules or instructions can be added here.</li>
-          </ul>
         </div>
-      </div>
-    </>
+      </>
+  
   );
 };
 
