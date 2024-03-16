@@ -10,6 +10,7 @@ const QuizCard = ({
   isMCQ,
   selectedOption,
   handleSelectedOption,
+  questionImageUrl
 }) => {
   const handleOptionChange = (e) => {
     const value = e.target.value;
@@ -31,6 +32,7 @@ const QuizCard = ({
         <h2>
           {questionNo}.{question}
         </h2>
+        {questionImageUrl && <img className='question-image' src = {questionImageUrl} alt='Question Image'/>}
       </div>
       <div className="options-box">
         <Form.Group>

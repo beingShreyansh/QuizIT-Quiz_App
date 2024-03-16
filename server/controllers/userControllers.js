@@ -56,8 +56,40 @@ const getUserQuizHistory = async (req, res) => {
   }
 };
 const getUserDetails = async (req, res) => {
+  const userId = req.params.id;
   try {
-    const userId = req.params.id;
-    const user = await User.findById(userId);
+    const query = `
+      SELECT name, email, imageId
+      FROM user
+      WHERE id = ?;
+    `;
+
+    db.query(query, [userId], (err, rows) => {
+      if (err) {
+        console.error("Error fetching user details: ", err);
+        res.status(500).json({
+          error: "An error occurred while fetching user details.",
+        });
+        return;
+      }
+      if (rows.length === 0) {
+        res.status(404).json({
+          error: "User not found.",
+        });
+        return;
+      }
+
+      const userDetails = JSON.parse(JSON.stringify(rows[0]));
+      res.json(userDetails);
+    });
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    res.status(500).json({
+      error: "An error occurred while fetching user details.",
+    });
+  }
+};
+
+
 
 module.exports = { getUserQuizHistory, getCategories,getUserDetails };

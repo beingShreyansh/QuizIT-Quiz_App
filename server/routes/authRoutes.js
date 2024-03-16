@@ -9,7 +9,9 @@ const {
   logoutUser,
   handleSendOTP,
   handleVerifyOTP,
-  getSignedObjectUrlToPut
+  getSignedObjectUrlToPut,
+  changePassword,
+  uploadImageId, // Import the changePassword function
 } = require("../controllers/authControllers");
 
 const { verifyAccessToken } = require("../controllers/jwtController");
@@ -25,13 +27,10 @@ router.post("/login", loginUser);
 router.post("/register", upload.single("profileImage"), createUser);
 router.post("/send-otp", handleSendOTP);
 router.post("/verify-otp", handleVerifyOTP);
-router.post(
-  "/upload-profile-image",
-  upload.single("profileImage"),
-  handleProfileImageUpload
-);
+router.post("/change-password", changePassword); // Add the route for changing password
 router.get("/logout", logoutUser);
-router.get("/get-signed-url",getSignedObjectUrlToPut)
+router.get("/get-signed-url", getSignedObjectUrlToPut);
+router.put("/putImageId/:imageId",uploadImageId);
 router.get("/", verifyAccessToken, redirectToDashboard);
 
 module.exports = router;

@@ -138,7 +138,11 @@ const UserHome = () => {
             )}
           </div>
         </div>
-
+        <div className="show-quiz-name-button-container">
+        <button className="show-quiz-name-button" onClick={openModal}>
+          Show All Quiz Names
+        </button>
+      </div>
         <div className="no-ques-txtbox-div">
             <p>Enter the number of questions to be played:</p>
             <input
@@ -192,11 +196,7 @@ const UserHome = () => {
           Start Quiz
         </button>
       </div>
-      <div className="show-quiz-name-button-container">
-        <button className="show-quiz-name-button" onClick={openModal}>
-          Show All Quiz Names
-        </button>
-      </div>
+      
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}

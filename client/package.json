@@ -11,6 +11,12 @@
     "remote": "vite --host"
   },
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+<<<<<<< Updated upstream
+=======
+    "avatar": "^0.1.0",
+>>>>>>> Stashed changes
     "axios": "^1.6.7",
     "dotenv": "^16.4.4",
     "react": "^18.2.0",

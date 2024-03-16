@@ -11,6 +11,8 @@ const region = process.env.region;
 const accessKeyId = process.env.accessKeyId;
 const secretAccessKey = process.env.secretAccessKey;
 const bucketName = process.env.bucketName;
+const { URL } = require('url');
+
 
 const s3Client = new S3Client({
   region: region,
@@ -47,6 +49,10 @@ const putObject = async (fileName, contentType) => {
 
 const uploadImageToS3 = async (imageUrl, fileName) => {
   try {
+    // If imageUrl is a relative URL, convert it into an absolute URL
+    const absoluteUrl = new URL(imageUrl, 'http://google.com'); // Provide a base URL (you can use any valid URL)
+    imageUrl = absoluteUrl.toString();
+
     // Generate a pre-signed URL for uploading
     const command = new PutObjectCommand({
       Bucket: bucketName,
@@ -87,9 +93,15 @@ const uploadImageToS3 = async (imageUrl, fileName) => {
     throw error;
   }
 };
-
 const init = async () => {
-  console.log("Url for Uploading: ", await getObjectUrl(".uploads/users/profile-default"));
+<<<<<<< Updated upstream
+  console.log("Url for Uploading: ", await getObjectUrl(".uploads/questions/38519b91-9f1b-46bf-9856-2d598e2c4375.jpg"));
+=======
+  console.log(
+    "Url for Uploading: ",
+    await putObject(".uploads/users/demo", "image/jpeg")
+  );
+>>>>>>> Stashed changes
   // console.log(
   //   "Url to get: ",
   //   await getObjectUrl(".uploads/user/default-profile")

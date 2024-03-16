@@ -4,10 +4,10 @@ const User = require('../models/User'); // Adjust the path based on your project
 const {
   getUserQuizHistory,
   getCategories,
-  getUserDetails,
+  getUserDetails
 } = require("../controllers/userControllers");
 
 router.post("/getHistory/:id", getUserQuizHistory);
 router.get("/getCategories", getCategories);
-router.get("/getUserDetails/:id", getUserDetails); 
+router.get("/getUserDetails/:id",getUserDetails);
 module.exports = router;

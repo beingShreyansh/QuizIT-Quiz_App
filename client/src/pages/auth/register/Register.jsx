@@ -12,7 +12,6 @@ function Register() {
     password: "",
     otp: "",
     isEmailVerified: false,
-    profilePhoto: null,
   });
 
   const [passwordValidationResult, setPasswordValidationResult] = useState("");
@@ -47,6 +46,8 @@ function Register() {
     }));
   };
 
+<<<<<<< Updated upstream
+<<<<<<< HEAD
   const handleFileChange = (e) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -54,16 +55,45 @@ function Register() {
     }));
   };
 
+=======
+  const handlePut = async () => {
+    try {
+
+      const signedUrlResponse ="  https://quiz-it-app-bucket.s3.us-east-1.amazonaws.com/.uploads/users/sample-img?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAQ5E2ZJW7ZX4DKK4Z%2F20240311%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240311T142238Z&X-Amz-Expires=900&X-Amz-Signature=16f40f72c2c3bc3f229fa70bade9169ab8db8918b0312f673599f14ad9c5a537&X-Amz-SignedHeaders=host&x-id=PutObject"
+
+      // Upload the selected image to the signed URL
+      await axios.put(signedUrlResponse, selectedImage, {
+        headers: {
+          "Content-Type": "image/jpeg", // Adjust the content type as per your requirements
+        },
+      });
+
+      toast.success("Image uploaded successfully");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+
+    }
+  };
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedImage(file);
+  };
+
+
+>>>>>>> 665a1008527f203310f0e05392a4e4d64ddad12b
+=======
+>>>>>>> Stashed changes
   const handleSendOTP = async () => {
     try {
       setLoading(true);
 
+      // Send request to server to send OTP to the provided email
       await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
         email: formData.email,
       });
 
       toast.success("OTP sent successfully");
-      setShowOTPInput(true);
+      setShowOTPInput(true); // Show OTP input after sending OTP
     } catch (error) {
       console.error("Error sending OTP:", error);
       toast.error("Failed to send OTP");
@@ -76,6 +106,7 @@ function Register() {
     try {
       setLoading(true);
 
+      // Send request to server to verify the provided OTP
       await axios.post(`${import.meta.env.VITE_API_URL}/auth/verify-otp`, {
         email: formData.email,
         otp: formData.otp,
@@ -86,7 +117,8 @@ function Register() {
         ...prevData,
         isEmailVerified: true,
       }));
-      setFormValidation(true);
+      setFormValidation(true); // Enable registration after successful OTP verification
+      setShowOTPInput(false); // Hide OTP input after successful verification
     } catch (error) {
       console.error("Error verifying OTP:", error);
       toast.error("Invalid not Verified");
@@ -108,21 +140,9 @@ function Register() {
           return;
         }
 
-        const formDataWithImage = new FormData();
-        formDataWithImage.append("name", formData.name);
-        formDataWithImage.append("email", formData.email);
-        formDataWithImage.append("password", formData.password);
-        formDataWithImage.append("otp", formData.otp);
-        formDataWithImage.append("isEmailVerified", formData.isEmailVerified);
-
-        // Append the profilePhoto only if it exists
-        if (formData.profilePhoto) {
-          formDataWithImage.append("profileImage", formData.profilePhoto);
-        }
-
         const response = await axios.post(
           `${import.meta.env.VITE_API_URL}/auth/register`,
-          formDataWithImage
+          formData
         );
 
         if (response.status === 201) {
@@ -154,7 +174,6 @@ function Register() {
         <div className="wrap-login100">
           <div className="login100-form">
             <span className="login100-form-title p-b-26">Welcome</span>
-
             <div className="wrap-input validate-input">
               <input
                 className="input100"
@@ -176,13 +195,14 @@ function Register() {
                 onChange={(e) => {
                   handleChange(e);
                   setEmailValidationResult("");
-                  setShowOTPInput(false);
+                  setShowOTPInput(false); // Hide OTP input when email changes
                 }}
               />
               {emailValidationResult && (
                 <font color="#FF4B4B">{emailValidationResult}</font>
               )}
 
+              {/* Add OTP input and buttons */}
               {showOTPInput && (
                 <div>
                   <input
@@ -204,7 +224,9 @@ function Register() {
               )}
 
               {formValidation ? (
-                <>{/* Rendered when OTP is verified */}</>
+                <div className="success-message">
+                  <p>OTP successfully verified!</p>
+                </div>
               ) : (
                 <>
                   <button
@@ -231,17 +253,8 @@ function Register() {
                 onChange={(e) => {
                   handleChange(e);
                   setPasswordValidationResult("");
-                  validator();
+                  validator(); // Call validator on password change
                 }}
-              />
-            </div>
-
-            <div className="wrap-input validate-input">
-              <input
-                type="file"
-                name="profilePhoto"
-                accept="image/*"
-                onChange={handleFileChange}
               />
             </div>
 
@@ -254,13 +267,18 @@ function Register() {
                 {loading ? "Registering..." : "Register"}
               </button>
             </div>
-
             <div className="text-center p-t-115">
               <span className="txt1">Already have an account? </span>{" "}
               <Link to="/login" className="txt2">
                 Login
               </Link>
             </div>
+            <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            <button onClick={handlePut}>CLick me</button>
           </div>
         </div>
       </div>
