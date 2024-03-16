@@ -16,7 +16,7 @@ const addQuiz = async (req, res) => {
 
     await uploadQuizDataToDB(quizData);
 
-    res.send("Quiz data uploaded successfully.");
+    res.status(201).send("Quiz data uploaded successfully.");
   } catch (error) {
     console.error("Error uploading quiz data:", error);
     res.status(500).send("An error occurred while uploading quiz data.");
@@ -66,7 +66,6 @@ const uploadQuizDataToDB = async (quizData) => {
       "MCQ/Scenario",
       "ProficiencyLevel(Intermediate/Advanced)",
       "IsMultipleRightChoice",
-      "ImageUrl", // Add 'ImageUrl' to expected fields
     ];
     const missingFields = expectedFields.filter(
       (field) => !Object.keys(quizData[0]).includes(field)
@@ -87,6 +86,7 @@ const uploadQuizDataToDB = async (quizData) => {
       quizCounts[quizName] = (quizCounts[quizName] || 0) + 1;
     }
 
+    // Process each quiz separately
     // Process each quiz separately
     for (const quizName of Object.keys(quizCounts)) {
       let quizId;
@@ -126,7 +126,7 @@ const uploadQuizDataToDB = async (quizData) => {
             .toString()
             .split(",")
             .map((choice) => choice.trim().match(/\d+/)[0]), // Extract only the numeric part
-          quesType: data["MCQ/Scenario"] === "MCQ" ? 0 : 1,
+          quesType: data["MCQ/Scenario"] === "MCQ" ? 1 : 0,
           quesProficiencyLevel:
             data["ProficiencyLevel(Intermediate/Advanced)"] === "Intermediate"
               ? 1
@@ -147,13 +147,13 @@ const uploadQuizDataToDB = async (quizData) => {
       // Insert questions and options for the current quiz
       for (const question of questions) {
         const questionId = uuidv4();
-        console.log("Question diagram URL:", question.questionDiagramURL);
+        let imageId = null; // Initialize imageId to null
 
-        // Upload image to S3 and get the signed URL
-        const imageId = await uploadImageToS3(
-          question.questionDiagramURL,
-          `${questionId}.jpg`
-        );
+        if (question.questionDiagramURL) {
+          // If questionDiagramURL is not empty, upload image to S3 and get the signed URL
+          imageId = uuidv4();
+          await uploadImageToS3(question.questionDiagramURL, `${imageId}.jpg`);
+        }
 
         const questionInsertQuery =
           "INSERT INTO quiz_question (question_id, quiz_id, question_content, imageId, ques_proficiency_level, ques_type, isMCQ) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -161,7 +161,7 @@ const uploadQuizDataToDB = async (quizData) => {
           questionId,
           quizId,
           question.content,
-          imageId, // Set 'imageId' to 'ques_diagram_url'
+          imageId, // Use imageId here
           question.quesProficiencyLevel,
           question.quesType,
           question.isMCQ,
@@ -171,7 +171,7 @@ const uploadQuizDataToDB = async (quizData) => {
           const optionValue = question.options[i];
           const isCorrect = question.correctAnswers.includes(`${i + 1}`)
             ? "1"
-            : "0"; 
+            : "0";
 
           const optionInsertQuery =
             "INSERT INTO options (option_id, quiz_id, question_id, option_value, correct_01) VALUES (?, ?, ?, ?, ?)";
@@ -185,15 +185,17 @@ const uploadQuizDataToDB = async (quizData) => {
         }
       }
     }
+  
   } catch (error) {
     console.error("Error uploading quiz data to DB:", error);
     throw new Error("Error uploading quiz data to DB: " + error.message);
   }
 };
+
 const executeQuery = async (query, params) => {
   try {
-    const result = await db.query(query, params);
-    return result;
+    const result = await db.promise().query(query, params); // Use db.promise().query() for promise-based execution
+    return result[0]; // Assuming you want to return only the rows
   } catch (error) {
     throw new Error("Error executing SQL query: " + error.message);
   }

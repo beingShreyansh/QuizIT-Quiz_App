@@ -32,7 +32,7 @@ CREATE TABLE quiz
     0 --> general
     1 --> scenario
 
-  ISmcaq field:
+  ISmcq field:
     0 --> False
     1 --> True
 */
