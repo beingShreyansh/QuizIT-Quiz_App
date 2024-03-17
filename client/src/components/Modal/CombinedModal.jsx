@@ -1,12 +1,11 @@
-// CombinedModal.jsx
-
 import React, { useState, useRef } from "react";
 import Modal1 from "./Modal1";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./modal.css"; // Import the CSS file
-import UpdateQuestionForm from "./UpdateQuetionForm"; // Import the UpdateQuestionForm component
+import UpdateQuestionForm from "./UpdateQuetionForm";// Import the UpdateQuestionForm component
 import axios from "axios";
+
 function CombinedModal({
   isOpen,
   onClose,
@@ -19,6 +18,7 @@ function CombinedModal({
   const [updateFormOpen, setUpdateFormOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null); // New state to store selected question data
   const modalContentRef = useRef(null);
+
   const openUpdateForm = (questionId) => {
     setSelectedQuestionId(questionId);
     const question = selectedQuiz.find((q) => q.question_id === questionId); // Find the selected question data
@@ -27,9 +27,8 @@ function CombinedModal({
   };
 
   const deleteQuestion = async (questionId) => {
-    //console.log('error in deletion function');
     const confirmDelete = window.confirm(
-      `Are you sure you want to delete the question with ID '${questionId}'?`
+      `Are you sure you want to delete the question`
     );
 
     if (confirmDelete) {
@@ -43,14 +42,15 @@ function CombinedModal({
 
         onClose();
       } catch (error) {
-        console.error("Error deleting question and Options :", error);
-        alert(`Error deleting question  and Options`);
+        console.error("Error deleting question:", error);
+        alert(`Error deleting question`);
       }
     } else {
       // If the user cancels deletion
       alert("Deletion canceled.");
     }
   };
+
   const handleMouseDown = (e) => {
     if (modalContentRef.current && modalContentRef.current.contains(e.target)) {
       // Clicked inside the modal content, do nothing
@@ -79,13 +79,13 @@ function CombinedModal({
           <table className="modal-table">
             <thead>
               <tr>
-                <th>question_content</th>
-
-                <th>option_1</th>
-                <th>option_2</th>
-                <th>option_3</th>
-                <th>option_4</th>
-                <th>option_5</th>
+                <th>Question Content</th>
+                <th>Option A</th>
+                <th>Option B</th>
+                <th>Option C</th>
+                <th>Option D</th>
+                <th>Option E</th>
+                <th>Image URL</th> {/* Added Image URL column */}
                 <th>Actions</th>
               </tr>
             </thead>
@@ -98,6 +98,7 @@ function CombinedModal({
                   <td>{question.option_3 || "-"}</td>
                   <td>{question.option_4 || "-"}</td>
                   <td>{question.option_5 || "-"}</td>
+                  <td>{question.imageId || "-"}</td> {/* Display Image URL */}
                   <td>
                     <FontAwesomeIcon
                       icon={faEdit}
@@ -108,8 +109,6 @@ function CombinedModal({
                       icon={faTrash}
                       onClick={() => deleteQuestion(question.question_id)}
                     />
-
-                    {/* Delete button */}
                   </td>
                 </tr>
               ))}

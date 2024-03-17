@@ -4,6 +4,7 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import "./UpdateQuestionForm.css"; // Import the CSS file
 import axios from "axios";
 
+
 function UpdateQuestionForm({
   isOpen,
   onClose,
@@ -12,16 +13,18 @@ function UpdateQuestionForm({
   initialData,
   quizId,
 }) {
+
+  
+
   // Define state variables for form fields and options
   const [questionContent, setQuestionContent] = useState("");
-  //const [diagramUrl, setDiagramUrl] = useState('');
   const [proficiencyLevel, setProficiencyLevel] = useState("");
   const [questionType, setQuestionType] = useState("");
-  const [option_1, setOption_1] = useState("");
-  const [option_2, setOption_2] = useState("");
-  const [option_3, setOption_3] = useState("");
-  const [option_4, setOption_4] = useState("");
-  const [option_5, setOption_5] = useState("");
+  const [OptionA, setOptionA] = useState("");
+  const [OptionB, setOptionB] = useState("");
+  const [OptionC, setOptionC] = useState("");
+  const [OptionD, setOptionD] = useState("");
+  const [OptionE, setOptionE] = useState("");
   const [imageUrl, setImageUrl] = useState("");
 
   const proficiencyLevels = {
@@ -40,14 +43,13 @@ function UpdateQuestionForm({
     if (initialData) {
       console.log("Setting state values from initialData:", initialData);
       setQuestionContent(initialData.question_content || "");
-      //setDiagramUrl(initialData.ques_diagram_url || '');
       setProficiencyLevel(initialData.ques_proficiency_level || "");
       setQuestionType(initialData.ques_type || "");
-      setOption_1(initialData.option_1 || "");
-      setOption_2(initialData.option_2 || "");
-      setOption_3(initialData.option_3 || "");
-      setOption_4(initialData.option_4 || "");
-      setOption_5(initialData.option_5 || "");
+      setOptionA(initialData.option_1 || "");
+      setOptionB(initialData.option_2 || "");
+      setOptionC(initialData.option_3 || "");
+      setOptionD(initialData.option_4 || "");
+      setOptionE(initialData.option_5 || "");
       setImageUrl(initialData.imageId || "");
     }
   }, [initialData]);
@@ -76,24 +78,24 @@ function UpdateQuestionForm({
         requestData.questionType = questionType;
       }
 
-      if (option_1) {
-        requestData.option_1 = option_1;
+      if (OptionA) {
+        requestData.option_1 = OptionA;
       }
 
-      if (option_2) {
-        requestData.option_2 = option_2;
+      if (OptionB) {
+        requestData.option_2 = OptionB;
       }
 
-      if (option_3) {
-        requestData.option_3 = option_3;
+      if (OptionC) {
+        requestData.option_3 = OptionC;
       }
 
-      if (option_4) {
-        requestData.option_4 = option_4;
+      if (OptionD) {
+        requestData.option_4 = OptionD;
       }
 
-      if (option_5) {
-        requestData.option_5 = option_5;
+      if (OptionE) {
+        requestData.option_5 = OptionE;
       }
       if (imageUrl) {
         requestData.imageUrl = imageUrl;
@@ -107,7 +109,9 @@ function UpdateQuestionForm({
         }`,
         requestData
       );
-
+       // Show success 
+       alert("Question updated successfully.");
+      
       // Close the form after successful update
       onClose();
     } catch (error) {
@@ -161,40 +165,40 @@ function UpdateQuestionForm({
               </option>
             ))}
           </select>
-          <label className="update-form-label">Option_1:</label>
+          <label className="update-form-label">Option A:</label>
           <input
             className="update-form-input"
             type="text"
-            value={option_1}
-            onChange={(e) => setOption_1(e.target.value)}
+            value={OptionA}
+            onChange={(e) => setOptionA(e.target.value)}
           />
-          <label className="update-form-label">Option_2:</label>
+          <label className="update-form-label">Option B:</label>
           <input
             className="update-form-input"
             type="text"
-            value={option_2}
-            onChange={(e) => setOption_2(e.target.value)}
+            value={OptionB}
+            onChange={(e) => setOptionB(e.target.value)}
           />
-          <label className="update-form-label">Option_3:</label>
+          <label className="update-form-label">Option C:</label>
           <input
             className="update-form-input"
             type="text"
-            value={option_3}
-            onChange={(e) => setOption_3(e.target.value)}
+            value={OptionC}
+            onChange={(e) => setOptionC(e.target.value)}
           />
-          <label className="update-form-label">Option_4:</label>
+          <label className="update-form-label">Option D:</label>
           <input
             className="update-form-input"
             type="text"
-            value={option_4}
-            onChange={(e) => setOption_4(e.target.value)}
+            value={OptionD}
+            onChange={(e) => setOptionD(e.target.value)}
           />
-          <label className="update-form-label">Option_5:</label>
+          <label className="update-form-label">Option E:</label>
           <input
             className="update-form-input"
             type="text"
-            value={option_5}
-            onChange={(e) => setOption_5(e.target.value)}
+            value={OptionE}
+            onChange={(e) => setOptionE(e.target.value)}
           />
           <label className="update-form-label"> Image Url:</label>
           <input

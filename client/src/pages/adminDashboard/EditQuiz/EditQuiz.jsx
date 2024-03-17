@@ -51,15 +51,15 @@ function EditQuiz() {
     }
 
 const deleteQuiz = async (quizId) => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete the quiz '${quizId}'?`);
+    const confirmDelete = window.confirm(`Are you sure you want to delete the quiz`);
     if (confirmDelete) {
     try {
         await axios.delete(`${import.meta.env.VITE_API_URL}/editQuiz/delete-quiz/${quizId}`);
         setQuizzes(quizzes.filter(quiz => quiz.quiz_id !== quizId)); // Update state to remove the deleted quiz
-        alert(`Quiz '${quizId}' deleted successfully.`);
+        alert(`Quiz deleted successfully.`);
     } catch (error) {
         console.error('Error deleting quiz:', error);
-        alert(`Error deleting quiz '${quizId}'.`);
+        alert(`Error deleting quiz`);
     }
 }
 else {
@@ -72,7 +72,7 @@ else {
 
     // Function to handle adding questions
     const addQuestions = (quizId) => {
-        alert(`Add questions for quiz id ${quizId}`);
+        alert(`Add questions for quiz`);
     }
 
     return (
