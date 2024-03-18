@@ -7,7 +7,7 @@ const QuizCard = ({
   question,
   questionNo,
   options,
-  isMCQ,
+  isMCQ, // Ensure isMCQ is received as a prop
   selectedOption,
   handleSelectedOption,
   questionImageUrl
@@ -17,7 +17,8 @@ const QuizCard = ({
     const isChecked = e.target.checked;
 
     if (isMCQ) {
-      handleSelectedOption(value);
+      handleSelectedOption(isChecked ? value : null);
+
     } else {
       const updatedOptions = isChecked
         ? [...(selectedOption || []), value]
@@ -32,19 +33,20 @@ const QuizCard = ({
         <h2>
           {questionNo}.{question}
         </h2>
-        {questionImageUrl && <img className='question-image' src = {questionImageUrl} alt='Question Image'/>}
+        {questionImageUrl && <img className='question-image' src={questionImageUrl} alt='Question Image' />}
       </div>
+      {console.log(questionImageUrl)}
       <div className="options-box">
         <Form.Group>
           {options.map((option, index) => (
             <Form.Check
               key={index}
-              type={isMCQ ? 'radio' : 'checkbox'}
+              type={isMCQ ? 'radio' : 'checkbox'} // Change type based on isMCQ
               id={`option-${index}`}
               label={option}
               value={option}
               checked={
-                isMCQ 
+                isMCQ
                   ? option === selectedOption
                   : (selectedOption || []).includes(option)
               }
@@ -61,7 +63,7 @@ QuizCard.propTypes = {
   question: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.string).isRequired,
   questionNo: PropTypes.number.isRequired,
-  isMCQ: PropTypes.oneOf(['MCQ', 'MSQ']).isRequired,
+  isMCQ: PropTypes.bool.isRequired, // Ensure isMCQ is received as a boolean prop
   selectedOption: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.arrayOf(PropTypes.string),

@@ -30,16 +30,15 @@ const getQuizData = async (req, res) => {
         advancedRatio,
         totalQuestions
       );
-      console.log("Selected questions:", selectedQuestions);
       const quizData = await Promise.all(selectedQuestions.map(async (row) => {
         if (row.imageId !== null) {
           const imageUrl = await getObjectUrl(`.uploads/questions/${row.imageId}.jpg`);
-          console.log("imageUrl", row.imageId)
           return {
             questionId: row.question_id,
             questionContent: row.question_content,
             options: [],
-            isMCQ: row.isMCQ === 1,
+            isMCQ: row.isMCQ === 0 ? false : true,
+
             imageUrl: imageUrl
           };
         } else {
@@ -47,11 +46,12 @@ const getQuizData = async (req, res) => {
             questionId: row.question_id,
             questionContent: row.question_content,
             options: [],
-            isMCQ: row.isMCQ === 1
+            isMCQ: row.isMCQ === 0 ? false : true 
           };
         }
       }));
 
+      
       const optionsQuery =
         "SELECT * FROM options WHERE quiz_id = ? AND question_id = ?";
 
@@ -109,9 +109,7 @@ const selectQuestions = (
     (advancedRatio / ratiosSum) * totalQuestions
   );
 
-  console.log("Num beginner questions:", numBeginnerQuestions);
-  console.log("Num intermediate questions:", numIntermediateQuestions);
-  console.log("Num advanced questions:", numAdvancedQuestions);
+
 
   if (groupedQuestions[0]) {
     selectedQuestions.push(
@@ -129,7 +127,6 @@ const selectQuestions = (
     );
   }
 
-  console.log("Selected questions:", selectedQuestions);
 
   return selectedQuestions;
 };

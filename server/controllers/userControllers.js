@@ -30,28 +30,28 @@ const getUserQuizHistory = async (req, res) => {
   try {
     const query = `
       SELECT q.quiz_name, uh.marks_obtained, 
-      DATE_FORMAT(uh.date_played, '%d-%m-%Y') as date_played, 
+      DATE_FORMAT(uh.date_played, '%d-%m-%Y') AS date_played, 
       uh.num_of_questions_attempted, uh.total_time_taken_in_sec
-      FROM quiz AS q, user_history AS uh
-      WHERE q.quiz_id = uh.quiz_id AND uh.user_id = ?;
+      FROM quiz AS q
+      INNER JOIN user_history AS uh ON q.quiz_id = uh.quiz_id
+      WHERE uh.user_id = ?;
     `;
-
-    db.query(query, [userId], (err, rows) => {
-      if (err) {
-        console.error("Error fetching the user history: ", err);
-        res.status(500).json({
-          error: "An error occurred while fetching the user history.",
-        });
-        return;
-      }
-      const userHistory = JSON.parse(JSON.stringify(rows));
-      res.send(userHistory);
+    
+    const userHistory = await new Promise((resolve, reject) => {
+      db.query(query, [userId], (err, rows) => {
+        if (err) {
+          console.error("Error fetching the user history: ", err);
+          reject(err);
+          return;
+        }
+        resolve(rows);
+      });
     });
+
+    res.send(userHistory);
   } catch (error) {
     console.error("Error fetching user quiz history:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while fetching user quiz history." });
+    res.status(500).json({ error: "An error occurred while fetching user quiz history." });
   }
 };
 
