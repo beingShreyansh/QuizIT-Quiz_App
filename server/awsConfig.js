@@ -86,19 +86,11 @@ const uploadImageToS3 = async (imageUrl, fileName) => {
       throw new Error("Failed to upload image to S3");
     }
 
-    console.log("Image uploaded to S3:", signedUrl);
     return signedUrl;
   } catch (error) {
     console.error("Error uploading image to S3:", error);
     throw error;
   }
 };
-const init = async () => {
-  console.log("Url for Uploading: ", await getObjectUrl(".uploads/questions/38519b91-9f1b-46bf-9856-2d598e2c4375.jpg"));
-  // console.log(
-  //   "Url to get: ",
-  //   await getObjectUrl(".uploads/user/default-profile")
-  // );
-};
-init();
+
 module.exports = { getObjectUrl, putObject, uploadImageToS3 };

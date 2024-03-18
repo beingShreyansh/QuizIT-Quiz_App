@@ -92,10 +92,6 @@ const deleteQuiz = (req, res) => {
           });
       } else {
         const missingQuizIds = results.map((result) => result.quiz_id);
-        console.log(
-          "User history entries related to the quiz to be deleted:",
-          missingQuizIds
-        );
         resolveUserHistoryEntries(missingQuizIds);
       }
     });
@@ -269,7 +265,6 @@ const updateQuestion = async(req, res) => {
                     console.error("Error updating options:", optionsError);
                     res.status(500).json({ error: "Internal Server Error" });
                   } else {
-                    console.log(optionsResults);
                     res
                       .status(200)
                       .json({
@@ -282,7 +277,6 @@ const updateQuestion = async(req, res) => {
           }
         );
       } else {
-        console.log(results);
         res.status(200).json({ message: "Question updated successfully" });
       }
     }
