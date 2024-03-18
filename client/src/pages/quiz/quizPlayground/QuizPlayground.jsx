@@ -12,13 +12,7 @@ import { PieChart, Pie, ResponsiveContainer } from "recharts";
 Modal.setAppElement("#root");
 
 function QuizPlayground() {
-  const {
-    id,
-    totalQuestions,
-    beginnerRatio,
-    intermediateRatio,
-    advancedRatio,
-  } = useParams();
+  const { id, totalQuestions, beginnerRatio, intermediateRatio, advancedRatio } = useParams();
   const navigate = useNavigate();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,10 +28,7 @@ function QuizPlayground() {
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/quiz/getQuiz/${id}/${totalQuestions}/${beginnerRatio}/${intermediateRatio}/${advancedRatio}`
-        );
-        console.log("API Response:", response);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/quiz/getQuiz/${id}/${totalQuestions}/${beginnerRatio}/${intermediateRatio}/${advancedRatio}`);
         
         if (response.status === 200 && response.data.length > 0) {
           setQuizData(response.data);
@@ -52,8 +43,7 @@ function QuizPlayground() {
       }
     };
     fetchQuizData();
-  }, []);
-  
+  }, [id, totalQuestions, beginnerRatio, intermediateRatio, advancedRatio, navigate]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -67,9 +57,7 @@ function QuizPlayground() {
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       event.preventDefault();
-      event.returnValue =
-        "Changes you made may not be saved. Reloading the quiz will close the quiz. Are you sure you want to reload?";
-      console.log(event);
+      event.returnValue = "Changes you made may not be saved. Reloading the quiz will close the quiz. Are you sure you want to reload?";
     };
 
     const handleReloadConfirmation = (event) => {
@@ -83,7 +71,7 @@ function QuizPlayground() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("unload", handleReloadConfirmation);
     };
-  }, []);
+  }, [navigate]);
 
   const startTimer = () => {
     setIsTimerRunning(true);
@@ -107,14 +95,6 @@ function QuizPlayground() {
   };
 
   const handleSelectedOption = (option) => {
-    handleOptionSelection(option);
-  };
-
-  const handleNewSelectedOption = (option) => {
-    handleOptionSelection(option);
-  };
-
-  const handleOptionSelection = (option) => {
     if (!quizSubmitted) {
       const questionId = quizData[questionIndex]?.questionId;
       const updatedAnswers = { ...answers, [questionId]: option };
@@ -130,9 +110,7 @@ function QuizPlayground() {
 
   const handleSubmitQuiz = async () => {
     setIsModalLoading(true);
-    const underReview = Object.values(answers).some(
-      (answer) => answer === "review"
-    );
+    const underReview = Object.values(answers).some((answer) => answer === "review");
 
     if (!underReview) {
       stopTimer();
@@ -147,10 +125,7 @@ function QuizPlayground() {
           attemptedQuestions: Object.keys(answers).length,
         };
 
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/quiz/get-results`,
-          updatedFormData
-        );
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/quiz/get-results`, updatedFormData);
 
         if (response.status === 200) {
           setScore(response.data);
@@ -162,9 +137,7 @@ function QuizPlayground() {
         console.error(error);
       }
     } else {
-      toast.error(
-        "One or more questions are under review. Please complete all reviews before submitting."
-      );
+      toast.error("One or more questions are under review. Please complete all reviews before submitting.");
     }
   };
 
@@ -233,9 +206,7 @@ function QuizPlayground() {
 
           <div className="unattempted-card">
             <p className="card-title">Unattempted Questions</p>
-            <p className="card-number">
-              {quizData.length - Object.keys(answers).length}
-            </p>
+            <p className="card-number">{quizData.length - Object.keys(answers).length}</p>
           </div>
 
           <div className="total-questions-card">
@@ -273,17 +244,15 @@ function QuizPlayground() {
             <div className="quiz-container">
               {quizData.length > 0 && (
                 <QuizCard
-                questionNo={questionIndex + 1}
-                questionImageUrl={quizData[questionIndex]?.imageUrl}
-                question={quizData[questionIndex]?.questionContent} // Pass the question_content property
-                options={quizData[questionIndex]?.options}
-                isMCQ={quizData[questionIndex]?.isMCQ}
-                selectedOption={answers[quizData[questionIndex]?.question_id]}
-                handleSelectedOption={handleSelectedOption}
-                handleNewSelectedOption={handleNewSelectedOption}
-              />
-              
-              )}
+                  questionNo={questionIndex + 1}
+                  questionImageUrl={quizData[questionIndex]?.imageUrl}
+                  question={quizData[questionIndex]?.questionContent}
+                  options={quizData[questionIndex]?.options}
+                  isMCQ={quizData[questionIndex]?.isMCQ}
+                  selectedOption={answers[quizData[questionIndex]?.questionId]}
+                  handleSelectedOption={handleSelectedOption}
+                />
+                )}
               <div className="prev-next-buttons">
                 <button
                   onClick={handlePrevQuestion}
@@ -294,16 +263,13 @@ function QuizPlayground() {
                 <button onClick={handleSubmitQuiz}>Submit Quiz</button>
                 <button
                   onClick={handleNextQuestion}
-                  disabled={
-                    questionIndex === quizData.length - 1 || quizSubmitted
-                  }
+                  disabled={questionIndex === quizData.length - 1 || quizSubmitted}
                 >
                   Next
                 </button>
               </div>
               <p className="submission-note">
-                Note: After submission, you will not be able to change your
-                answers.
+                Note: After submission, you will not be able to change your answers.
               </p>
             </div>
           </div>

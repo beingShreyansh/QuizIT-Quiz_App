@@ -1,7 +1,7 @@
 const xlsx = require("xlsx");
 const { v4: uuidv4 } = require("uuid");
 const { db } = require("../dbConfig");
-const { uploadImageToS3 } = require("../awsConfig");
+const { uploadImageToS3, getObjectUrl } = require("../awsConfig");
 
 const addQuiz = async (req, res) => {
   const { file } = req;
@@ -65,7 +65,7 @@ const uploadQuizDataToDB = async (quizData) => {
       "Category",
       "MCQ/Scenario",
       "ProficiencyLevel(Intermediate/Advanced)",
-      "IsMultipleRightChoice",
+      "IsMCQ",
     ];
     const missingFields = expectedFields.filter(
       (field) => !Object.keys(quizData[0]).includes(field)
@@ -134,7 +134,7 @@ const uploadQuizDataToDB = async (quizData) => {
               ? 0
               : 2,
           isMCQ:
-            data["IsMultipleRightChoice"].toLowerCase() === "yes" ? "1" : "0",
+            data["IsMCQ"].toLowerCase() === "yes" ? "1" : "0",
           questionDiagramURL: data["ImageUrl"], // Set 'ImageUrl' field to 'questionDiagramURL'
         }));
 
@@ -185,7 +185,6 @@ const uploadQuizDataToDB = async (quizData) => {
         }
       }
     }
-  
   } catch (error) {
     console.error("Error uploading quiz data to DB:", error);
     throw new Error("Error uploading quiz data to DB: " + error.message);
@@ -201,4 +200,14 @@ const executeQuery = async (query, params) => {
   }
 };
 
-module.exports = { addQuiz, getUserQuizHistory };
+const getSheetUrl = async (req,res) => {
+  try {
+    const url = await getObjectUrl(".uploads/sampleSheet/SheetFormat.xlsx");
+    res.status(200).json({url});
+  } catch (error) {
+    console.error("Error getting URL from S3:", error);
+    res.status(500).send(error.message);
+  }
+};
+
+module.exports = { addQuiz, getUserQuizHistory, getSheetUrl };

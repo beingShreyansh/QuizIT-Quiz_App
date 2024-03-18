@@ -38,7 +38,6 @@ function EditQuiz() {
         try {
             setquizId(quizId);
             const response = await axios.get(`${import.meta.env.VITE_API_URL}/editQuiz/questions-and-options/${quizId}`);
-            console.log(response.data); // Log response data to inspect its structure
             setSelectedQuiz(response.data);
             setCombinedModalOpen(true); // Open the combined modal when questions are fetched
         } catch (error) {

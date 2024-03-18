@@ -1,14 +1,65 @@
+/* Default styles */
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Responsive styles */
+/* Adjust font sizes for smaller screens */
+@media screen and (max-width: 768px) {
+  :root {
+    font-size: 14px;
+  }
+}
+
+/* Adjust layout for smaller screens */
+@media screen and (max-width: 576px) {
+  /* Center align text */
+  body {
+    text-align: center;
+  }
+
+  /* Adjust margins and paddings */
+  .container {
+    padding: 10px;
+  }
+
+  /* Make images responsive */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Adjust styles for smaller screens */
+@media screen and (max-width: 480px) {
+  /* Hide certain elements */
+  .hide-on-small-screen {
+    display: none;
+  }
+}
+
+/* Fluid typography */
+html {
+  font-size: 16px;
+}
+
+@media screen and (max-width: 1200px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  html {
+    font-size: 12px;
+  }
 }
