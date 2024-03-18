@@ -19,9 +19,9 @@ const UserHome = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [numOfQues, setNumOfQues] = useState(10);
   let qProfMap = new Map();
-  qProfMap.set('beg', 30);
-  qProfMap.set('imed', 50);
-  qProfMap.set('adv', 20);
+  qProfMap.set('beg', 10);
+  qProfMap.set('imed', 80);
+  qProfMap.set('adv', 10);
   const [quesProficiencyPerMap, setQuesProficiencyPer] = useState(qProfMap);
   const navigate = useNavigate();
 
@@ -73,11 +73,13 @@ const UserHome = () => {
 
   const handleStartQuiz = () => {
     if (selectedCategory.quiz_id) {
-      navigate(`/quiz/${selectedCategory.quiz_id}/${numOfQues}/${qProfMap.get('beg')}/${qProfMap.get('imed')}/${qProfMap.get('adv')}`);
+        const url = `/quiz/${selectedCategory.quiz_id}/${numOfQues}/${qProfMap.get('beg')}/${qProfMap.get('imed')}/${qProfMap.get('adv')}`;
+        window.open(url, '_blank');
     } else {
-      toast.error("Select a Category");
+        toast.error("Select a Category");
     }
-  };
+};
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -137,7 +139,11 @@ const UserHome = () => {
             )}
           </div>
         </div>
-
+        <div className="show-quiz-name-button-container">
+        <button className="show-quiz-name-button" onClick={openModal}>
+          Show All Quiz Names
+        </button>
+      </div>
         <div className="no-ques-txtbox-div">
             <p>Enter the number of questions to be played:</p>
             <input
@@ -191,11 +197,7 @@ const UserHome = () => {
           Start Quiz
         </button>
       </div>
-      <div className="show-quiz-name-button-container">
-        <button className="show-quiz-name-button" onClick={openModal}>
-          Show All Quiz Names
-        </button>
-      </div>
+      
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}

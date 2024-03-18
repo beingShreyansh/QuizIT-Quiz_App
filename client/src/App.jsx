@@ -27,9 +27,9 @@ function App() {
       errorElement: <PageNotFound />,
     },
     {
-      path: "/quiz/:id",
-      element:<QuizPlayground/>,
-    },
+      path: "/quiz/:id/:totalQuestions/:beginnerRatio/:intermediateRatio/:advancedRatio",
+      element: <QuizPlayground />,
+    },      
     {
       path: "/quiz-result",
       element: <Results />,
@@ -48,7 +48,7 @@ function App() {
     },
     
     {
-      path: "/edit",
+      path: "/editQuiz",
       element:<EditQuiz/>,
     },
     {

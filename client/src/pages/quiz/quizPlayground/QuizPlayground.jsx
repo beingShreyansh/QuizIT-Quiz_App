@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import QuizCard from '../../../components/QuizCard/QuizCard';
-import ReviewPanel from './ReviewPanel/ReviewPanel';
-import './QuizPlayground.css';
-import toast from 'react-hot-toast';
-import Modal from 'react-modal';
-import { useNavigate, useParams } from 'react-router-dom';
-import Spinner from '../../../components/spinner/Spinner';
-import { PieChart, Pie, ResponsiveContainer } from 'recharts';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import QuizCard from "../../../components/QuizCard/QuizCard";
+import ReviewPanel from "./ReviewPanel/ReviewPanel";
+import "./QuizPlayground.css";
+import toast from "react-hot-toast";
+import Modal from "react-modal";
+import { useNavigate, useParams } from "react-router-dom";
+import Spinner from "../../../components/spinner/Spinner";
+import { PieChart, Pie, ResponsiveContainer } from "recharts";
 
-Modal.setAppElement('#root');
+Modal.setAppElement("#root");
 
 function QuizPlayground() {
-  const { id } = useParams();
+  const { id, totalQuestions, beginnerRatio, intermediateRatio, advancedRatio } = useParams();
   const navigate = useNavigate();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,23 +28,22 @@ function QuizPlayground() {
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/quiz/getQuiz/${id}`
-        );
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/quiz/getQuiz/${id}/${totalQuestions}/${beginnerRatio}/${intermediateRatio}/${advancedRatio}`);
+        
         if (response.status === 200 && response.data.length > 0) {
           setQuizData(response.data);
           setIsLoading(false);
           startTimer();
         } else {
-          navigate('/');
-          toast.error('No quiz found');
+          navigate("/");
+          toast.error("No quiz found");
         }
       } catch (error) {
-        console.error('Error fetching quiz data:', error);
+        console.error("Error fetching quiz data:", error);
       }
     };
     fetchQuizData();
-  }, []);
+  }, [id, totalQuestions, beginnerRatio, intermediateRatio, advancedRatio, navigate]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,6 +53,25 @@ function QuizPlayground() {
     }, 1000);
     return () => clearInterval(interval);
   }, [isTimerRunning]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = "Changes you made may not be saved. Reloading the quiz will close the quiz. Are you sure you want to reload?";
+    };
+
+    const handleReloadConfirmation = (event) => {
+      navigate("/");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("unload", handleReloadConfirmation);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("unload", handleReloadConfirmation);
+    };
+  }, [navigate]);
 
   const startTimer = () => {
     setIsTimerRunning(true);
@@ -77,14 +95,6 @@ function QuizPlayground() {
   };
 
   const handleSelectedOption = (option) => {
-    handleOptionSelection(option);
-  };
-
-  const handleNewSelectedOption = (option) => {
-    handleOptionSelection(option);
-  };
-
-  const handleOptionSelection = (option) => {
     if (!quizSubmitted) {
       const questionId = quizData[questionIndex]?.questionId;
       const updatedAnswers = { ...answers, [questionId]: option };
@@ -94,22 +104,20 @@ function QuizPlayground() {
 
   const markAsReview = (questionId) => {
     if (!quizSubmitted) {
-      setAnswers((prevAnswers) => ({ ...prevAnswers, [questionId]: 'review' }));
+      setAnswers((prevAnswers) => ({ ...prevAnswers, [questionId]: "review" }));
     }
   };
 
   const handleSubmitQuiz = async () => {
     setIsModalLoading(true);
-    const underReview = Object.values(answers).some(
-      (answer) => answer === 'review'
-    );
+    const underReview = Object.values(answers).some((answer) => answer === "review");
 
     if (!underReview) {
       stopTimer();
 
       try {
         const updatedFormData = {
-          userId: localStorage.getItem('userId'),
+          userId: localStorage.getItem("userId"),
           quizId: id,
           answers,
           timeTaken: timer,
@@ -117,10 +125,7 @@ function QuizPlayground() {
           attemptedQuestions: Object.keys(answers).length,
         };
 
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/quiz/get-results`,
-          updatedFormData
-        );
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/quiz/get-results`, updatedFormData);
 
         if (response.status === 200) {
           setScore(response.data);
@@ -132,9 +137,7 @@ function QuizPlayground() {
         console.error(error);
       }
     } else {
-      toast.error(
-        'One or more questions are under review. Please complete all reviews before submitting.'
-      );
+      toast.error("One or more questions are under review. Please complete all reviews before submitting.");
     }
   };
 
@@ -146,8 +149,8 @@ function QuizPlayground() {
     const unattemptedQuestions = quizData.length - attemptedQuestions;
 
     return [
-      { name: 'Attempted', value: attemptedQuestions },
-      { name: 'Unattempted', value: unattemptedQuestions },
+      { name: "Attempted", value: attemptedQuestions },
+      { name: "Unattempted", value: unattemptedQuestions },
     ];
   };
 
@@ -161,16 +164,16 @@ function QuizPlayground() {
           onRequestClose={closeModal}
           contentLabel="Quiz Summary"
           style={{
-            overlay: { backgroundColor: 'rgba(128, 128, 128, 0.5)' },
+            overlay: { backgroundColor: "rgba(128, 128, 128, 0.5)" },
             content: {
-              backgroundColor: 'lightgrey',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              outline: 'none',
-              padding: '20px',
-              maxWidth: '600px',
-              margin: 'auto',
-              color: 'black',
+              backgroundColor: "lightgrey",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              outline: "none",
+              padding: "20px",
+              maxWidth: "600px",
+              margin: "auto",
+              color: "black",
             },
           }}
         >
@@ -203,9 +206,7 @@ function QuizPlayground() {
 
           <div className="unattempted-card">
             <p className="card-title">Unattempted Questions</p>
-            <p className="card-number">
-              {quizData.length - Object.keys(answers).length}
-            </p>
+            <p className="card-number">{quizData.length - Object.keys(answers).length}</p>
           </div>
 
           <div className="total-questions-card">
@@ -216,7 +217,7 @@ function QuizPlayground() {
           <button
             onClick={() => {
               setIsModalOpen(false);
-              navigate('/');
+              navigate("/");
             }}
           >
             Close
@@ -244,14 +245,14 @@ function QuizPlayground() {
               {quizData.length > 0 && (
                 <QuizCard
                   questionNo={questionIndex + 1}
+                  questionImageUrl={quizData[questionIndex]?.imageUrl}
                   question={quizData[questionIndex]?.questionContent}
                   options={quizData[questionIndex]?.options}
                   isMCQ={quizData[questionIndex]?.isMCQ}
                   selectedOption={answers[quizData[questionIndex]?.questionId]}
                   handleSelectedOption={handleSelectedOption}
-                  handleNewSelectedOption={handleNewSelectedOption}
                 />
-              )}
+                )}
               <div className="prev-next-buttons">
                 <button
                   onClick={handlePrevQuestion}
@@ -262,16 +263,13 @@ function QuizPlayground() {
                 <button onClick={handleSubmitQuiz}>Submit Quiz</button>
                 <button
                   onClick={handleNextQuestion}
-                  disabled={
-                    questionIndex === quizData.length - 1 || quizSubmitted
-                  }
+                  disabled={questionIndex === quizData.length - 1 || quizSubmitted}
                 >
                   Next
                 </button>
               </div>
               <p className="submission-note">
-                Note: After submission, you will not be able to change your
-                answers.
+                Note: After submission, you will not be able to change your answers.
               </p>
             </div>
           </div>

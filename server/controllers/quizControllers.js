@@ -1,26 +1,57 @@
 const { v4: uuidv4 } = require("uuid");
 const { db } = require("../dbConfig");
+const { getObjectUrl } = require("../awsConfig");
 
-const getQuizData = (req, res) => {
+const getQuizData = async (req, res) => {
   const { quizId } = req.params;
-  try {
-    const query = "SELECT * FROM quiz_question WHERE quiz_id = ?";
+  const totalQuestions = parseInt(req.params.totalQuestions);
+  const beginnerRatio = parseInt(req.params.beginnerRatio);
+  const intermediateRatio = parseInt(req.params.intermediateRatio);
+  const advancedRatio = parseInt(req.params.advancedRatio);
 
-    db.query(query, [quizId], (err, rows) => {
+  try {
+    const query =
+      "SELECT * FROM quiz_question WHERE quiz_id = ? ORDER BY ques_proficiency_level";
+    db.query(query, [quizId], async (err, rows) => {
       if (err) {
         console.error("Error retrieving questions for quiz: ", err);
         res.status(500).json({ error: "Error retrieving questions for quiz" });
         return;
       }
 
-      const quizData = rows.map((row) => {
-        return {
-          questionId: row.question_id,
-          questionContent: row.question_content,
-          options: [],
-          isMCQ: row.isMCQ === '0' // Set isMCQ to true if isMCQ is '0'
-        };
-      });
+      const shuffledQuestions = shuffleQuestions(rows);
+
+      const groupedQuestions = groupQuestionsByProficiency(shuffledQuestions);
+
+      const selectedQuestions = selectQuestions(
+        groupedQuestions,
+        beginnerRatio,
+        intermediateRatio,
+        advancedRatio,
+        totalQuestions
+      );
+      const quizData = await Promise.all(selectedQuestions.map(async (row) => {
+        if (row.imageId !== null) {
+          const imageUrl = await getObjectUrl(`.uploads/questions/${row.imageId}.jpg`);
+          return {
+            questionId: row.question_id,
+            questionContent: row.question_content,
+            options: [],
+            isMCQ: row.isMCQ === 0 ? false : true,
+
+            imageUrl: imageUrl
+          };
+        } else {
+          return {
+            questionId: row.question_id,
+            questionContent: row.question_content,
+            options: [],
+            isMCQ: row.isMCQ === 0 ? false : true 
+          };
+        }
+      }));
+
+      
       const optionsQuery =
         "SELECT * FROM options WHERE quiz_id = ? AND question_id = ?";
 
@@ -35,18 +66,19 @@ const getQuizData = (req, res) => {
               .json({ error: "Error retrieving options for quiz" });
             return;
           }
-          
-          // Filter out null options
-          quiz.options = optionRows
-            .filter(option => option.option_value !== null)
-            .map(option => option.option_value);
+
+          quiz.options = optionRows.map((option) => option.option_value);
 
           completedRequests++;
 
           // Check if all options requests are completed
           if (completedRequests === quizData.length) {
+            // Filter quizData to include only questions with more than one option
+            const filteredQuizData = quizData.filter(
+              (quiz) => quiz.options.length > 1
+            );
             // Send response after filtering
-            res.json(quizData);
+            res.json(filteredQuizData);
           }
         });
       });
@@ -57,6 +89,67 @@ const getQuizData = (req, res) => {
   }
 };
 
+const selectQuestions = (
+  groupedQuestions,
+  beginnerRatio,
+  intermediateRatio,
+  advancedRatio,
+  totalQuestions
+) => {
+  const selectedQuestions = [];
+  const ratiosSum = beginnerRatio + intermediateRatio + advancedRatio;
+
+  const numBeginnerQuestions = Math.floor(
+    (beginnerRatio / ratiosSum) * totalQuestions
+  );
+  const numIntermediateQuestions = Math.floor(
+    (intermediateRatio / ratiosSum) * totalQuestions
+  );
+  const numAdvancedQuestions = Math.floor(
+    (advancedRatio / ratiosSum) * totalQuestions
+  );
+
+
+
+  if (groupedQuestions[0]) {
+    selectedQuestions.push(
+      ...groupedQuestions[0].slice(0, numBeginnerQuestions)
+    );
+  }
+  if (groupedQuestions[1]) {
+    selectedQuestions.push(
+      ...groupedQuestions[1].slice(0, numIntermediateQuestions)
+    );
+  }
+  if (groupedQuestions[2]) {
+    selectedQuestions.push(
+      ...groupedQuestions[2].slice(0, numAdvancedQuestions)
+    );
+  }
+
+
+  return selectedQuestions;
+};
+
+const shuffleQuestions = (questions) => {
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  return questions;
+};
+
+const groupQuestionsByProficiency = (questions) => {
+  const groupedQuestions = {};
+  questions.forEach((question) => {
+    const proficiencyLevel = question.ques_proficiency_level;
+    if (!groupedQuestions[proficiencyLevel]) {
+      groupedQuestions[proficiencyLevel] = [];
+    }
+    groupedQuestions[proficiencyLevel].push(question);
+  });
+  return groupedQuestions;
+};
 
 const submitQuizData = (req, res) => {
   const {
@@ -180,18 +273,22 @@ const submitQuizData = (req, res) => {
                     // Update the no_of_times_played counter for the quiz
                     const updateQuizCounterQuery =
                       "UPDATE quiz SET no_of_times_played = no_of_times_played + 1 WHERE quiz_id = ?";
-                    db.query(updateQuizCounterQuery, [quizId], (err, result) => {
-                      if (err) {
-                        console.error("Error updating quiz counter:", err);
-                        res
-                          .status(500)
-                          .json({ error: "Error updating quiz counter" });
-                        return;
-                      }
+                    db.query(
+                      updateQuizCounterQuery,
+                      [quizId],
+                      (err, result) => {
+                        if (err) {
+                          console.error("Error updating quiz counter:", err);
+                          res
+                            .status(500)
+                            .json({ error: "Error updating quiz counter" });
+                          return;
+                        }
 
-                      // Send the score as response
-                      res.json(percentage);
-                    });
+                        // Send the score as response
+                        res.json(percentage);
+                      }
+                    );
                   }
                 );
               }

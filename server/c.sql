@@ -9,7 +9,7 @@ CREATE TABLE user
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   role VARCHAR(255) DEFAULT 'user',
-  profile_img_url VARCHAR(1500),
+  imageId VARCHAR(1500) DEFAULT 'profile-default',
   access_token VARCHAR(255)
 );
 
@@ -32,7 +32,7 @@ CREATE TABLE quiz
     0 --> general
     1 --> scenario
 
-  ISmcaq field:
+  ISmcq field:
     0 --> False
     1 --> True
 */
@@ -42,7 +42,7 @@ CREATE TABLE quiz_question (
     question_id CHAR(36),
     quiz_id CHAR(36),
     question_content VARCHAR(1000),
-    ques_diagram_url VARCHAR(1500),
+    imageId VARCHAR(1500),
     ques_proficiency_level CHAR(1),
     ques_type CHAR(2),
     isMCQ CHAR(1),

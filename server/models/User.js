@@ -1,5 +1,6 @@
 const mysql = require("mysql2");
 const { v4: uuidv4 } = require("uuid");
+const { getObjectUrl } = require("../awsConfig");
 
 const pool = mysql.createPool({
   host: process.env.DATABASE_HOST,
@@ -11,12 +12,20 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+
 class User {
-  constructor({ name, email, password, role = "user" }) {
+  constructor({
+    name,
+    email,
+    password,
+    role = "user",  
+    imageId = 'profile-default',
+  }) {
     this.name = name;
     this.email = email;
     this.password = password;
     this.role = role; // Default role is 'user'
+    this.imageId = imageId;
     this.pool = pool;
   }
 
@@ -29,11 +38,11 @@ class User {
         }
 
         const query =
-          "INSERT INTO user (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)";
+          "INSERT INTO user (id, name, email, password, role, imageId) VALUES (?, ?, ?, ?, ?,?)";
 
         connection.query(
           query,
-          [uuidv4(), this.name, this.email, this.password, this.role],
+          [uuidv4(), this.name, this.email, this.password, this.role, this.imageId],
           (error, results) => {
             connection.release();
 

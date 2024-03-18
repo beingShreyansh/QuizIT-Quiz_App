@@ -7,6 +7,7 @@ import { faEdit, faTrashAlt, faPlusCircle } from '@fortawesome/free-solid-svg-ic
 import './EditQuiz.css'; // Import CSS file for styling
 import CombinedModal from '../../../components/Modal/CombinedModal'; // Import CombinedModal component
 import UpdateQuestionForm from '../../../components/Modal/UpdateQuetionForm'; // Import UpdateQuestionForm component
+import Navbar from '../../../components/Navbar/Navbar';
 
 function EditQuiz() {
     // State to store quizzes and selected quiz questions
@@ -15,17 +16,19 @@ function EditQuiz() {
     const [combinedModalOpen, setCombinedModalOpen] = useState(false);
     const [selectedQuestion, setSelectedQuestion] = useState(null);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
+    const [quizId,setquizId]=useState(null);
 
     // Fetch quizzes from the backend API
+    const fetchQuizzes = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/editQuiz/categories`);
+            setQuizzes(response.data);
+        } catch (error) {
+            console.error('Error fetching quizzes:', error);
+        }
+    };
     useEffect(() => {
-        const fetchQuizzes = async () => {
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/edit/categories`);
-                setQuizzes(response.data);
-            } catch (error) {
-                console.error('Error fetching quizzes:', error);
-            }
-        };
+     
 
         fetchQuizzes();
     }, []);
@@ -33,39 +36,37 @@ function EditQuiz() {
     // Function to handle editing a quiz and fetching questions/options
     const editQuiz = async (quizId, quizName) => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/edit/questions-and-options/${quizName}`);
-            console.log(response.data); // Log response data to inspect its structure
+            setquizId(quizId);
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/editQuiz/questions-and-options/${quizId}`);
             setSelectedQuiz(response.data);
             setCombinedModalOpen(true); // Open the combined modal when questions are fetched
         } catch (error) {
             console.error('Error fetching questions:', error);
         }
     }
-
-    // Function to handle updating a question
     const updateQuestion = (question) => {
         setSelectedQuestion(question);
-        setUpdateModalOpen(true); // Open the update form when a question is selected for update
+        setUpdateModalOpen(true); 
     }
 
-    // Function to handle deleting a quiz
-    // Function to handle deleting a quiz
 const deleteQuiz = async (quizId) => {
+    const confirmDelete = window.confirm(`Are you sure you want to delete the quiz '${quizId}'?`);
+    if (confirmDelete) {
     try {
-        // Send a DELETE request to the backend API to delete the quiz
-        await axios.delete(`${import.meta.env.VITE_API_URL}/edit/delete-quiz/${quizId}`);
-        
-        // After successful deletion, update the state to remove the deleted quiz
-        setQuizzes((prevQuizzes) => prevQuizzes.filter(quiz => quiz.quiz_id !== quizId));
-
-        // Optionally, you can display a success message or perform other actions
-        alert(`Quiz with id ${quizId} deleted successfully`);
+        await axios.delete(`${import.meta.env.VITE_API_URL}/editQuiz/delete-quiz/${quizId}`);
+        setQuizzes(quizzes.filter(quiz => quiz.quiz_id !== quizId)); // Update state to remove the deleted quiz
+        alert(`Quiz '${quizId}' deleted successfully.`);
     } catch (error) {
         console.error('Error deleting quiz:', error);
-        // Handle the error, display an error message, or perform other actions as needed
-        alert('Error deleting quiz. Please try again.');
+        alert(`Error deleting quiz '${quizId}'.`);
     }
 }
+else {
+    // If the user cancels deletion
+    alert('Deletion canceled.');
+}
+}
+
 
 
     // Function to handle adding questions
@@ -74,6 +75,8 @@ const deleteQuiz = async (quizId) => {
     }
 
     return (
+
+        <div> <Navbar />
         <div className="edit-quiz-container">
             <table className="edit-quiz-table">
                 <thead>
@@ -92,10 +95,14 @@ const deleteQuiz = async (quizId) => {
                             <td>{quiz.quiz_category}</td>
                             <td>{quiz.quiz_name}</td>
                             <td>
-                                <FontAwesomeIcon icon={faEdit} onClick={() => editQuiz(quiz.quiz_id, quiz.quiz_name)} />
-                                <FontAwesomeIcon icon={faTrashAlt} onClick={() => deleteQuiz(quiz.quiz_id)} />
+
+                                <FontAwesomeIcon icon={faEdit} className="icon edit-icon" onClick={() => editQuiz(quiz.quiz_id, quiz.quiz_name)} style={{ marginRight: '50px' }} />
+                                
+                               
+                                <FontAwesomeIcon icon={faTrashAlt} className="icon edit-icon"  onClick={() => deleteQuiz(quiz.quiz_id)} />
+                                
                             </td>
-                            <td><FontAwesomeIcon icon={faPlusCircle} onClick={() => addQuestions(quiz.quiz_id)} /></td>
+                            <td><FontAwesomeIcon icon={faPlusCircle} className="add-icon"  onClick={() => addQuestions(quiz.quiz_id)} /></td>
                         </tr>
                     ))}
                 </tbody>
@@ -108,6 +115,8 @@ const deleteQuiz = async (quizId) => {
                     onClose={() => setCombinedModalOpen(false)} 
                     selectedQuiz={selectedQuiz} 
                     updateQuestion={updateQuestion} // Pass the updateQuestion function
+                    quizId={quizId}
+                    fetchQuizzes ={fetchQuizzes}
                 />
             )}
 
@@ -117,8 +126,10 @@ const deleteQuiz = async (quizId) => {
                     isOpen={updateModalOpen} 
                     onClose={() => setUpdateModalOpen(false)} 
                     question={selectedQuestion} // Pass the selected question to update
+                    quizId={quizId}
                 />
             )}
+        </div>
         </div>
     );
 }
