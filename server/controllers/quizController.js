@@ -23,6 +23,7 @@ const fetchCategories = (req, res) => {
 // Controller to fetch questions and options by quiz name from the database
 const fetchQuestionsAndOptions = (req, res) => {
     const quizName = req.params.quizName;
+    console.log(quizName);
     const query = `
         SELECT 
             qq.question_id, 
