@@ -87,7 +87,6 @@ const uploadQuizDataToDB = async (quizData) => {
     }
 
     // Process each quiz separately
-    // Process each quiz separately
     for (const quizName of Object.keys(quizCounts)) {
       let quizId;
 
@@ -133,8 +132,7 @@ const uploadQuizDataToDB = async (quizData) => {
               : data["ProficiencyLevel(Intermediate/Advanced)"] === "Beginner"
               ? 0
               : 2,
-          isMCQ:
-            data["IsMCQ"].toLowerCase() === "yes" ? "1" : "0",
+          isMCQ: data["IsMCQ"].toLowerCase() === "yes" ? "1" : "0",
           questionDiagramURL: data["ImageUrl"], // Set 'ImageUrl' field to 'questionDiagramURL'
         }));
 
@@ -145,45 +143,51 @@ const uploadQuizDataToDB = async (quizData) => {
       await executeQuery(quizInsertQuery, [noOfQuestions, quizId]);
 
       // Insert questions and options for the current quiz
-      for (const question of questions) {
-        const questionId = uuidv4();
-        let imageId = null; // Initialize imageId to null
+      await Promise.all(
+        questions.map(async (question) => {
+          const questionId = uuidv4();
+          let imageId = null; // Initialize imageId to null
 
-        if (question.questionDiagramURL) {
-          // If questionDiagramURL is not empty, upload image to S3 and get the signed URL
-          imageId = uuidv4();
-          await uploadImageToS3(question.questionDiagramURL, `${imageId}.jpg`);
-        }
+          if (question.questionDiagramURL) {
+            // If questionDiagramURL is not empty, upload image to S3 and get the signed URL
+            imageId = uuidv4();
+            await uploadImageToS3(
+              question.questionDiagramURL,
+              `${imageId}.jpg`
+            );
+          }
 
-        const questionInsertQuery =
-          "INSERT INTO quiz_question (question_id, quiz_id, question_content, imageId, ques_proficiency_level, ques_type, isMCQ) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        await executeQuery(questionInsertQuery, [
-          questionId,
-          quizId,
-          question.content,
-          imageId, // Use imageId here
-          question.quesProficiencyLevel,
-          question.quesType,
-          question.isMCQ,
-        ]);
-
-        for (let i = 0; i < question.options.length; i++) {
-          const optionValue = question.options[i];
-          const isCorrect = question.correctAnswers.includes(`${i + 1}`)
-            ? "1"
-            : "0";
-
-          const optionInsertQuery =
-            "INSERT INTO options (option_id, quiz_id, question_id, option_value, correct_01) VALUES (?, ?, ?, ?, ?)";
-          await executeQuery(optionInsertQuery, [
-            uuidv4(),
-            quizId,
+          const questionInsertQuery =
+            "INSERT INTO quiz_question (question_id, quiz_id, question_content, imageId, ques_proficiency_level, ques_type, isMCQ) VALUES (?, ?, ?, ?, ?, ?, ?)";
+          await executeQuery(questionInsertQuery, [
             questionId,
-            optionValue,
-            isCorrect,
+            quizId,
+            question.content,
+            imageId, // Use imageId here
+            question.quesProficiencyLevel,
+            question.quesType,
+            question.isMCQ,
           ]);
-        }
-      }
+
+          await Promise.all(
+            question.options.map(async (optionValue, i) => {
+              const isCorrect = question.correctAnswers.includes(`${i + 1}`)
+                ? "1"
+                : "0";
+
+              const optionInsertQuery =
+                "INSERT INTO options (option_id, quiz_id, question_id, option_value, correct_01) VALUES (?, ?, ?, ?, ?)";
+              await executeQuery(optionInsertQuery, [
+                uuidv4(),
+                quizId,
+                questionId,
+                optionValue,
+                isCorrect,
+              ]);
+            })
+          );
+        })
+      );
     }
   } catch (error) {
     console.error("Error uploading quiz data to DB:", error);
@@ -200,10 +204,10 @@ const executeQuery = async (query, params) => {
   }
 };
 
-const getSheetUrl = async (req,res) => {
+const getSheetUrl = async (req, res) => {
   try {
     const url = await getObjectUrl(".uploads/sampleSheet/SheetFormat.xlsx");
-    res.status(200).json({url});
+    res.status(200).json({ url });
   } catch (error) {
     console.error("Error getting URL from S3:", error);
     res.status(500).send(error.message);

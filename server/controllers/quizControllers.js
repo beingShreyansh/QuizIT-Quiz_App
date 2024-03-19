@@ -38,7 +38,7 @@ const getQuizData = async (req, res) => {
             questionContent: row.question_content,
             options: [],
             isMCQ: row.isMCQ === 0 ? false : true,
-
+            proficiencyLevel: row.ques_proficiency_level ,
             imageUrl: imageUrl
           };
         } else {
@@ -46,6 +46,7 @@ const getQuizData = async (req, res) => {
             questionId: row.question_id,
             questionContent: row.question_content,
             options: [],
+            proficiencyLevel: row.ques_proficiency_level ,
             isMCQ: row.isMCQ === 0 ? false : true 
           };
         }

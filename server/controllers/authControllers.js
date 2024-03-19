@@ -10,7 +10,7 @@ const { v4: uuidv4 } = require("uuid");
 const otpMemory = {};
 
 const createUser = async (req, res) => {
-  const { name, email, password,  isEmailVerified } = req.body.formData;
+  const { name, email, password, isEmailVerified } = req.body.formData;
   try {
     // Check if user with the same email already exists
     const existingUser = await User.findOneByEmail(email);
@@ -31,7 +31,6 @@ const createUser = async (req, res) => {
 
     // Save the user to the database
     const userId = await newUser.save();
-
 
     // Generate JWT access token
     const accessToken = await signAccessToken(userId);
@@ -222,7 +221,6 @@ const loginUser = async (req, res) => {
         userId: existingUser.id,
         role: existingUser.role,
         accessToken,
-        
       });
     } else {
       // Password does not match
