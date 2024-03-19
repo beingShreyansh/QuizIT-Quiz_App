@@ -12,7 +12,13 @@ import { PieChart, Pie, ResponsiveContainer } from "recharts";
 Modal.setAppElement("#root");
 
 function QuizPlayground() {
-  const { id, totalQuestions, beginnerRatio, intermediateRatio, advancedRatio } = useParams();
+  const {
+    id,
+    totalQuestions,
+    beginnerRatio,
+    intermediateRatio,
+    advancedRatio,
+  } = useParams();
   const navigate = useNavigate();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,8 +34,12 @@ function QuizPlayground() {
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/quiz/getQuiz/${id}/${totalQuestions}/${beginnerRatio}/${intermediateRatio}/${advancedRatio}`);
-        
+        const response = await axios.get(
+          `${
+            import.meta.env.VITE_API_URL
+          }/quiz/getQuiz/${id}/${totalQuestions}/${beginnerRatio}/${intermediateRatio}/${advancedRatio}`
+        );
+
         if (response.status === 200 && response.data.length > 0) {
           setQuizData(response.data);
           setIsLoading(false);
@@ -43,7 +53,14 @@ function QuizPlayground() {
       }
     };
     fetchQuizData();
-  }, [id, totalQuestions, beginnerRatio, intermediateRatio, advancedRatio, navigate]);
+  }, [
+    id,
+    totalQuestions,
+    beginnerRatio,
+    intermediateRatio,
+    advancedRatio,
+    navigate,
+  ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -57,7 +74,8 @@ function QuizPlayground() {
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       event.preventDefault();
-      event.returnValue = "Changes you made may not be saved. Reloading the quiz will close the quiz. Are you sure you want to reload?";
+      event.returnValue =
+        "Changes you made may not be saved. Reloading the quiz will close the quiz. Are you sure you want to reload?";
     };
 
     const handleReloadConfirmation = (event) => {
@@ -110,7 +128,9 @@ function QuizPlayground() {
 
   const handleSubmitQuiz = async () => {
     setIsModalLoading(true);
-    const underReview = Object.values(answers).some((answer) => answer === "review");
+    const underReview = Object.values(answers).some(
+      (answer) => answer === "review"
+    );
 
     if (!underReview) {
       stopTimer();
@@ -125,7 +145,10 @@ function QuizPlayground() {
           attemptedQuestions: Object.keys(answers).length,
         };
 
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/quiz/get-results`, updatedFormData);
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/quiz/get-results`,
+          updatedFormData
+        );
 
         if (response.status === 200) {
           setScore(response.data);
@@ -137,7 +160,9 @@ function QuizPlayground() {
         console.error(error);
       }
     } else {
-      toast.error("One or more questions are under review. Please complete all reviews before submitting.");
+      toast.error(
+        "One or more questions are under review. Please complete all reviews before submitting."
+      );
     }
   };
 
@@ -152,6 +177,12 @@ function QuizPlayground() {
       { name: "Attempted", value: attemptedQuestions },
       { name: "Unattempted", value: unattemptedQuestions },
     ];
+  };
+
+  const getProficiencyLevelText = (level) => {
+    if (level == 0) return "Beginner";
+    if (level == 1) return "Intermediate";
+    if (level == 2) return "Advanced";
   };
 
   return (
@@ -206,7 +237,9 @@ function QuizPlayground() {
 
           <div className="unattempted-card">
             <p className="card-title">Unattempted Questions</p>
-            <p className="card-number">{quizData.length - Object.keys(answers).length}</p>
+            <p className="card-number">
+              {quizData.length - Object.keys(answers).length}
+            </p>
           </div>
 
           <div className="total-questions-card">
@@ -240,6 +273,15 @@ function QuizPlayground() {
           <div className="review-quiz-container">
             <div className="timer">
               Timer: {Math.floor(timer / 60)}:{timer % 60}
+              <div
+                className={`proficiency-level ${getProficiencyLevelText(
+                  quizData[questionIndex]?.proficiencyLevel
+                ).toLowerCase()}`}
+              >
+                {getProficiencyLevelText(
+                  quizData[questionIndex]?.proficiencyLevel
+                )}
+              </div>
             </div>
             <div className="quiz-container">
               {quizData.length > 0 && (
@@ -252,7 +294,7 @@ function QuizPlayground() {
                   selectedOption={answers[quizData[questionIndex]?.questionId]}
                   handleSelectedOption={handleSelectedOption}
                 />
-                )}
+              )}
               <div className="prev-next-buttons">
                 <button
                   onClick={handlePrevQuestion}
@@ -263,13 +305,16 @@ function QuizPlayground() {
                 <button onClick={handleSubmitQuiz}>Submit Quiz</button>
                 <button
                   onClick={handleNextQuestion}
-                  disabled={questionIndex === quizData.length - 1 || quizSubmitted}
+                  disabled={
+                    questionIndex === quizData.length - 1 || quizSubmitted
+                  }
                 >
                   Next
                 </button>
               </div>
               <p className="submission-note">
-                Note: After submission, you will not be able to change your answers.
+                Note: After submission, you will not be able to change your
+                answers.
               </p>
             </div>
           </div>
