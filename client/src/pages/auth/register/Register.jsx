@@ -18,9 +18,10 @@ function Register() {
   const [emailValidationResult, setEmailValidationResult] = useState("");
   const [formValidation, setFormValidation] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showOTPInput, setShowOTPInput] = useState(false);
+  const [showSendOTPButton, setShowSendOTPButton] = useState(true);
+  const [showVerifyOTPButton, setShowVerifyOTPButton] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
   const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState(null);
 
   const validator = () => {
     const validPasswordString = passwordValidations.validatePassword(
@@ -46,48 +47,26 @@ function Register() {
     }));
   };
 
-  const handlePut = async () => {
-    try {
+const handleSendOTP = async () => {
+  try {
+    setLoading(true); // Start loading
 
-      const signedUrlResponse ="  https://quiz-it-app-bucket.s3.us-east-1.amazonaws.com/.uploads/users/sample-img?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAQ5E2ZJW7ZX4DKK4Z%2F20240311%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240311T142238Z&X-Amz-Expires=900&X-Amz-Signature=16f40f72c2c3bc3f229fa70bade9169ab8db8918b0312f673599f14ad9c5a537&X-Amz-SignedHeaders=host&x-id=PutObject"
+    // Send request to server to send OTP to the provided email
+    await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
+      email: formData.email,
+    });
 
-      // Upload the selected image to the signed URL
-      await axios.put(signedUrlResponse, selectedImage, {
-        headers: {
-          "Content-Type": "image/jpeg", // Adjust the content type as per your requirements
-        },
-      });
+    toast.success("OTP sent successfully");
+    setShowSendOTPButton(false); // Hide Send OTP button after sending OTP
+    setShowVerifyOTPButton(true); // Show Verify OTP button after sending OTP
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    toast.error("Failed to send OTP");
+  } finally {
+    setLoading(false); // Stop loading
+  }
+};
 
-      toast.success("Image uploaded successfully");
-    } catch (error) {
-      console.error("Error uploading image:", error);
-
-    }
-  };
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedImage(file);
-  };
-
-
-  const handleSendOTP = async () => {
-    try {
-      setLoading(true);
-
-      // Send request to server to send OTP to the provided email
-      await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
-        email: formData.email,
-      });
-
-      toast.success("OTP sent successfully");
-      setShowOTPInput(true); // Show OTP input after sending OTP
-    } catch (error) {
-      console.error("Error sending OTP:", error);
-      toast.error("Failed to send OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleVerifyOTP = async () => {
     try {
@@ -104,10 +83,12 @@ function Register() {
         ...prevData,
         isEmailVerified: true,
       }));
+      setOtpVerified(true);
+      setShowVerifyOTPButton(false); // Hide Verify OTP button after successful verification
       setFormValidation(true); // Enable registration after successful OTP verification
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      toast.error("Invalid not Verified");
+      toast.error("Invalid OTP");
     } finally {
       setLoading(false);
     }
@@ -118,9 +99,11 @@ function Register() {
 
     try {
       setLoading(true);
+
       validator();
 
       if (formValidation) {
+        // Check if email is verified before registering
         if (!formData.isEmailVerified) {
           toast.error("Please verify your email address");
           return;
@@ -131,8 +114,13 @@ function Register() {
           formData
         );
 
+        console.log("Registration successful. Response:", response.data);
+
         if (response.status === 201) {
+          // Show a success toast upon successful registration
           toast.success("Registered Successfully!");
+
+          // Redirect to the login page after successful registration
           navigate("/login");
         }
       }
@@ -141,6 +129,7 @@ function Register() {
 
       if (error.response) {
         console.error("Server responded with an error:", error.response.data);
+        // Show a user-friendly error message
         toast.error(error.response.data.error || "Registration failed");
       } else if (error.request) {
         console.error("No response received from the server");
@@ -181,7 +170,6 @@ function Register() {
                 onChange={(e) => {
                   handleChange(e);
                   setEmailValidationResult("");
-                  setShowOTPInput(false); // Hide OTP input when email changes
                 }}
               />
               {emailValidationResult && (
@@ -189,7 +177,20 @@ function Register() {
               )}
 
               {/* Add OTP input and buttons */}
-              {showOTPInput && (
+              {showSendOTPButton && (
+                <div>
+                  <button
+                    className="btn"
+                    onClick={handleSendOTP}
+                    disabled={!formData.email || loading}
+                  >
+                    Send OTP
+                  </button>
+                  {loading && <div className="loader">Loading...</div>}
+                </div>
+              )}
+
+              {showVerifyOTPButton && (
                 <div>
                   <input
                     className="input100"
@@ -209,18 +210,8 @@ function Register() {
                 </div>
               )}
 
-              {formValidation ? (
-                <>{/* Rendered when OTP is verified */}</>
-              ) : (
-                <>
-                  <button
-                    className="btn"
-                    onClick={handleSendOTP}
-                    disabled={!formData.email || loading}
-                  >
-                    Send OTP
-                  </button>
-                </>
+              {otpVerified && (
+                <font color="green">OTP successfully verified</font>
               )}
             </div>
 
@@ -257,12 +248,6 @@ function Register() {
                 Login
               </Link>
             </div>
-            <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-              />
-            <button onClick={handlePut}>CLick me</button>
           </div>
         </div>
       </div>

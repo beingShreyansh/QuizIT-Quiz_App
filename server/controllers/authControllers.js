@@ -3,46 +3,50 @@ const User = require("../models/User");
 const { signAccessToken } = require("./jwtController");
 const sendMail = require("../helpers/sendMail");
 const randomstring = require("randomstring");
-const { getObjectUrl } = require("../awsConfig");
+const { getObjectUrl, putObject } = require("../awsConfig");
 const { v4: uuidv4 } = require("uuid");
+const {db}=require('../dbConfig')
 
 // Memory storage for OTPs
 const otpMemory = {};
 
 const createUser = async (req, res) => {
-  const { name, email, password,  isEmailVerified } = req.body.formData;
   try {
+    const { name, email, password, isEmailVerified } = req.body; // Destructure directly from req.body
+
     // Check if user with the same email already exists
     const existingUser = await User.findOneByEmail(email);
     if (existingUser) {
       return res.status(409).json({ error: "User already exists" });
     }
-    if (!isEmailVerified)
-      return res.status(410).json({ error: "Email not Verified" });
+
+    if (!isEmailVerified) {
+      return res.status(410).json({ error: "Email not verified" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new User instance with role based on request or default to 'user'
+    // Create a new User instance with default role 'user'
     const newUser = new User({
       name,
       email,
       password: hashedPassword,
-      role: role || "user",
     });
 
     // Save the user to the database
     const userId = await newUser.save();
 
-
     // Generate JWT access token
     const accessToken = await signAccessToken(userId);
 
     // Respond with user ID, role, and access token
-    res.status(201).json({ userId, role: newUser.role, accessToken });
+    res.status(201).json({ userId, accessToken });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ error: "Failed to register user" });
   }
 };
+
 
 function generateRandomOTP(length) {
   const charset = "0123456789";
@@ -222,7 +226,6 @@ const loginUser = async (req, res) => {
         userId: existingUser.id,
         role: existingUser.role,
         accessToken,
-        
       });
     } else {
       // Password does not match
@@ -255,13 +258,82 @@ const getSignedObjectUrlToPut = async (req, res) => {
   try {
     const { fileName, contentType } = req.query;
     const key = uuidv4();
-    const signedUrl = await getObjectUrl(key, contentType);
+    const signedUrl = await putObject(key, contentType);
     res.json({ signedUrl, imageId: key });
   } catch (error) {
     console.error("Error registering user:", error);
     res.status(500).json({ error: "Failed to register user" });
   }
 };
+const changePassword = async (req, res) => {
+  const { userId, currentPassword, newPassword } = req.body;
+
+  try {
+    // Fetch the user's hashed password from the database using userId
+    const user = await User.findOneById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Compare the provided current password with the user's stored password
+    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!passwordMatch) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    // Hash the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user's password
+    await User.updatePassword(userId, hashedNewPassword);
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    return res.status(500).json({ error: "Failed to change password" });
+  }
+};
+const forgetPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  try {
+    // Check if email and newPassword are provided
+    if (!email || !newPassword) {
+      return res
+        .status(400)
+        .json({ error: "Email and new password are required" });
+    }
+
+    // Update password in the database using email
+    await User.updatePasswordByEmail(email, newPassword);
+
+    // Respond with success message
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+const uploadImageId =  (req, res) => {
+  const { userId } = req.body;
+  const { imageId } = req.params;
+
+  try {
+    // Update imageId for the user
+    const updateQuery = "UPDATE user SET imageId = ? WHERE id = ?";
+     db.query(updateQuery, [imageId, userId]);
+
+    res.send("Image ID updated successfully");
+  } catch (error) {
+    console.error("Error updating image ID:", error);
+    res.status(500).send("Internal server error");
+  }
+};
+
 
 module.exports = {
   createUser,
@@ -271,4 +343,7 @@ module.exports = {
   handleSendOTP,
   handleVerifyOTP,
   getSignedObjectUrlToPut,
+  changePassword,
+  uploadImageId,
+  forgetPassword,
 };

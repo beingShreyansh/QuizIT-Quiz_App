@@ -18,11 +18,9 @@ const UserHome = () => {
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [numOfQues, setNumOfQues] = useState(10);
-  let qProfMap = new Map();
-  qProfMap.set('beg', 10);
-  qProfMap.set('imed', 80);
-  qProfMap.set('adv', 10);
-  const [quesProficiencyPerMap, setQuesProficiencyPer] = useState(qProfMap);
+  const [begQuesPer, setBegQuesPer] = useState(20);
+  const [imedQuesPer, setImedQuesPer] = useState(60);
+  const [advQuesPer, setAdvQuesPer] = useState(20);
   const navigate = useNavigate();
 
   const handleInputChange = (event) => {
@@ -38,11 +36,8 @@ const UserHome = () => {
 
   const handleBegProficInptChange = (event) => {
     const value = event.target.value;
-    qProfMap.set('beg', value);
-    var imedVal = qProfMap.get('imed');
-    var advVal = qProfMap.get('adv');
-    setQuesProficiencyPer(qProfMap);
-    if ((value + imedVal + advVal) != 100)
+    setBegQuesPer(value);
+    if ((begQuesPer + imedQuesPer + advQuesPer) != 100)
     {
       toast.error("Sum of Percentage is not equal to 100");
     } 
@@ -50,14 +45,20 @@ const UserHome = () => {
 
   const handleImedProficInptChange = (event) => {
     const value = event.target.value;
-    qProfMap.set('imed', value);
-    setQuesProficiencyPer(qProfMap);
+    setImedQuesPer(value);
+    if ((begQuesPer + imedQuesPer + advQuesPer) != 100)
+    {
+      toast.error("Sum of Percentage is not equal to 100");
+    }
   }
 
   const handleAdvProficInptChange = (event) => {
     const value = event.target.value;
-    qProfMap.set('adv', value);
-    setQuesProficiencyPer(qProfMap);
+    setAdvQuesPer(value);
+    if ((begQuesPer + imedQuesPer + advQuesPer) != 100)
+    {
+      toast.error("Sum of Percentage is not equal to 100");
+    }
   }
 
   const handleCategorySelect = (category) => {
@@ -73,7 +74,7 @@ const UserHome = () => {
 
   const handleStartQuiz = () => {
     if (selectedCategory.quiz_id) {
-        const url = `/quiz/${selectedCategory.quiz_id}/${numOfQues}/${qProfMap.get('beg')}/${qProfMap.get('imed')}/${qProfMap.get('adv')}`;
+        const url = `/quiz/${selectedCategory.quiz_id}/${numOfQues}/${begQuesPer}/${imedQuesPer}/${advQuesPer}`;
         window.open(url, '_blank');
     } else {
         toast.error("Select a Category");
@@ -126,7 +127,7 @@ const UserHome = () => {
                   filteredCategories.map((category) => (
                     <div
                       key={category.quiz_id}
-                      className="dropdown-item"
+                      className="dropdown-items"
                       onClick={() => handleCategorySelect(category)}
                     >
                       {category.quiz_name}
@@ -164,7 +165,7 @@ const UserHome = () => {
                 id="beg-inpt"
                 type="text"
                 placeholder="Enter beginner percentage"
-                value={quesProficiencyPerMap.get('beg')}
+                value={begQuesPer}
                 onChange={handleBegProficInptChange}
               />
             </div>
@@ -175,7 +176,7 @@ const UserHome = () => {
                 id="imed-inpt"
                 type="text"
                 placeholder="Enter intermediate percentage"
-                value={quesProficiencyPerMap.get('imed')}
+                value={imedQuesPer}
                 onChange={handleImedProficInptChange}
               />
             </div>
@@ -186,7 +187,7 @@ const UserHome = () => {
                 id="adv-inpt"
                 type="text"
                 placeholder="Enter advanced percentage"
-                value={quesProficiencyPerMap.get('adv')}
+                value={advQuesPer}
                 onChange={handleAdvProficInptChange}
               />
             </div>

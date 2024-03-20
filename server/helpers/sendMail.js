@@ -10,11 +10,11 @@ const sendMail = async (email, mailSubject, content) => {
 
     const transport = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      requireTLS: true,
+      port: 465, // Change port to 465 for SSL connection
+      secure: true, // Use SSL/TLS
       auth: { user: SMTP_MAIL, pass: SMTP_PASSWORD },
     });
+
 
     const mailOptions = {
       from: SMTP_MAIL,
