@@ -1,6 +1,6 @@
 const mysql = require("mysql2");
+const bcrypt = require("bcrypt");
 const { v4: uuidv4 } = require("uuid");
-const { getObjectUrl } = require("../awsConfig");
 
 const pool = mysql.createPool({
   host: process.env.DATABASE_HOST,
@@ -12,21 +12,22 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-
 class User {
   constructor({
     name,
     email,
     password,
-    role = "user",  
-    imageId = 'profile-default',
+    role = "user",
+    imageId = "profile-default",
   }) {
     this.name = name;
     this.email = email;
-    this.password = password;
     this.role = role; // Default role is 'user'
     this.imageId = imageId;
     this.pool = pool;
+    if (password) {
+      this.password = bcrypt.hashSync(password, 10); // Hash the password
+    }
   }
 
   save() {
@@ -37,20 +38,20 @@ class User {
           return;
         }
 
+        const id = uuidv4(); // Generate UUID for the user
         const query =
-          "INSERT INTO user (id, name, email, password, role, imageId) VALUES (?, ?, ?, ?, ?,?)";
+          "INSERT INTO user (id, name, email, password, role, imageId) VALUES (?, ?, ?, ?, ?, ?)";
 
         connection.query(
           query,
-          [uuidv4(), this.name, this.email, this.password, this.role, this.imageId],
+          [id, this.name, this.email, this.password, this.role, this.imageId],
           (error, results) => {
             connection.release();
 
             if (error) {
               reject(error);
             } else {
-              this.id = results.insertId;
-              resolve(this.id);
+              resolve(id); // Resolve with the generated user ID
             }
           }
         );
@@ -75,6 +76,102 @@ class User {
             reject(error);
           } else {
             resolve(results.length > 0 ? results[0] : null);
+          }
+        });
+      });
+    });
+  }
+
+  static findOneById(userId) {
+    return new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const query = "SELECT * FROM user WHERE id = ? LIMIT 1";
+
+        connection.query(query, [userId], (error, results) => {
+          connection.release();
+
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results.length > 0 ? results[0] : null);
+          }
+        });
+      });
+    });
+  }
+
+  static updatePassword(userId, newPassword) {
+    return new Promise((resolve, reject) => {
+      const hashedPassword = bcrypt.hashSync(newPassword, 10); // Hash the new password
+
+      pool.getConnection((err, connection) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const query = "UPDATE user SET password = ? WHERE id = ?";
+
+        connection.query(query, [hashedPassword, userId], (error, results) => {
+          connection.release();
+
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+    });
+  }
+
+  static updatePasswordByEmail(email, newPassword) {
+    return new Promise((resolve, reject) => {
+      const hashedPassword = bcrypt.hashSync(newPassword, 10); // Hash the new password
+
+      pool.getConnection((err, connection) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const query = "UPDATE user SET password = ? WHERE email = ?";
+
+        connection.query(query, [hashedPassword, email], (error, results) => {
+          connection.release();
+
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+    });
+  }
+
+  static uploadImageId(userId, imageId) {
+    return new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const query = "UPDATE user SET imageId = ? WHERE id = ?";
+
+        connection.query(query, [imageId, userId], (error, results) => {
+          connection.release();
+
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
           }
         });
       });

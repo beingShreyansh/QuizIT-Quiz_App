@@ -1,3 +1,5 @@
+/* Navbar.css */
+
 #admin-navbar {
   top: 0;
   height: 60px;
@@ -42,17 +44,18 @@
 }
 
 #navLinks {
-  display: inline-block;
-  float: right;
+  display: flex;
+  justify-content: flex-end;
   list-style: none;
-  text-align: right;
+  margin-right: 15px;
+  gap: 20px;
   transition: transform 0.5s ease-out;
 }
 
 #navLinks a {
   color: #ffffffde; /* Secondary color for text */
   display: inline-block;
-  font-size: 0.8em;
+  font-size: 14px;
   height: 50px;
   letter-spacing: 1px;
   margin: 0 20px;
@@ -73,7 +76,7 @@
 /* Animated Bottom Line */
 #navLinks a:before,
 #navLinks a:after {
-  content: '';
+  content: "";
   position: absolute;
   width: 0%;
   height: 1px;
@@ -112,6 +115,176 @@
   transition: transform 0.5s ease; /* Added transition for hamburger menu */
 }
 
+.profile-container {
+  display: inline-flex;
+  align-items: center;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.user-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.dropdown-item {
+  color: #ffffffde;
+  display: inline-block;
+  font-size: 14px;
+  padding: 0 4px;
+  position: relative;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+  width: 90%;
+  margin: auto;
+}
+
+.dropdown-item:hover {
+  background-color: #333;
+}
+
+.dropdown-content {
+  position: absolute;
+  background-color: none;
+  min-width: 160px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  top: 100%;
+  margin: auto;
+  width: 100%;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  backdrop-filter: blur(
+    5px
+  ); /* Apply blur effect to content behind the modal */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+  width: 400px; /* Adjust width as needed */
+  position: relative; /* Ensure relative positioning for absolute positioning of close button */
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 24px;
+  color: #888; /* Adjust color to grey */
+  transition: color 0.3s ease; /* Smooth color transition */
+}
+
+.modal-close:hover {
+  color: #333; /* Darken color on hover */
+}
+
+.modal-content h2 {
+  color: #333; /* Adjust color to a darker grey */
+  margin-bottom: 20px; /* Add space below heading */
+}
+
+.modal-content input[type="password"],
+.modal-content input[type="text"] {
+  width: calc(100% - 20px); /* Make input full width with padding */
+  padding: 10px;
+  margin-bottom: 20px; /* Add space below input */
+  border: 1px solid #ddd; /* Add subtle border */
+  border-radius: 5px; /* Add border radius */
+  transition: border-color 0.3s ease; /* Smooth border color transition */
+}
+
+.modal-content input[type="password"]:focus,
+.modal-content input[type="text"]:focus {
+  border-color: #007bff; /* Change border color on focus */
+}
+
+.modal-content button {
+  background-color: #007bff; /* Primary color for button */
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth background color transition */
+}
+
+.modal-content button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+.modal-content .error {
+  color: #ff0000; /* Red color for error message */
+  margin-bottom: 20px; /* Add space below error message */
+}
+
+.avatar-container {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto;
+  position: relative;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-inputs {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-labels {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.file-labels:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
 button.btn {
   background-color: #007bff; /* Primary color */
   color: white;
@@ -124,62 +297,19 @@ button.btn {
 button.btn :hover {
   background-color: #0056b3;
 }
-
-.menu-toggle .bar {
-  background-color: #6b696d; /* Updated color for the toggle bar */
-  height: 3px;
-  width: 25px;
-  margin: 5px 0;
-  transition: 0.3s;
+.upload-btn {
+  display: block;
+  width: 20%;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-/* Add this to your AdminNavbar.css */
-
-/* ... existing styles ... */
-@media (max-width: 768px) {
-  #admin-navbar #navLinks {
-    display: none;
-  }
-  .logo {
-    align-items: center;
-    /* margin: auto; */
-  }
-  #admin-navbar #navLinks.open {
-    display: block;
-    background-color: #1c1c1c; /* Background color on mobile menu */
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    text-align: center;
-    box-shadow: 2px 2px 10px #1c1c1c;
-    transition: opacity 0.5s ease; /* Added transition for opening the hamburger menu */
-  }
-
-  #admin-navbar #navLinks.open li {
-    display: block;
-    margin: 10px 0;
-  }
-
-  #admin-navbar #navLinks.open a {
-    font-size: 1.1em;
-    display: block;
-    color: #69696d; /* Secondary color for text */
-    transition: opacity 0.5s ease; /* Added transition for closing the hamburger menu */
-  }
-
-  #admin-navbar #navLinks.open a:before,
-  #admin-navbar #navLinks.open a:after {
-    display: none;
-  }
-
-  #admin-navbar .menu-toggle {
-    display: block;
-  }
-
-  #admin-navbar .menu-toggle.open {
-    transform: rotate(
-      90deg
-    ); /* Added rotation for the hamburger icon when the menu is open */
-  }
+.upload-btn:hover {
+  background-color: #0056b3;
 }

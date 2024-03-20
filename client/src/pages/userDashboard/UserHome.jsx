@@ -126,7 +126,7 @@ const UserHome = () => {
                   filteredCategories.map((category) => (
                     <div
                       key={category.quiz_id}
-                      className="dropdown-item"
+                      className="dropdown-items"
                       onClick={() => handleCategorySelect(category)}
                     >
                       {category.quiz_name}

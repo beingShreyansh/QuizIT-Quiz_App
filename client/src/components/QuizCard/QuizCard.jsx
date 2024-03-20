@@ -35,7 +35,6 @@ const QuizCard = ({
         </h2>
         {questionImageUrl && <img className='question-image' src={questionImageUrl} alt='Question Image' />}
       </div>
-      {console.log(questionImageUrl)}
       <div className="options-box">
         <Form.Group>
           {options.map((option, index) => (
