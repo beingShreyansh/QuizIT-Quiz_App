@@ -1,4 +1,5 @@
 const mysql = require("mysql2");
+const bcrypt = require("bcrypt");
 const { v4: uuidv4 } = require("uuid");
 
 const pool = mysql.createPool({
@@ -21,10 +22,12 @@ class User {
   }) {
     this.name = name;
     this.email = email;
-    this.password = password;
     this.role = role; // Default role is 'user'
     this.imageId = imageId;
     this.pool = pool;
+    if (password) {
+      this.password = bcrypt.hashSync(password, 10); // Hash the password
+    }
   }
 
   save() {
@@ -104,6 +107,8 @@ class User {
 
   static updatePassword(userId, newPassword) {
     return new Promise((resolve, reject) => {
+      const hashedPassword = bcrypt.hashSync(newPassword, 10); // Hash the new password
+
       pool.getConnection((err, connection) => {
         if (err) {
           reject(err);
@@ -112,7 +117,32 @@ class User {
 
         const query = "UPDATE user SET password = ? WHERE id = ?";
 
-        connection.query(query, [newPassword, userId], (error, results) => {
+        connection.query(query, [hashedPassword, userId], (error, results) => {
+          connection.release();
+
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+    });
+  }
+
+  static updatePasswordByEmail(email, newPassword) {
+    return new Promise((resolve, reject) => {
+      const hashedPassword = bcrypt.hashSync(newPassword, 10); // Hash the new password
+
+      pool.getConnection((err, connection) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const query = "UPDATE user SET password = ? WHERE email = ?";
+
+        connection.query(query, [hashedPassword, email], (error, results) => {
           connection.release();
 
           if (error) {

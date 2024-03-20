@@ -295,6 +295,29 @@ const changePassword = async (req, res) => {
     return res.status(500).json({ error: "Failed to change password" });
   }
 };
+const forgetPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  try {
+    // Check if email and newPassword are provided
+    if (!email || !newPassword) {
+      return res
+        .status(400)
+        .json({ error: "Email and new password are required" });
+    }
+
+    // Update password in the database using email
+    await User.updatePasswordByEmail(email, newPassword);
+
+    // Respond with success message
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
 const uploadImageId =  (req, res) => {
   const { userId } = req.body;
   const { imageId } = req.params;
@@ -322,4 +345,5 @@ module.exports = {
   getSignedObjectUrlToPut,
   changePassword,
   uploadImageId,
+  forgetPassword,
 };
