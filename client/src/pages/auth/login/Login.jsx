@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import passwordValidations from "../../../validations/passwordValidation";
 import Spinner from "../../../components/spinner/Spinner";
+import Modal from "react-modal"; // Import Modal component
 
 function Login() {
   const navigate = useNavigate();
@@ -15,6 +16,15 @@ function Login() {
     email: "",
     password: "",
   });
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changePasswordError, setChangePasswordError] = useState("");
+
+  const handleChangePassword = () => {
+    // Implement change password logic here
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -22,6 +32,7 @@ function Login() {
       [e.target.name]: e.target.value,
     });
   };
+
   const validator = () => {
     const validPasswordString = passwordValidations.validatePassword(
       formData.password
@@ -129,7 +140,11 @@ function Login() {
                     </button>
                   </div>
 
-                  <div className="text-center p-t-115">
+                  <div className="text-center p-t-20">
+                    <button className="forgot-password" onClick={() => setPasswordModalOpen(true)}>Forgot Password?</button>
+                  </div>
+
+                  <div className="text-center p-t-20">
                     <span className="txt1">Don't have an account? </span>
                     <Link to="/register" className="txt2">
                       Sign Up
@@ -139,6 +154,43 @@ function Login() {
               </div>
             </div>
           </div>
+
+          <Modal
+            isOpen={passwordModalOpen}
+            onRequestClose={() => setPasswordModalOpen(false)}
+            className="modal-content"
+            overlayClassName="modal-overlay"
+          >
+            <span
+              className="modal-close"
+              onClick={() => setPasswordModalOpen(false)}
+            >
+              &times;
+            </span>
+            <h2>Change Password</h2>
+            <input
+              type="password"
+              placeholder="Old Password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Confirm New Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            {changePasswordError && <p className="error">{changePasswordError}</p>}
+            <button className="change-password-btn" onClick={handleChangePassword}>
+              Change Password
+            </button>
+          </Modal>
         </>
       )}
     </>

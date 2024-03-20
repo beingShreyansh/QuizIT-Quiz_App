@@ -35,10 +35,11 @@ function QuizPlayground() {
     const fetchQuizData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/quiz/getQuiz/${id}/${totalQuestions}/${beginnerRatio}/${intermediateRatio}/${advancedRatio}`
+          `${
+            import.meta.env.VITE_API_URL
+          }/quiz/getQuiz/${id}/${totalQuestions}/${beginnerRatio}/${intermediateRatio}/${advancedRatio}`
         );
-        console.log("API Response:", response);
-        
+
         if (response.status === 200 && response.data.length > 0) {
           setQuizData(response.data);
           setIsLoading(false);
@@ -52,8 +53,14 @@ function QuizPlayground() {
       }
     };
     fetchQuizData();
-  }, []);
-  
+  }, [
+    id,
+    totalQuestions,
+    beginnerRatio,
+    intermediateRatio,
+    advancedRatio,
+    navigate,
+  ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -69,7 +76,6 @@ function QuizPlayground() {
       event.preventDefault();
       event.returnValue =
         "Changes you made may not be saved. Reloading the quiz will close the quiz. Are you sure you want to reload?";
-      console.log(event);
     };
 
     const handleReloadConfirmation = (event) => {
@@ -83,7 +89,7 @@ function QuizPlayground() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("unload", handleReloadConfirmation);
     };
-  }, []);
+  }, [navigate]);
 
   const startTimer = () => {
     setIsTimerRunning(true);
@@ -107,14 +113,6 @@ function QuizPlayground() {
   };
 
   const handleSelectedOption = (option) => {
-    handleOptionSelection(option);
-  };
-
-  const handleNewSelectedOption = (option) => {
-    handleOptionSelection(option);
-  };
-
-  const handleOptionSelection = (option) => {
     if (!quizSubmitted) {
       const questionId = quizData[questionIndex]?.questionId;
       const updatedAnswers = { ...answers, [questionId]: option };
@@ -179,6 +177,12 @@ function QuizPlayground() {
       { name: "Attempted", value: attemptedQuestions },
       { name: "Unattempted", value: unattemptedQuestions },
     ];
+  };
+
+  const getProficiencyLevelText = (level) => {
+    if (level == 0) return "Beginner";
+    if (level == 1) return "Intermediate";
+    if (level == 2) return "Advanced";
   };
 
   return (
@@ -269,20 +273,27 @@ function QuizPlayground() {
           <div className="review-quiz-container">
             <div className="timer">
               Timer: {Math.floor(timer / 60)}:{timer % 60}
+              <div
+                className={`proficiency-level ${getProficiencyLevelText(
+                  quizData[questionIndex]?.proficiencyLevel
+                ).toLowerCase()}`}
+              >
+                {getProficiencyLevelText(
+                  quizData[questionIndex]?.proficiencyLevel
+                )}
+              </div>
             </div>
             <div className="quiz-container">
               {quizData.length > 0 && (
                 <QuizCard
-                questionNo={questionIndex + 1}
-                questionImageUrl={quizData[questionIndex]?.imageUrl}
-                question={quizData[questionIndex]?.questionContent} // Pass the question_content property
-                options={quizData[questionIndex]?.options}
-                isMCQ={quizData[questionIndex]?.isMCQ}
-                selectedOption={answers[quizData[questionIndex]?.question_id]}
-                handleSelectedOption={handleSelectedOption}
-                handleNewSelectedOption={handleNewSelectedOption}
-              />
-              
+                  questionNo={questionIndex + 1}
+                  questionImageUrl={quizData[questionIndex]?.imageUrl}
+                  question={quizData[questionIndex]?.questionContent}
+                  options={quizData[questionIndex]?.options}
+                  isMCQ={quizData[questionIndex]?.isMCQ}
+                  selectedOption={answers[quizData[questionIndex]?.questionId]}
+                  handleSelectedOption={handleSelectedOption}
+                />
               )}
               <div className="prev-next-buttons">
                 <button

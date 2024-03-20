@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Navbar.css";
 import Logo from "../../assets/logo.png";
@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import Modal from "react-modal";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userId, setUserId] = useState(null);
@@ -23,14 +24,11 @@ const Navbar = () => {
   const [uploadError, setUploadError] = useState("");
 
   const handleLogout = () => {
-    toast.success("Logged out");
+    navigate("/login");
     localStorage.removeItem("role");
     localStorage.removeItem("userId");
     localStorage.removeItem("accessToken");
-  };
-
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+    toast.success("Logged out");
   };
 
   const handleChangePasswordClick = () => {
@@ -78,53 +76,64 @@ const Navbar = () => {
         setChangePasswordError("Failed to change password. Please try again.");
       });
   };
- const handlePut = async () => {
-   console.log(selectedImage);
-   try {
-     const signedUrlResponse = await axios.get(
-       `${import.meta.env.VITE_API_URL}/auth/get-signed-url`,
-       {
-         params: {
-           fileName: selectedImage.name,
-           contentType: selectedImage.type,
-         },
-       }
-     );
+  const handlePut = async () => {
+    try {
+      const signedUrlResponse = await axios.get(
+        `${import.meta.env.VITE_API_URL}/auth/get-signed-url`,
+        {
+          params: {
+            fileName: selectedImage.name,
+            contentType: selectedImage.type,
+          },
+        }
+      );
 
-     const putResponse = await axios.put(
-       signedUrlResponse.data.signedUrl,
-       selectedImage,
-       {
-         headers: {
-           "Content-Type": "image/jpeg",
-         },
-       }
-     );
+      const putResponse = await axios.put(
+        signedUrlResponse.data.signedUrl,
+        selectedImage,
+        {
+          headers: {
+            "Content-Type": "image/jpeg",
+          },
+        }
+      );
 
-     console.log("Response status:", putResponse.status);
-
-     if (putResponse.status === 200) {
-       console.log("Image uploaded successfully");
-
-       // Update imageId for the user
-       const updateResponse = await axios.put(
-         `${import.meta.env.VITE_API_URL}/auth/putImageId/${
-           signedUrlResponse.data.imageId
-         }`,
-         { userId }
-       );
-
-       toast.success("Image uploaded successfully");
-     }
-   } catch (error) {
-     console.error("Error uploading image:", error);
-   }
- };
-
+      if (putResponse.status === 200) {
+        // Update imageId for the user
+        const updateResponse = await axios.put(
+          `${import.meta.env.VITE_API_URL}/auth/putImageId/${
+            signedUrlResponse.data.imageId
+          }`,
+          { userId }
+        );
+        setProfilePictureModalOpen(false);
+        getUserDetailsFunc();
+        window.location.reload();
+        toast.success("Image uploaded successfully");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setSelectedImage(file);
+  };
+
+  const getUserDetailsFunc = (userDetailsApiUrl) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+    axios
+      .get(userDetailsApiUrl, { headers })
+      .then((response) => {
+        const { name, imageUrl } = response.data;
+        setUserName(name);
+        setProfilePicture(imageUrl);
+      })
+      .catch((error) => console.error("Error fetching user details:", error));
   };
 
   useEffect(() => {
@@ -132,27 +141,11 @@ const Navbar = () => {
     const id = localStorage.getItem("userId");
     setIsAdmin(role);
     setUserId(id);
-
-    if (!role && id) {
+    if (id) {
       const userDetailsApiUrl = `${
         import.meta.env.VITE_API_URL
       }/user/getUserDetails/${id}`;
-      const accessToken = localStorage.getItem("accessToken");
-      const headers = {
-        Authorization: `Bearer ${accessToken}`,
-      };
-
-      axios
-        .get(userDetailsApiUrl, { headers })
-        .then((response) => {
-          const { name, profilePicture } = response.data;
-          setUserName(name);
-          setProfilePicture(
-            profilePicture ||
-              "https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o="
-          );
-        })
-        .catch((error) => console.error("Error fetching user details:", error));
+      getUserDetailsFunc(userDetailsApiUrl);
     }
   }, [userId]);
 
@@ -175,36 +168,10 @@ const Navbar = () => {
               <NavLink to="/admin/user-history" className="navlink">
                 User Statistics
               </NavLink>
-              <NavLink to="/login" className="navlink">
-                <button className="btn" onClick={handleLogout}>
-                  Logout
-                </button>
-              </NavLink>
-            </div>
-          ) : (
-            <div
-              id="navLinks"
-              className={`${menuOpen ? "open" : ""}`}
-              onClick={() => setDropdownOpen(false)}
-            >
-              <NavLink to="/#home" className="navlink">
-                User Home
-              </NavLink>
-              <NavLink
-                to={`/user-history/${userId}`}
-                className="navlink"
-                onClick={() => setDropdownOpen(false)}
-              >
-                History
-              </NavLink>
               <div>
                 {userId && (
                   <NavLink to="/#home" className="navlink">
-                    <div
-                      className="user-info"
-                      onMouseEnter={toggleDropdown}
-                      onMouseLeave={toggleDropdown}
-                    >
+                    <div className="user-info" onClick={toggleDropdown}>
                       <div className="profile-container">
                         {profilePicture && (
                           <div className="profile-container">
@@ -232,7 +199,7 @@ const Navbar = () => {
                           >
                             Change Picture
                           </span>
-                          <Link to="/login" className="dropdown">
+                          <Link to="/login" className="logout-btn">
                             <span
                               className="dropdown-item"
                               onClick={handleLogout}
@@ -245,6 +212,56 @@ const Navbar = () => {
                     </div>
                   </NavLink>
                 )}
+              </div>
+            </div>
+          ) : (
+            <div id="navLinks" onClick={() => setDropdownOpen((prev) => !prev)}>
+              <NavLink to="/#home" className="navlink">
+                User Home
+              </NavLink>
+              <NavLink
+                to={`/user-history/${userId}`}
+                className="navlink"
+                onClick={() => setDropdownOpen(false)}
+              >
+                History
+              </NavLink>
+              <div>
+                <div className="user-info" onClick={(e) => toggleDropdown(e)}>
+                  <div className="profile-container">
+                    {profilePicture && (
+                      <div className="profile-container">
+                        <img
+                          src={profilePicture}
+                          alt="Profile"
+                          className="profile-pic"
+                        />
+                      </div>
+                    )}
+                    <span className="user-name">Hi, {userName}</span>
+                  </div>
+                  {dropdownOpen && (
+                    <div className="dropdown-content">
+                      <span
+                        className="dropdown-item"
+                        onClick={handleChangePasswordClick}
+                      >
+                        Change Password
+                      </span>
+                      <span
+                        className="dropdown-item"
+                        onClick={handleChangeProfilePictureClick}
+                      >
+                        Change Picture
+                      </span>
+                      <div to="/login">
+                        <span className="dropdown-item" onClick={handleLogout}>
+                          Logout
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

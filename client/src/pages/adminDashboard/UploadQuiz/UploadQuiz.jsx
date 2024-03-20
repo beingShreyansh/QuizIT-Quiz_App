@@ -14,6 +14,7 @@ const UploadQuiz = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [sheetFormatUrl, setSheetFormatUrl] = useState("");
   const navigate = useNavigate();
 
   const handleFileChange = (event) => {
@@ -60,6 +61,7 @@ const UploadQuiz = () => {
       } else toast.error("File not submitted");
     }
   };
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -75,92 +77,106 @@ const UploadQuiz = () => {
       }
     };
     fetchCategories();
+
   }, []);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  return (
- 
-      <>
-        <Navbar />
-        {isUploading && <Spinner />}
-        <div className="upload-container">
-          <div className="upload-box">
-            <h1 className="upload-heading">Upload Excel File</h1>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              className="file-input"
-              accept=".xlsx, .xls"
-            />
+  const handleDownloadSheetFormat = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/admin/getSheetFormatUrl`
+      );
+      setSheetFormatUrl(response.data.url);
+      if (sheetFormatUrl) {
+        window.open(sheetFormatUrl, "_blank");
+      } else {
+        toast.error("Sheet format URL not available.");
+      }
+    } catch (error) {
+      console.error("Error fetching sheet format URL:", error);
+      toast.error("Error fetching sheet format URL. Please try again later.");
+    }
+  };
 
-            <button onClick={handleUpload} className="upload-button">
-              Upload
-            </button>
-            {selectedFile && (
-              <p className="file-selected">
-                Selected File: {selectedFile.name}
-              </p>
-            )}
-          </div>
-          <div className="show-quiz-name-button-container">
-            <button className="show-quiz-name-button" onClick={openModal}>
-              Show All Quiz Names
-            </button>
-            <button
-              className="show-quiz-name-button"
-              onClick={() => {
-                navigate("/editQuiz");
-              }}
-            >
-              Edit Quizes
-            </button>
-          </div>
-          <Modal
-            isOpen={isModalOpen}
-            onRequestClose={() => setIsModalOpen(false)}
-            contentLabel="All Quiz Names"
-            style={{
-              overlay: {
-                backgroundColor: "rgba(128, 128, 128, 0.4)",
-              },
-              content: {
-                backgroundColor: "lightgrey",
-                border: "1px solid #ccc",
-                outline: "none",
-                padding: "20px",
-                maxWidth: "600px",
-                margin: "auto",
-                color: "black",
-              },
-            }}
-          >
-            <h2>All Quiz Names</h2>
-            <div className="modal-categories">
-              {categories.map((category) => (
-                <div key={category.quiz_id} className="modal-category-name">
-                  {category.quiz_name}
-                </div>
-              ))}
-            </div>
-            <button
-              className="close-button"
-              onClick={() => setIsModalOpen(false)}
-            >
-              Close
-            </button>
-          </Modal>
-          <div className="instruction-box">
-            <h2 className="instruction-heading">Instructions:</h2>
-            <ul className="instruction-list">
-              <li>File should be Excel Sheet (.xlsx or .xls).</li>
-              <li>Only one sheet can be uploaded at a time.</li>
-              <li>Additional rules or instructions can be added here.</li>
-            </ul>
-          </div>
+  return (
+    <>
+      <Navbar />
+      {isUploading && <Spinner />}
+      <div className="upload-container">
+        <div className="upload-box">
+          <h1 className="upload-heading">Upload Excel File</h1>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            className="file-input"
+            accept=".xlsx, .xls"
+          />
+
+          <button onClick={handleUpload} className="upload-button">
+            Upload
+          </button>
+          {selectedFile && (
+            <p className="file-selected">Selected File: {selectedFile.name}</p>
+          )}
         </div>
-      </>
-  
+        <div className="show-quiz-name-button-container">
+          <button className="show-quiz-name-button" onClick={openModal}>
+            Show All Quiz Names
+          </button>
+        </div>
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={() => setIsModalOpen(false)}
+          contentLabel="All Quiz Names"
+          style={{
+            overlay: {
+              backgroundColor: "rgba(128, 128, 128, 0.4)",
+            },
+            content: {
+              backgroundColor: "lightgrey",
+              border: "1px solid #ccc",
+              outline: "none",
+              padding: "20px",
+              maxWidth: "600px",
+              margin: "auto",
+              color: "black",
+            },
+          }}
+        >
+          <h2>All Quiz Names</h2>
+          <div className="modal-categories">
+            {categories.map((category) => (
+              <div key={category.quiz_id} className="modal-category-name">
+                {category.quiz_name}
+              </div>
+            ))}
+          </div>
+          <button
+            className="close-button"
+            onClick={() => setIsModalOpen(false)}
+          >
+            Close
+          </button>
+        </Modal>
+        <div className="download-sheet-format-button-container">
+          <button
+            className="download-sheet-format-button"
+            onClick={handleDownloadSheetFormat}
+          >
+            Download Sheet Format
+          </button>
+        </div>
+        <div className="instruction-box">
+          <h2 className="instruction-heading">Instructions:</h2>
+          <ul className="instruction-list">
+            <li>File should be Excel Sheet (.xlsx or .xls).</li>
+            <li>Only one sheet can be uploaded at a time.</li>
+            <li>Additional rules or instructions can be added here.</li>
+          </ul>
+        </div>
+      </div>
+    </>
   );
 };
 

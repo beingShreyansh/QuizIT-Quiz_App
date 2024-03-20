@@ -73,12 +73,13 @@ const UserHome = () => {
 
   const handleStartQuiz = () => {
     if (selectedCategory.quiz_id) {
-      navigate(`/quiz/${selectedCategory.quiz_id}/${numOfQues}/${qProfMap.get('beg')}/${qProfMap.get('imed')}/${qProfMap.get('adv')}`);
+        const url = `/quiz/${selectedCategory.quiz_id}/${numOfQues}/${qProfMap.get('beg')}/${qProfMap.get('imed')}/${qProfMap.get('adv')}`;
+        window.open(url, '_blank');
     } else {
-      toast.error("Select a Category");
+        toast.error("Select a Category");
     }
-  };
-  
+};
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -125,7 +126,7 @@ const UserHome = () => {
                   filteredCategories.map((category) => (
                     <div
                       key={category.quiz_id}
-                      className="dropdown-item"
+                      className="dropdown-items"
                       onClick={() => handleCategorySelect(category)}
                     >
                       {category.quiz_name}

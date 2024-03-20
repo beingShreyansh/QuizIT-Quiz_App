@@ -45,18 +45,18 @@
 }
 
 #navLinks {
-  display: inline-flex;
-  float: right;
+  display: flex;
+  justify-content: flex-end;
   list-style: none;
-  text-align: right;
-  transition: transform 0.5s ease-out;
   margin-right: 15px;
+  gap: 20px;
+  transition: transform 0.5s ease-out;
 }
 
 #navLinks a {
   color: #ffffffde; /* Secondary color for text */
   display: inline-block;
-  font-size: 0.8em;
+  font-size: 14px;
   height: 50px;
   letter-spacing: 1px;
   margin: 0 20px;
@@ -155,48 +155,39 @@ button.btn:hover {
   position: relative;
   display: inline-flex;
   align-items: center;
-  cursor: pointer; /* Add cursor pointer to indicate interactivity */
+  cursor: pointer;
+   text-decoration: none;
+  text-transform: uppercase; 
 }
 
-.user-info:hover .dropdown-content {
-  display: block; /* Show dropdown content on hover */
+.dropdown-item {
+  color: #ffffffde;
+  display: inline-block;
+  font-size: 14px;
+  padding: 0 4px;
+  position: relative;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+  width: 90%;
+  margin: auto;
 }
 
+.dropdown-item:hover {
+  background-color: #333;
+}
 .dropdown-content {
-  display: none; /* Hide dropdown content by default */
   position: absolute;
   background-color: none;
   min-width: 160px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1;
-  right: 0;
   top: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
 }
-
-.dropdown-content button,
-.dropdown-content a {
-  color: #333;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  transition: background-color 0.3s;
-}
-
-.dropdown-content button:hover,
-.dropdown-content a:hover {
-  background-color: #ddd;
-}
-/* Navbar.css */
-
-/* Existing styles */
-
-/* Add this to your Navbar.css */
-
-/* Navbar.css */
-
-/* Existing styles */
-
-/* Add this to your Navbar.css */
 
 .modal-overlay {
   position: fixed;
@@ -205,7 +196,9 @@ button.btn:hover {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-  backdrop-filter: blur(5px); /* Apply blur effect to content behind the modal */
+  backdrop-filter: blur(
+    5px
+  ); /* Apply blur effect to content behind the modal */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -332,4 +325,3 @@ button.btn:hover {
 .upload-btn:hover {
   background-color: #0056b3;
 }
-
