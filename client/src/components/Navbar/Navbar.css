@@ -4,11 +4,10 @@
   top: 0;
   height: 60px;
   line-height: 60px;
-  width: 100vw;
+  width: 90vw;
   margin: auto;
   z-index: 10;
   border-bottom: 1px solid #69696d;
-  position: fixed;
 }
 
 .nav-wrapper {
@@ -116,30 +115,6 @@
   transition: transform 0.5s ease; /* Added transition for hamburger menu */
 }
 
-button.btn {
-  background-color: #007bff; /* Primary color */
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button.btn:hover {
-  background-color: #0056b3;
-}
-
-.menu-toggle .bar {
-  background-color: #6b696d; /* Updated color for the toggle bar */
-  height: 3px;
-  width: 25px;
-  margin: 5px 0;
-  transition: 0.3s;
-}
-
-/* Add this to your Navbar.css */
-
 .profile-container {
   display: inline-flex;
   align-items: center;
@@ -151,13 +126,14 @@ button.btn:hover {
   border-radius: 50%;
   margin-right: 10px;
 }
+
 .user-info {
   position: relative;
   display: inline-flex;
   align-items: center;
   cursor: pointer;
-   text-decoration: none;
-  text-transform: uppercase; 
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
 .dropdown-item {
@@ -177,6 +153,7 @@ button.btn:hover {
 .dropdown-item:hover {
   background-color: #333;
 }
+
 .dropdown-content {
   position: absolute;
   background-color: none;
@@ -185,8 +162,7 @@ button.btn:hover {
   z-index: 1;
   top: 100%;
   margin: auto;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
 }
 
 .modal-overlay {
@@ -265,6 +241,7 @@ button.btn:hover {
   color: #ff0000; /* Red color for error message */
   margin-bottom: 20px; /* Add space below error message */
 }
+
 .avatar-container {
   width: 150px;
   height: 150px;
@@ -280,7 +257,7 @@ button.btn:hover {
   object-fit: cover;
 }
 
-.file-input {
+.file-inputs {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -290,7 +267,7 @@ button.btn:hover {
   cursor: pointer;
 }
 
-.file-label {
+.file-labels {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -305,10 +282,21 @@ button.btn:hover {
   transition: background-color 0.3s ease;
 }
 
-.file-label:hover {
+.file-labels:hover {
   background-color: rgba(0, 0, 0, 0.7);
 }
-
+button.btn {
+  background-color: #007bff; /* Primary color */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button.btn :hover {
+  background-color: #0056b3;
+}
 .upload-btn {
   display: block;
   width: 20%;

@@ -25,18 +25,20 @@ const Navbar = () => {
 
   const handleLogout = () => {
     navigate("/login");
-    localStorage.removeItem("role");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("accessToken");
+    localStorage.clear();
     toast.success("Logged out");
   };
 
+  const toggleModal = (stateSetter) => {
+    stateSetter((prevState) => !prevState);
+  };
+
   const handleChangePasswordClick = () => {
-    setPasswordModalOpen(true);
+    toggleModal(setPasswordModalOpen);
   };
 
   const handleChangeProfilePictureClick = () => {
-    setProfilePictureModalOpen(true);
+    toggleModal(setProfilePictureModalOpen);
   };
 
   const handleChangePassword = () => {
@@ -76,6 +78,7 @@ const Navbar = () => {
         setChangePasswordError("Failed to change password. Please try again.");
       });
   };
+
   const handlePut = async () => {
     try {
       const signedUrlResponse = await axios.get(
@@ -121,7 +124,10 @@ const Navbar = () => {
     setSelectedImage(file);
   };
 
-  const getUserDetailsFunc = (userDetailsApiUrl) => {
+  const getUserDetailsFunc = () => {
+    const userDetailsApiUrl = `${
+      import.meta.env.VITE_API_URL
+    }/user/getUserDetails/${userId}`;
     const accessToken = localStorage.getItem("accessToken");
     const headers = {
       Authorization: `Bearer ${accessToken}`,
@@ -142,129 +148,94 @@ const Navbar = () => {
     setIsAdmin(role);
     setUserId(id);
     if (id) {
-      const userDetailsApiUrl = `${
-        import.meta.env.VITE_API_URL
-      }/user/getUserDetails/${id}`;
-      getUserDetailsFunc(userDetailsApiUrl);
+      getUserDetailsFunc();
     }
   }, [userId]);
 
   return (
     <>
-      <nav id="admin-navbar" className={`${menuOpen ? "open" : ""}`}>
+      <nav id="admin-navbar" className={menuOpen ? "open" : ""}>
         <div className="nav-wrapper">
           <div className="logo">
             <img width="150px" height="auto" src={Logo} alt="Logo" />
           </div>
 
-          {isAdmin ? (
-            <div id="navLinks" className={`${menuOpen ? "open" : ""}`}>
-              <NavLink to="/admin/add-quiz" className="navlink">
-                Add Quiz
-              </NavLink>
-              <NavLink to="/editQuiz" className="navlink">
-                Edit Quiz
-              </NavLink>
-              <NavLink to="/admin/user-history" className="navlink">
-                User Statistics
-              </NavLink>
-              <div>
-                {userId && (
-                  <NavLink to="/#home" className="navlink">
-                    <div className="user-info" onClick={toggleDropdown}>
-                      <div className="profile-container">
-                        {profilePicture && (
-                          <div className="profile-container">
-                            <img
-                              src={profilePicture}
-                              alt="Profile"
-                              className="profile-pic"
-                            />
-                          </div>
-                        )}
-                        <span className="user-name">Hi, {userName}</span>
-                      </div>
-                      {dropdownOpen && (
-                        <div className="dropdown-content">
-                          <span
-                            className="dropdown-item"
-                            onClick={handleChangePasswordClick}
-                          >
-                            Change Password
-                          </span>
-                          <br />
-                          <span
-                            className="dropdown-item"
-                            onClick={handleChangeProfilePictureClick}
-                          >
-                            Change Picture
-                          </span>
-                          <Link to="/login" className="logout-btn">
-                            <span
-                              className="dropdown-item"
-                              onClick={handleLogout}
-                            >
-                              Logout
-                            </span>
-                          </Link>
+          <div id="navLinks" className={menuOpen ? "open" : ""}>
+            {isAdmin ? (
+              <>
+                <NavLink to="/admin/add-quiz" className="navlink">
+                  Add Quiz
+                </NavLink>
+                <NavLink to="/editQuiz" className="navlink">
+                  Edit Quiz
+                </NavLink>
+                <NavLink to="/admin/user-history" className="navlink">
+                  User Statistics
+                </NavLink>
+              </>
+            ) : (
+              <>
+                <NavLink to="/#home" className="navlink">
+                  User Home
+                </NavLink>
+                <NavLink
+                  to={`/user-history/${userId}`}
+                  className="navlink"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  History
+                </NavLink>
+              </>
+            )}
+            <div>
+              {userId && (
+                <NavLink to="/#home" className="navlink">
+                  <div
+                    className="user-info"
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                  >
+                    <div className="profile-container">
+                      {profilePicture && (
+                        <div className="profile-container">
+                          <img
+                            src={profilePicture}
+                            alt="Profile"
+                            className="profile-pic"
+                          />
                         </div>
                       )}
+                      <span className="user-name">Hi, {userName}</span>
                     </div>
-                  </NavLink>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div id="navLinks" onClick={() => setDropdownOpen((prev) => !prev)}>
-              <NavLink to="/#home" className="navlink">
-                User Home
-              </NavLink>
-              <NavLink
-                to={`/user-history/${userId}`}
-                className="navlink"
-                onClick={() => setDropdownOpen(false)}
-              >
-                History
-              </NavLink>
-              <div>
-                <div className="user-info" onClick={(e) => toggleDropdown(e)}>
-                  <div className="profile-container">
-                    {profilePicture && (
-                      <div className="profile-container">
-                        <img
-                          src={profilePicture}
-                          alt="Profile"
-                          className="profile-pic"
-                        />
+                    {dropdownOpen && (
+                      <div className="dropdown-content">
+                        <span
+                          className="dropdown-item"
+                          onClick={handleChangePasswordClick}
+                        >
+                          Change Password
+                        </span>
+                        <br />
+                        <span
+                          className="dropdown-item"
+                          onClick={handleChangeProfilePictureClick}
+                        >
+                          Change Picture
+                        </span>
+                        <Link to="/login" className="logout-btn">
+                          <span
+                            className="dropdown-item"
+                            onClick={handleLogout}
+                          >
+                            Logout
+                          </span>
+                        </Link>
                       </div>
                     )}
-                    <span className="user-name">Hi, {userName}</span>
                   </div>
-                  {dropdownOpen && (
-                    <div className="dropdown-content">
-                      <span
-                        className="dropdown-item"
-                        onClick={handleChangePasswordClick}
-                      >
-                        Change Password
-                      </span>
-                      <span
-                        className="dropdown-item"
-                        onClick={handleChangeProfilePictureClick}
-                      >
-                        Change Picture
-                      </span>
-                      <div to="/login">
-                        <span className="dropdown-item" onClick={handleLogout}>
-                          Logout
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+                </NavLink>
+              )}
             </div>
-          )}
+          </div>
 
           <div
             className={`menu-toggle ${menuOpen ? "open" : ""}`}
@@ -276,7 +247,7 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-      {/* Modal for Changing Password */}
+
       <Modal
         isOpen={passwordModalOpen}
         onRequestClose={() => setPasswordModalOpen(false)}
@@ -287,7 +258,7 @@ const Navbar = () => {
           className="modal-close"
           onClick={() => setPasswordModalOpen(false)}
         >
-          &times;
+          ×
         </span>
         <h2>Change Password</h2>
         <input
@@ -313,7 +284,7 @@ const Navbar = () => {
           Change Password
         </button>
       </Modal>
-      {/* Modal for Changing Profile Picture */}
+
       <Modal
         isOpen={profilePictureModalOpen}
         onRequestClose={() => setProfilePictureModalOpen(false)}
@@ -324,7 +295,7 @@ const Navbar = () => {
           className="modal-close"
           onClick={() => setProfilePictureModalOpen(false)}
         >
-          &times;
+          ×
         </span>
         <h2>Change Profile Picture</h2>
         <div className="avatar-container">
@@ -337,12 +308,12 @@ const Navbar = () => {
           )}
           <input
             type="file"
-            accept="image/*"
+            accept="image/"
             onChange={handleImageChange} // Handle file selection
-            className="file-input"
-            id="file-input"
+            className="file-inputs"
+            id="file-inputs"
           />
-          <label htmlFor="file-input" className="file-label">
+          <label htmlFor="file-inputs" className="file-labels">
             Choose Image
           </label>
         </div>

@@ -123,3 +123,8 @@ input::-webkit-input-placeholder {
   }
 }
 
+.loader {
+  display: inline-block;
+  margin-left: 5px; /* Adjust this value to fit your design */
+}
+
