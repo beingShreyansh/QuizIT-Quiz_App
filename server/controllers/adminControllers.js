@@ -87,6 +87,7 @@ const uploadQuizDataToDB = async (quizData) => {
     }
 
     // Process each quiz separately
+    // Process each quiz separately
     for (const quizName of Object.keys(quizCounts)) {
       let quizId;
 
@@ -189,6 +190,7 @@ const uploadQuizDataToDB = async (quizData) => {
         })
       );
     }
+  
   } catch (error) {
     console.error("Error uploading quiz data to DB:", error);
     throw new Error("Error uploading quiz data to DB: " + error.message);

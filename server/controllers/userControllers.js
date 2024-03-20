@@ -1,6 +1,7 @@
 const xlsx = require("xlsx");
 const { db } = require("../dbConfig");
-
+const User = require("../models/User");
+const { getObjectUrl } = require("../awsConfig");
 
 const getCategories = async (req, res) => {
   try {
@@ -54,5 +55,44 @@ const getUserQuizHistory = async (req, res) => {
     res.status(500).json({ error: "An error occurred while fetching user quiz history." });
   }
 };
+const getUserDetails = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const query = `
+      SELECT name, email, imageId
+      FROM user
+      WHERE id = ?;
+    `;
 
-module.exports = { getUserQuizHistory, getCategories };
+    db.query(query, [userId], async (err, rows) => {
+      if (err) {
+        console.error("Error fetching user details: ", err);
+        res.status(500).json({
+          error: "An error occurred while fetching user details.",
+        });
+        return;
+      }
+      if (rows.length === 0) {
+        res.status(404).json({
+          error: "User not found.",
+        });
+        return;
+      }
+
+      const userDetails = JSON.parse(JSON.stringify(rows[0]));
+      const imageUrl = await getObjectUrl(`.uploads/users/${userDetails.imageId}`);
+      console.log(imageUrl);
+      userDetails.imageUrl = imageUrl;
+      delete userDetails.imageId; 
+
+      res.json(userDetails);
+    });
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    res.status(500).json({
+      error: "An error occurred while fetching user details.",
+    });
+  }
+};
+
+module.exports = { getUserQuizHistory, getCategories, getUserDetails };

@@ -11,8 +11,7 @@ const region = process.env.region;
 const accessKeyId = process.env.accessKeyId;
 const secretAccessKey = process.env.secretAccessKey;
 const bucketName = process.env.bucketName;
-const { URL } = require('url');
-
+const { URL } = require("url");
 
 const s3Client = new S3Client({
   region: region,
@@ -50,7 +49,7 @@ const putObject = async (fileName, contentType) => {
 const uploadImageToS3 = async (imageUrl, fileName) => {
   try {
     // If imageUrl is a relative URL, convert it into an absolute URL
-    const absoluteUrl = new URL(imageUrl, 'http://google.com'); // Provide a base URL (you can use any valid URL)
+    const absoluteUrl = new URL(imageUrl, "http://google.com"); // Provide a base URL (you can use any valid URL)
     imageUrl = absoluteUrl.toString();
 
     // Generate a pre-signed URL for uploading
