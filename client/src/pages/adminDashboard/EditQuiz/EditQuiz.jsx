@@ -63,7 +63,7 @@ function EditQuiz() {
     }
 
 const deleteQuiz = async (quizId) => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete the quiz`);
+    const confirmDelete = window.confirm(`Are you sure you want to delete the quiz.`);
     if (confirmDelete) {
     try {
         await axios.delete(`${import.meta.env.VITE_API_URL}/editQuiz/delete-quiz/${quizId}`);
@@ -71,7 +71,7 @@ const deleteQuiz = async (quizId) => {
         alert(`Quiz deleted successfully.`);
     } catch (error) {
         console.error('Error deleting quiz:', error);
-        alert(`Error deleting quiz`);
+        alert(`Error deleting quiz.`);
     }
 }
 else {
@@ -80,57 +80,54 @@ else {
 }
 }
 
-
-
-    // Function to handle adding questions
-    const addQuestions = (quizId) => {
-        alert(`Add questions for quiz`);
-    }
-
-    return (
-
-        <div> <Navbar />
-        {isLoading ? (
-                <Spinner /> // Show loader while fetching data
-            ) : (
-        
-        
+return (
+    <div>
+      <Navbar />
+      {isLoading ? (
+        <Spinner /> // Show loader while fetching data
+      ) : (
         <div className="edit-quiz-container">
-            {isNoData ? (
-                        <div style={{ display: 'flex' }}>
-                            <img src={NoData} alt="No data" style={{ margin: 'auto' }} />
-                        </div>
-                    ) : (
-            <table className="edit-quiz-table">
-                <thead>
-                    <tr>
-                        <th>Sr.No</th>
-                        <th>Quiz Category</th>
-                        <th>Quiz Name</th>
-                        <th>Actions</th>
-                        <th>Add Questions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {quizzes.map((quiz, index) => (
-                        <tr key={quiz.quiz_id}>
-                            <td>{index + 1}</td>
-                            <td>{quiz.quiz_category}</td>
-                            <td>{quiz.quiz_name}</td>
-                            <td>
-
-                                <FontAwesomeIcon icon={faEdit} className="icon edit-icon" onClick={() => editQuiz(quiz.quiz_id, quiz.quiz_name)} style={{ marginRight: '50px' }} />
-                                
-                               
-                                <FontAwesomeIcon icon={faTrashAlt} className="icon edit-icon"  onClick={() => deleteQuiz(quiz.quiz_id)} />
-                                
-                            </td>
-                            <td><FontAwesomeIcon icon={faPlusCircle} className="add-icon"  onClick={() => addQuestions(quiz.quiz_id)} /></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-                    )}
+          <table className="edit-quiz-table">
+            <thead>
+              <tr>
+                <th>Sr.No</th>
+                <th>Quiz Category</th>
+                <th>Quiz Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {quizzes.length === 0 ? (
+                <tr>
+                  <td colSpan="4" style={{ textAlign: "center" }}>
+                    <img src={NoData} alt="No data" />
+                  </td>
+                </tr>
+              ) : (
+                quizzes.map((quiz, index) => (
+                  <tr key={quiz.quiz_id}>
+                    <td>{index + 1}</td>
+                    <td>{quiz.quiz_category}</td>
+                    <td>{quiz.quiz_name}</td>
+                    <td>
+                      <FontAwesomeIcon
+                        icon={faEdit}
+                        className="icon edit-icon"
+                        onClick={() => editQuiz(quiz.quiz_id, quiz.quiz_name)}
+                        style={{ marginRight: "50px" }}
+                      />
+                      <FontAwesomeIcon
+                        icon={faTrashAlt}
+                        className="icon edit-icon"
+                        onClick={() => deleteQuiz(quiz.quiz_id)}
+                      />
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+  
 
             {/* Combined Modal */}
             {combinedModalOpen && (
