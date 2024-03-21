@@ -1,4 +1,3 @@
-// App.js
 import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
@@ -14,29 +13,27 @@ import {
   QuizPlayground,
   EditQuiz,
 } from "./pages";
-import ProtectedRoute from './ProtectedRoute.jsx';
+import ProtectedRoute from "./ProtectedRoute.jsx";
+import Layout from "./pages/Layout.jsx";
 
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/", // Root path
+      path: "/",
       element: <ProtectedRoute />,
       children: [
-        { path: "", element: <UserHome /> },
+        { path: "", element: <Layout Children={UserHome} /> },
+        {
+          path: "/quiz/:id/:totalQuestions/:beginnerRatio/:intermediateRatio/:advancedRatio",
+          element: <QuizPlayground />,
+        },
+        { path: "/quiz-result", element: <Results /> },
+        {
+          path: "/user-history/:id",
+          element: <Layout Children={UserHistoryStats} />,
+        },
       ],
       errorElement: <PageNotFound />,
-    },
-    {
-      path: "/quiz/:id/:totalQuestions/:beginnerRatio/:intermediateRatio/:advancedRatio",
-      element: <QuizPlayground />,
-    },      
-    {
-      path: "/quiz-result",
-      element: <Results />,
-    },
-    {
-      path: "/user-history/:id",
-      element: <UserHistoryStats />,
     },
     {
       path: "/login",
@@ -46,24 +43,25 @@ function App() {
       path: "/register",
       element: <Register />,
     },
-    
-    {
-      path: "/editQuiz",
-      element:<EditQuiz/>,
-    },
     {
       path: "/admin",
-      element: <ProtectedRoute adminOnly={true} />, // Wrap admin routes with ProtectedRoute and specify adminOnly prop
+      element: <ProtectedRoute adminOnly={true} />,
       children: [
-        { path: "", element: <UploadQuiz /> }, // Admin Home route
-        { path: "add-quiz", element: <UploadQuiz /> }, // Add Quiz route
-        { path: "user-history", element: <AdminUserHistory /> }, // User History route
+        { path: "", element: <Layout Children={UploadQuiz} /> },
+        { path: "add-quiz", element: <Layout Children={UploadQuiz} /> }, // Removed the leading slash
+        { path: "editQuiz", element: <Layout Children={EditQuiz} /> }, // Also removed the leading slash
+        {
+          path: "user-history",
+          element: <Layout Children={AdminUserHistory} />,
+        },
       ],
     },
+    { path: "*", element: <PageNotFound /> }, // Catch-all route
   ]);
 
   return (
     <div>
+      <RouterProvider router={router} />
       <Toaster
         position="top-right"
         toastOptions={{
@@ -79,7 +77,6 @@ function App() {
           },
         }}
       />
-      <RouterProvider router={router} />
     </div>
   );
 }

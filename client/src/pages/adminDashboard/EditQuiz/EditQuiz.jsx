@@ -82,7 +82,7 @@ else {
 
 return (
     <div>
-      <Navbar />
+  
       {isLoading ? (
         <Spinner /> // Show loader while fetching data
       ) : (

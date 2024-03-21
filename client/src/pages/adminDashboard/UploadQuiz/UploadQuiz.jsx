@@ -101,14 +101,16 @@ const UploadQuiz = () => {
 
   return (
     <>
-      <Navbar />
       {isUploading && <Spinner />}
       <div className="upload-container">
         <div className="upload-box">
           <h1 className="upload-heading">Upload Excel File</h1>
           <input
             type="file"
-            onChange={handleFileChange}
+            onChange={(e) => {
+              handleFileChange(e);
+              setSelectedFile(e.target.files[0]);
+            }}
             className="file-input"
             accept=".xlsx, .xls"
           />
@@ -144,13 +146,19 @@ const UploadQuiz = () => {
             },
           }}
         >
-          <h2>All Quiz Names</h2>
+          <h2 className="modal-heading">All Quiz Names</h2>
           <div className="modal-categories">
-            {categories.map((category) => (
-              <div key={category.quiz_id} className="modal-category-name">
-                {category.quiz_name}
+            {categories.length > 0 ? (
+              categories.map((category) => (
+                <div key={category.quiz_id} className="modal-category-name">
+                  {category.quiz_name}
+                </div>
+              ))
+            ) : (
+              <div className="no-data-container">
+                <p>No quiz names available.</p>
               </div>
-            ))}
+            )}
           </div>
           <button
             className="close-button"
@@ -170,12 +178,15 @@ const UploadQuiz = () => {
         <div className="instruction-box">
           <h2 className="instruction-heading">Instructions:</h2>
           <ul className="instruction-list">
-            <li>File should be Excel Sheet (.xlsx or .xls).</li>
-            <li>Only one sheet can be uploaded at a time.</li>
-            <li>Don't upload the same file twice.</li>
             <li>
-              If you're adding questions to an already added quiz, upload the
-              file containing the new questions.
+              File should be an Excel Sheet (.xlsx or .xls) following the
+              provided format.
+            </li>
+            <li>Only one sheet can be uploaded at a time.</li>
+            <li>Do not upload the same file twice.</li>
+            <li>
+              If you are adding questions to an already added quiz, upload the
+              file containing the new questions along with the quiz name.
             </li>
           </ul>
         </div>

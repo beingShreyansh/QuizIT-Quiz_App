@@ -107,7 +107,7 @@ const UserHome = () => {
   const closeModal = () => setIsModalOpen(false);
   return (
     <>
-      <Navbar />
+
       <div className="user-home-container">
         <h1>Welcome to QuizIT!</h1>
         <p>Please select a Quiz Name to start the quiz:</p>

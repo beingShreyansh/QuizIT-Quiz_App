@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import './UserHistory.css';
-import Navbar from '../../../components/Navbar/Navbar';
-import { useParams } from 'react-router-dom';
-import Spinner from '../../../components/spinner/Spinner';
-import NoData from '../../../assets/No-data.png';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./UserHistory.css";
+import Navbar from "../../../components/Navbar/Navbar";
+import { useParams } from "react-router-dom";
+import Spinner from "../../../components/spinner/Spinner";
+import NoData from "../../../assets/No-data.png";
 
 const pageLimit = 12;
 const UserHistory = () => {
@@ -30,7 +30,7 @@ const UserHistory = () => {
         setIsLoading(false);
         setUserHistory(response.data);
       } catch (error) {
-        console.error('Error fetching user history:', error);
+        console.error("Error fetching user history:", error);
       }
     };
 
@@ -56,17 +56,18 @@ const UserHistory = () => {
                 <div className="table-cell">Score</div>
                 <div className="table-cell">Last Date Played</div>
                 <div className="table-cell">Question Attempted</div>
+                <div className="table-cell">Total Questions</div>
                 <div className="table-cell">
                   Time Taken
-                  <span style={{ fontSize: '12px', marginLeft: '5px' }}>
+                  <span style={{ fontSize: "12px", marginLeft: "5px" }}>
                     (Seconds)
                   </span>
                 </div>
               </div>
 
               {userHistory.length === 0 ? (
-                <div style={{ display: 'flex' }}>
-                  <img src={NoData} alt="No data" style={{ margin: 'auto' }} />
+                <div style={{ display: "flex" }}>
+                  <img src={NoData} alt="No data" style={{ margin: "auto" }} />
                 </div>
               ) : (
                 <>
@@ -82,6 +83,9 @@ const UserHistory = () => {
                       </div>
                       <div className="table-cell">
                         {historyItem.num_of_questions_attempted}
+                      </div>
+                      <div className="table-cell">
+                        {historyItem.total_questions}
                       </div>
                       <div className="table-cell">
                         {historyItem.total_time_taken_in_sec}
