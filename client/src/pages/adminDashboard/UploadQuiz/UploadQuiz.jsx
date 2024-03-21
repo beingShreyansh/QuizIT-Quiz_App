@@ -101,7 +101,7 @@ const UploadQuiz = () => {
 
   return (
     <>
-      <Navbar />
+   
       {isUploading && <Spinner />}
       <div className="upload-container">
         <div className="upload-box">
@@ -170,12 +170,12 @@ const UploadQuiz = () => {
         <div className="instruction-box">
           <h2 className="instruction-heading">Instructions:</h2>
           <ul className="instruction-list">
-            <li>File should be Excel Sheet (.xlsx or .xls).</li>
+            <li>File should be Excel Sheet (.xlsx or .xls), and in the format provided.</li>
             <li>Only one sheet can be uploaded at a time.</li>
             <li>Don't upload the same file twice.</li>
             <li>
               If you're adding questions to an already added quiz, upload the
-              file containing the new questions.
+              file containing the new questions with the quiz name.
             </li>
           </ul>
         </div>

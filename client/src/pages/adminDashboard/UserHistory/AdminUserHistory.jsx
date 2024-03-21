@@ -49,7 +49,7 @@ const AdminUserHistory = () => {
   return (
     <>
       {isLoading && <Spinner />}
-      <Navbar />
+  
       <div className="user-statistics-container">
         <h2>User Statistics</h2>
         <div className="user-stats-table">

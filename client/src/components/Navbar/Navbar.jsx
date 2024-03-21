@@ -124,10 +124,10 @@ const Navbar = () => {
     setSelectedImage(file);
   };
 
-  const getUserDetailsFunc = () => {
+  const getUserDetailsFunc = (id) => {
     const userDetailsApiUrl = `${
       import.meta.env.VITE_API_URL
-    }/user/getUserDetails/${userId}`;
+    }/user/getUserDetails/${id}`;
     const accessToken = localStorage.getItem("accessToken");
     const headers = {
       Authorization: `Bearer ${accessToken}`,
@@ -148,9 +148,10 @@ const Navbar = () => {
     setIsAdmin(role);
     setUserId(id);
     if (id) {
-      getUserDetailsFunc();
+      getUserDetailsFunc(id);
     }
-  }, [userId]);
+  }, []);
+
   const linkTo = isAdmin ? "/admin" : "/";
   return (
     <>
@@ -168,7 +169,7 @@ const Navbar = () => {
                 <NavLink to="/admin/add-quiz" className="navlink">
                   Add Quiz
                 </NavLink>
-                <NavLink to="/editQuiz" className="navlink">
+                <NavLink to="/admin/editQuiz" className="navlink">
                   Edit Quiz
                 </NavLink>
                 <NavLink to="/admin/user-history" className="navlink">
