@@ -151,14 +151,16 @@ const Navbar = () => {
       getUserDetailsFunc();
     }
   }, [userId]);
-
+  const linkTo = isAdmin ? "/admin" : "/";
   return (
     <>
       <nav id="admin-navbar" className={menuOpen ? "open" : ""}>
         <div className="nav-wrapper">
-          <div className="logo">
-            <img width="150px" height="auto" src={Logo} alt="Logo" />
-          </div>
+          <NavLink to={linkTo}>
+            <div className="logo">
+              <img width="150px" height="auto" src={Logo} alt="Logo" />
+            </div>
+          </NavLink>
 
           <div id="navLinks" className={menuOpen ? "open" : ""}>
             {isAdmin ? (
