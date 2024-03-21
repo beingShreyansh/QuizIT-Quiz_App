@@ -85,11 +85,9 @@ const deleteQuiz = (req, res) => {
     pool.query(query, [quizId], (error, results) => {
       if (error) {
         console.error("Error identifying user history entries:", error);
-        res
-          .status(500)
-          .json({
-            error: "An error occurred while identifying user history entries.",
-          });
+        res.status(500).json({
+          error: "An error occurred while identifying user history entries.",
+        });
       } else {
         const missingQuizIds = results.map((result) => result.quiz_id);
         resolveUserHistoryEntries(missingQuizIds);
@@ -130,11 +128,9 @@ const deleteQuiz = (req, res) => {
         (questionsError, questionsResults) => {
           if (questionsError) {
             console.error("Error deleting quiz questions:", questionsError);
-            res
-              .status(500)
-              .json({
-                error: "An error occurred while deleting quiz questions.",
-              });
+            res.status(500).json({
+              error: "An error occurred while deleting quiz questions.",
+            });
             return;
           }
 
@@ -160,7 +156,7 @@ const deleteQuiz = (req, res) => {
   // Call the function to start the process
   identifyUserHistoryEntries();
 };
-const updateQuestion = async(req, res) => {
+const updateQuestion = async (req, res) => {
   const { questionId } = req.params;
   const {
     questionContent,
@@ -172,9 +168,8 @@ const updateQuestion = async(req, res) => {
     option_3,
     option_4,
     option_5,
-    imageUrl
+    imageUrl,
   } = req.body;
-
 
   let imageId = null; // Initialize imageId to null
 
@@ -202,7 +197,7 @@ const updateQuestion = async(req, res) => {
     questionType,
     questionId,
     quizId,
-    imageId
+    imageId,
   ];
 
   // Execute the query to update the question
@@ -265,11 +260,9 @@ const updateQuestion = async(req, res) => {
                     console.error("Error updating options:", optionsError);
                     res.status(500).json({ error: "Internal Server Error" });
                   } else {
-                    res
-                      .status(200)
-                      .json({
-                        message: "Question and options updated successfully",
-                      });
+                    res.status(200).json({
+                      message: "Question and options updated successfully",
+                    });
                   }
                 }
               );
@@ -309,18 +302,13 @@ const deleteQuestion = (req, res) => {
         (questionError, questionResults) => {
           if (questionError) {
             console.error("Error deleting question:", questionError);
-            res
-              .status(500)
-              .json({
-                error: "An error occurred while deleting the question.",
-              });
+            res.status(500).json({
+              error: "An error occurred while deleting the question.",
+            });
           } else {
-            res
-              .status(200)
-              .json({
-                message:
-                  "Question and associated options deleted successfully.",
-              });
+            res.status(200).json({
+              message: "Question and associated options deleted successfully.",
+            });
           }
         }
       );

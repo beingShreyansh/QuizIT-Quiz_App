@@ -31,7 +31,10 @@ const getUserQuizHistory = async (req, res) => {
     MAX(DATE_FORMAT(uh.date_played, '%d-%m-%Y')) AS last_date_played
     FROM user_history AS uh
     JOIN user AS u ON uh.user_id = u.id
-    GROUP BY uh.user_id;
+    JOIN quiz AS qt ON uh.quiz_id = qt.quiz_id
+    GROUP BY uh.user_id
+    ORDER BY last_date_played DESC;
+    
   `;
 
     db.query(query, (err, rows) => {
