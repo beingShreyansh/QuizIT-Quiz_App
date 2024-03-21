@@ -265,6 +265,7 @@ const getSignedObjectUrlToPut = async (req, res) => {
     res.status(500).json({ error: "Failed to register user" });
   }
 };
+
 const changePassword = async (req, res) => {
   const { userId, currentPassword, newPassword } = req.body;
 

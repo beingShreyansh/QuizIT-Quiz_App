@@ -157,3 +157,14 @@
   background-color: #92b5e2; /* Blue */
   border: 4px solid #386cb0; /* Green */
 }
+
+.playground-btn {
+  background-color: "lightgrey";
+  border: "1px solid #ccc";
+  border-radius: "4px";
+  outline: "none";
+  padding: "20px";
+  max-width: "600px";
+  margin: "auto";
+  color: "black";
+}
