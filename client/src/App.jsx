@@ -25,7 +25,7 @@ function App() {
         { path: "", element: <Layout Children={UserHome} /> },
         {
           path: "/quiz/:id/:totalQuestions/:beginnerRatio/:intermediateRatio/:advancedRatio",
-          element: <Layout Children={QuizPlayground} />,
+          element: <QuizPlayground />,
         },
         { path: "/quiz-result", element: <Results /> },
         {
@@ -47,12 +47,12 @@ function App() {
       path: "/admin",
       element: <ProtectedRoute adminOnly={true} />,
       children: [
-        { path: "", element: <Layout Children={<UploadQuiz />} /> },
-        { path: "add-quiz", element: <Layout Children={<UploadQuiz />} /> }, // Removed the leading slash
-        { path: "editQuiz", element: <Layout Children={<EditQuiz />} /> }, // Also removed the leading slash
+        { path: "", element: <Layout Children={UploadQuiz} /> },
+        { path: "add-quiz", element: <Layout Children={UploadQuiz} /> }, // Removed the leading slash
+        { path: "editQuiz", element: <Layout Children={EditQuiz} /> }, // Also removed the leading slash
         {
           path: "user-history",
-          element: <Layout Children={<AdminUserHistory />} />,
+          element: <Layout Children={AdminUserHistory} />,
         },
       ],
     },
@@ -61,6 +61,7 @@ function App() {
 
   return (
     <div>
+      <RouterProvider router={router} />
       <Toaster
         position="top-right"
         toastOptions={{
@@ -76,7 +77,6 @@ function App() {
           },
         }}
       />
-      <RouterProvider router={router} />
     </div>
   );
 }

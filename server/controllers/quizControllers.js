@@ -30,29 +30,32 @@ const getQuizData = async (req, res) => {
         advancedRatio,
         totalQuestions
       );
-      const quizData = await Promise.all(selectedQuestions.map(async (row) => {
-        if (row.imageId !== null) {
-          const imageUrl = await getObjectUrl(`.uploads/questions/${row.imageId}.jpg`);
-          return {
-            questionId: row.question_id,
-            questionContent: row.question_content,
-            options: [],
-            isMCQ: row.isMCQ === 0 ? false : true,
-            proficiencyLevel: row.ques_proficiency_level ,
-            imageUrl: imageUrl
-          };
-        } else {
-          return {
-            questionId: row.question_id,
-            questionContent: row.question_content,
-            options: [],
-            proficiencyLevel: row.ques_proficiency_level ,
-            isMCQ: row.isMCQ === 0 ? false : true 
-          };
-        }
-      }));
+      const quizData = await Promise.all(
+        selectedQuestions.map(async (row) => {
+          if (row.imageId !== null) {
+            const imageUrl = await getObjectUrl(
+              `.uploads/questions/${row.imageId}.jpg`
+            );
+            return {
+              questionId: row.question_id,
+              questionContent: row.question_content,
+              options: [],
+              isMCQ: row.isMCQ === 0 ? false : true,
+              proficiencyLevel: row.ques_proficiency_level,
+              imageUrl: imageUrl,
+            };
+          } else {
+            return {
+              questionId: row.question_id,
+              questionContent: row.question_content,
+              options: [],
+              proficiencyLevel: row.ques_proficiency_level,
+              isMCQ: row.isMCQ === 0 ? false : true,
+            };
+          }
+        })
+      );
 
-      
       const optionsQuery =
         "SELECT * FROM options WHERE quiz_id = ? AND question_id = ?";
 
@@ -110,8 +113,6 @@ const selectQuestions = (
     (advancedRatio / ratiosSum) * totalQuestions
   );
 
-
-
   if (groupedQuestions[0]) {
     selectedQuestions.push(
       ...groupedQuestions[0].slice(0, numBeginnerQuestions)
@@ -127,7 +128,6 @@ const selectQuestions = (
       ...groupedQuestions[2].slice(0, numAdvancedQuestions)
     );
   }
-
 
   return selectedQuestions;
 };
@@ -250,7 +250,7 @@ const submitQuizData = (req, res) => {
 
                 // Insert user history record into database
                 const insertUserHistoryQuery =
-                  "INSERT INTO user_history (history_record_id, user_id, quiz_id, marks_obtained, date_played, num_of_questions_attempted,total_time_taken_in_sec) VALUES (?, ?, ?, ?, ?, ?,?)";
+                  "INSERT INTO user_history (history_record_id, user_id, quiz_id, marks_obtained, date_played, num_of_questions_attempted,total_time_taken_in_sec,no_of_questions_shown) VALUES (?, ?, ?, ?, ?, ?,?,?)";
                 db.query(
                   insertUserHistoryQuery,
                   [
@@ -261,6 +261,7 @@ const submitQuizData = (req, res) => {
                     date_played,
                     num_of_questions_attempted,
                     timeTaken,
+                    totalQuestions,
                   ],
                   (err, result) => {
                     if (err) {
@@ -287,7 +288,7 @@ const submitQuizData = (req, res) => {
                         }
 
                         // Send the score as response
-                        res.send({percentage,score});
+                        res.send({ percentage, score });
                       }
                     );
                   }

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./UserHistory.css";
-import Navbar from "../../../components/Navbar/Navbar";
 import Spinner from "../../../components/spinner/Spinner";
 import NoData from "../../../assets/No-data.png";
 const pageLimit = 12;
@@ -49,7 +48,7 @@ const AdminUserHistory = () => {
   return (
     <>
       {isLoading && <Spinner />}
-  
+
       <div className="user-statistics-container">
         <h2>User Statistics</h2>
         <div className="user-stats-table">
@@ -76,7 +75,12 @@ const AdminUserHistory = () => {
                   <div className="table-cell">{startIndex + index + 1}</div>
                   <div className="table-cell">{user.name}</div>
                   <div className="table-cell">{user.no_of_times_played}</div>
-                  <div className="table-cell">{user.avg_score}</div>
+                  <div className="table-cell">
+                    {typeof user.avg_score === "number"
+                      ? user.avg_score.toFixed(2)
+                      : Number(user.avg_score).toFixed(2)}
+                  </div>
+
                   <div className="table-cell">
                     {user.last_date_played.slice(0, 10)}
                   </div>

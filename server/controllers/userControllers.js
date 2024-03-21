@@ -32,7 +32,8 @@ const getUserQuizHistory = async (req, res) => {
     const query = `
     SELECT q.quiz_name, uh.marks_obtained, 
     DATE_FORMAT(uh.date_played, '%d-%m-%Y') AS date_played, 
-    uh.num_of_questions_attempted, uh.total_time_taken_in_sec
+    uh.num_of_questions_attempted, uh.total_time_taken_in_sec,
+    uh.no_of_questions_shown AS total_questions
     FROM quiz AS q
     INNER JOIN user_history AS uh ON q.quiz_id = uh.quiz_id
     WHERE uh.user_id = ?
@@ -59,6 +60,7 @@ const getUserQuizHistory = async (req, res) => {
       .json({ error: "An error occurred while fetching user quiz history." });
   }
 };
+
 const getUserDetails = async (req, res) => {
   const userId = req.params.id;
   try {
@@ -87,7 +89,6 @@ const getUserDetails = async (req, res) => {
       const imageUrl = await getObjectUrl(
         `.uploads/users/${userDetails.imageId}`
       );
-      console.log(imageUrl);
       userDetails.imageUrl = imageUrl;
       delete userDetails.imageId;
 
