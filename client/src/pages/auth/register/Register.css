@@ -28,6 +28,7 @@ input::-webkit-input-placeholder {
   display: flex;
   justify-content: center;
   margin: auto;
+  padding: 19px 10px 10px 20px;
 }
 
 .p-b-26 {
@@ -91,7 +92,7 @@ input::-webkit-input-placeholder {
 .input100 {
   font-family: 'Montserrat', sans-serif;
   font-size: 15px;
-  color: #555555;
+  color:#dadada;
   line-height: 1.2;
 
   display: block;

@@ -199,6 +199,7 @@
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+  
   position: relative; /* Ensure relative positioning for absolute positioning of close button */
 }
 
@@ -315,7 +316,7 @@ button.btn:hover {
 
 .upload-btn {
   display: block;
-  width: 20%;
+  width: auto;
   margin-top: 10px;
   padding: 10px;
   background-color: #007bff;
