@@ -5,7 +5,6 @@ import { faTimes, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./modal.css"; // Import the CSS file
 import UpdateQuestionForm from "./UpdateQuetionForm"; // Import the UpdateQuestionForm component
 import axios from "axios";
-import NoData from "../../assets/No-data.png";
 
 function CombinedModal({
   isOpen,
@@ -19,7 +18,7 @@ function CombinedModal({
   const [updateFormOpen, setUpdateFormOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null); // New state to store selected question data
   const modalContentRef = useRef(null);
-  const [isNoData, setIsNoData] = useState(false);
+
   const openUpdateForm = (questionId) => {
     setSelectedQuestionId(questionId);
     const question = selectedQuiz.find((q) => q.question_id === questionId); // Find the selected question data
@@ -77,11 +76,7 @@ function CombinedModal({
           </button>
         </div>
         <div className="modal-body">
-          {isNoData ? (
-            <div style={{ display: "flex" }}>
-              <img src={NoData} alt="No data" style={{ margin: "auto" }} />
-            </div>
-          ) : (
+         
             <table className="modal-table">
               <thead>
                 <tr>
@@ -91,7 +86,6 @@ function CombinedModal({
                   <th>Option C</th>
                   <th>Option D</th>
                   <th>Option E</th>
-                  <th>Image URL</th> {/* Added Image URL column */}
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -104,7 +98,7 @@ function CombinedModal({
                     <td>{question.option_3 || "-"}</td>
                     <td>{question.option_4 || "-"}</td>
                     <td>{question.option_5 || "-"}</td>
-                    <td>{question.imageId || "-"}</td> {/* Display Image URL */}
+                  
                     <td>
                       <FontAwesomeIcon
                         icon={faEdit}
@@ -120,7 +114,7 @@ function CombinedModal({
                 ))}
               </tbody>
             </table>
-          )}
+          
         </div>
       </div>
       {updateFormOpen &&

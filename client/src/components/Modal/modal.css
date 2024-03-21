@@ -76,8 +76,7 @@ color:white;
 
 
 .modal-question {
-max-height: 40vh; 
- 
+/*max-height: 40vh; / Adjust as needed */
 overflow-y: auto; /* Enable vertical scrolling for the question content */
 }
 

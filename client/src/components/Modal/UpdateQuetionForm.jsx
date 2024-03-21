@@ -25,6 +25,7 @@ function UpdateQuestionForm({
   const [OptionC, setOptionC] = useState("");
   const [OptionD, setOptionD] = useState("");
   const [OptionE, setOptionE] = useState("");
+  
   const [imageUrl, setImageUrl] = useState("");
 
   const proficiencyLevels = {
@@ -50,6 +51,7 @@ function UpdateQuestionForm({
       setOptionC(initialData.option_3 || "");
       setOptionD(initialData.option_4 || "");
       setOptionE(initialData.option_5 || "");
+      
       setImageUrl(initialData.imageId || "");
     }
   }, [initialData]);
@@ -97,6 +99,7 @@ function UpdateQuestionForm({
       if (OptionE) {
         requestData.option_5 = OptionE;
       }
+      
       if (imageUrl) {
         requestData.imageUrl = imageUrl;
       }
@@ -200,6 +203,7 @@ function UpdateQuestionForm({
             value={OptionE}
             onChange={(e) => setOptionE(e.target.value)}
           />
+         
           <label className="update-form-label"> Image Url:</label>
           <input
             className="update-form-input"
