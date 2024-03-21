@@ -18,6 +18,9 @@
     display: flex;
     border-bottom: 1px solid #ccc;
   }
+  .table-row :hover{
+    cursor: pointer;
+  }
   
   .table-row.header {
     background-color: var(--primary-color);

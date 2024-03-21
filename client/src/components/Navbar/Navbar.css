@@ -170,7 +170,7 @@
 
 .dropdown-content {
   position: absolute;
-  background-color: none;
+  background-color: #242424;
   min-width: 160px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1;
