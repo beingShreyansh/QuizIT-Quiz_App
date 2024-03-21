@@ -188,52 +188,47 @@ const Navbar = () => {
               </>
             )}
             <div>
-              {userId && (
-                <NavLink to="/#home" className="navlink">
-                  <div
-                    className="user-info"
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                  >
+              <div
+                className="user-info"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                <div className="profile-container">
+                  {profilePicture && (
                     <div className="profile-container">
-                      {profilePicture && (
-                        <div className="profile-container">
-                          <img
-                            src={profilePicture}
-                            alt="Profile"
-                            className="profile-pic"
-                          />
-                        </div>
-                      )}
-                      <span className="user-name">Hi, {userName}</span>
+                      <img
+                        src={profilePicture}
+                        alt="Profile"
+                        className="profile-pic"
+                        loading="lazy"
+                      />
                     </div>
-                    {dropdownOpen && (
-                      <div className="dropdown-content">
-                        <span
-                          className="dropdown-item"
-                          onClick={handleChangePasswordClick}
-                        >
-                          Change Password
-                        </span>
-                        <br />
-                        <span
-                          className="dropdown-item"
-                          onClick={handleChangeProfilePictureClick}
-                        >
-                          Change Picture
-                        </span>
-                        <Link to="/login" className="logout-btn">
-                          <span
-                            className="dropdown-item"
-                            onClick={handleLogout}
-                          >
-                            Logout
-                          </span>
-                        </Link>
-                      </div>
-                    )}
+                  )}
+
+                  <span className="user-name">Hi, {userName}</span>
+                </div>
+                {dropdownOpen && (
+                  <div className="dropdown-content">
+                    <span
+                      className="dropdown-item"
+                      onClick={handleChangePasswordClick}
+                    >
+                      Change Password
+                    </span>
+                    <br />
+                    <span
+                      className="dropdown-item"
+                      onClick={handleChangeProfilePictureClick}
+                    >
+                      Change Picture
+                    </span>
+                    <Link to="/login" className="logout-btn">
+                      <span className="dropdown-item" onClick={handleLogout}>
+                        Logout
+                      </span>
+                    </Link>
                   </div>
-                </NavLink>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
