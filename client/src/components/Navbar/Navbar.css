@@ -34,12 +34,12 @@
   height: 30px;
   letter-spacing: 1px;
   color: #ffffffde; /* Secondary color for text */
-  margin: auto;
 }
 
 @media (max-width: 768px) {
   .logo {
-    margin-left: 100px;
+    margin-left: 10px; /* Adjusted margin for smaller screens */
+    float: none; /* Remove float for smaller screens */
   }
 }
 
@@ -50,6 +50,13 @@
   margin-right: 15px;
   gap: 20px;
   transition: transform 0.5s ease-out;
+}
+
+@media (max-width: 768px) {
+  #navLinks {
+    justify-content: center; /* Center align links for smaller screens */
+    margin-right: 0;
+  }
 }
 
 #navLinks a {
@@ -64,13 +71,23 @@
   text-decoration: none;
   text-transform: uppercase;
   transition: all 0.5s ease;
-  -webkit-transition: all 0.5s ease;
+}
+
+@media (max-width: 768px) {
+  #navLinks a {
+    margin: 0 10px; /* Adjusted margin for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  #navLinks a {
+    font-size: 12px; /* Decrease font size for even smaller screens */
+  }
 }
 
 #navLinks a:hover {
   color: #8b8b8b; /* Updated color on hover */
   transition: all 1s ease;
-  -webkit-transition: all 0.5s ease;
 }
 
 /* Animated Bottom Line */
@@ -145,9 +162,6 @@
   text-decoration: none;
   text-transform: uppercase;
   transition: all 0.5s ease;
-  -webkit-transition: all 0.5s ease;
-  width: 90%;
-  margin: auto;
 }
 
 .dropdown-item:hover {
@@ -156,7 +170,7 @@
 
 .dropdown-content {
   position: absolute;
-  background-color: none;
+  background-color: #242424;
   min-width: 160px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1;
@@ -185,7 +199,6 @@
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
-  width: 400px; /* Adjust width as needed */
   position: relative; /* Ensure relative positioning for absolute positioning of close button */
 }
 
@@ -238,7 +251,7 @@
 }
 
 .modal-content .error {
-  color: #ff0000; /* Red color for error message */
+  color: #ff0000;
   margin-bottom: 20px; /* Add space below error message */
 }
 
@@ -285,6 +298,7 @@
 .file-labels:hover {
   background-color: rgba(0, 0, 0, 0.7);
 }
+
 button.btn {
   background-color: #007bff; /* Primary color */
   color: white;
@@ -294,9 +308,11 @@ button.btn {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-button.btn :hover {
+
+button.btn:hover {
   background-color: #0056b3;
 }
+
 .upload-btn {
   display: block;
   width: 20%;
@@ -312,4 +328,11 @@ button.btn :hover {
 
 .upload-btn:hover {
   background-color: #0056b3;
+}
+
+@media (max-width: 480px) {
+  .avatar-container {
+    width: 100px;
+    height: 100px;
+  }
 }

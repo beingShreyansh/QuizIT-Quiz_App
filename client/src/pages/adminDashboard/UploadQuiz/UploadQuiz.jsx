@@ -77,7 +77,6 @@ const UploadQuiz = () => {
       }
     };
     fetchCategories();
-
   }, []);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -87,9 +86,10 @@ const UploadQuiz = () => {
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/admin/getSheetFormatUrl`
       );
-      setSheetFormatUrl(response.data.url);
-      if (sheetFormatUrl) {
-        window.open(sheetFormatUrl, "_blank");
+      const sheetUrl = response.data.url;
+      setSheetFormatUrl(sheetUrl);
+      if (sheetUrl) {
+        window.open(sheetUrl, "_blank");
       } else {
         toast.error("Sheet format URL not available.");
       }
@@ -172,7 +172,11 @@ const UploadQuiz = () => {
           <ul className="instruction-list">
             <li>File should be Excel Sheet (.xlsx or .xls).</li>
             <li>Only one sheet can be uploaded at a time.</li>
-            <li>Additional rules or instructions can be added here.</li>
+            <li>Don't upload the same file twice.</li>
+            <li>
+              If you're adding questions to an already added quiz, upload the
+              file containing the new questions.
+            </li>
           </ul>
         </div>
       </div>

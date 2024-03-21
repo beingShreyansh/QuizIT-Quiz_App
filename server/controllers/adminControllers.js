@@ -31,7 +31,8 @@ const getUserQuizHistory = async (req, res) => {
     MAX(DATE_FORMAT(uh.date_played, '%d-%m-%Y')) AS last_date_played
     FROM user_history AS uh
     JOIN user AS u ON uh.user_id = u.id
-    GROUP BY uh.user_id;
+    GROUP BY uh.user_id
+    ORDER BY last_date_played DESC;
   `;
 
     db.query(query, (err, rows) => {
@@ -190,7 +191,6 @@ const uploadQuizDataToDB = async (quizData) => {
         })
       );
     }
-  
   } catch (error) {
     console.error("Error uploading quiz data to DB:", error);
     throw new Error("Error uploading quiz data to DB: " + error.message);

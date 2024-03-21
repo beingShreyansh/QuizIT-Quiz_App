@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import Modal from "react-modal";
 import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../../../components/spinner/Spinner";
-import { PieChart, Pie, ResponsiveContainer } from "recharts";
+import { ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
 Modal.setAppElement("#root");
 
@@ -28,6 +28,7 @@ function QuizPlayground() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+  const [correcrtAnswer, setCorrectAnswer] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalLoading, setIsModalLoading] = useState(false);
 
@@ -142,6 +143,7 @@ function QuizPlayground() {
           answers,
           timeTaken: timer,
           date: Date.now(),
+          totalQuestions: Object.keys(quizData).length,
           attemptedQuestions: Object.keys(answers).length,
         };
 
@@ -151,7 +153,8 @@ function QuizPlayground() {
         );
 
         if (response.status === 200) {
-          setScore(response.data);
+          setScore(response.data.percentage);
+          setCorrectAnswer(response.data.score);
           openModal();
           setIsModalLoading(false);
           setQuizSubmitted(true);
@@ -175,7 +178,7 @@ function QuizPlayground() {
 
     return [
       { name: "Attempted", value: attemptedQuestions },
-      { name: "Unattempted", value: unattemptedQuestions },
+      { name: "Correct Answers", value: correcrtAnswer },
     ];
   };
 
@@ -184,6 +187,7 @@ function QuizPlayground() {
     if (level == 1) return "Intermediate";
     if (level == 2) return "Advanced";
   };
+  const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"]; // Define color palette
 
   return (
     <>
@@ -220,7 +224,15 @@ function QuizPlayground() {
                   fill="#8884d8"
                   dataKey="value"
                   label={({ name, value }) => `${name}: ${value}`}
-                />
+                >
+                  {getPieChartData().map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={colors[index % colors.length]}
+                    />
+                  ))}
+                </Pie>
+                <Legend align="center" verticalAlign="bottom" height={36} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -230,16 +242,14 @@ function QuizPlayground() {
             <p className="card-number">{score}%</p>
           </div>
 
+          <div className="unattempted-card">
+            <p className="card-title">Corect Answers</p>
+            <p className="card-number">{correcrtAnswer}</p>
+          </div>
+
           <div className="attempted-card">
             <p className="card-title">Attempted Questions</p>
             <p className="card-number">{Object.keys(answers).length}</p>
-          </div>
-
-          <div className="unattempted-card">
-            <p className="card-title">Unattempted Questions</p>
-            <p className="card-number">
-              {quizData.length - Object.keys(answers).length}
-            </p>
           </div>
 
           <div className="total-questions-card">
@@ -261,6 +271,9 @@ function QuizPlayground() {
         <Spinner />
       ) : (
         <div className="quiz-playground-container">
+          <button className="close-button playground-btn" onClick={() => navigate("/")}>
+            &#10005; {/* Cross mark symbol */}
+          </button>
           <div className="review-panel">
             <ReviewPanel
               quizData={quizData}
