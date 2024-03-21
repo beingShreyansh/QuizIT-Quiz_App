@@ -168,7 +168,6 @@ const handleSendOTP = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "OTP sent successfully",
-      otpData: otpData,
     });
   } catch (error) {
     console.error("Error sending OTP:", error);
@@ -284,11 +283,8 @@ const changePassword = async (req, res) => {
       return res.status(400).json({ error: "Current password is incorrect" });
     }
 
-    // Hash the new password
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-
     // Update user's password
-    await User.updatePassword(userId, hashedNewPassword);
+    await User.updatePassword(userId, newPassword);
 
     return res.status(200).json({ message: "Password changed successfully" });
   } catch (error) {

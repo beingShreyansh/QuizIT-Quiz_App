@@ -12,14 +12,14 @@ input::-webkit-input-placeholder {
 }
 
 .txt1 {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 13px;
   color: #dadada;
   line-height: 1.5;
 }
 
 .txt2 {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 13px;
   color: #dadada;
   line-height: 1.5;
@@ -29,7 +29,9 @@ input::-webkit-input-placeholder {
   justify-content: center;
   margin: auto;
 }
-
+.p-b-20 {
+  padding: 19px 10px 10px 20px;
+}
 .p-b-26 {
   padding-bottom: 26px;
 }
@@ -69,7 +71,7 @@ input::-webkit-input-placeholder {
 
 .login100-form-title {
   display: block;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 30px;
   color: #dadada;
   line-height: 1.2;
@@ -90,7 +92,7 @@ input::-webkit-input-placeholder {
 }
 
 .input100 {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 15px;
   color: #555555;
   line-height: 1.2;
