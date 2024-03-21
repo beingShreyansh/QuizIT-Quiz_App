@@ -11,7 +11,7 @@ const getQuizData = async (req, res) => {
 
   try {
     const query =
-      "SELECT * FROM quiz_question WHERE quiz_id = ? ORDER BY ques_proficiency_level";
+      "SELECT * FROM quiz_question WHERE quiz_id = ? ORDER BY RAND()";
     db.query(query, [quizId], async (err, rows) => {
       if (err) {
         console.error("Error retrieving questions for quiz: ", err);
@@ -100,10 +100,10 @@ const selectQuestions = (
   const selectedQuestions = [];
   const ratiosSum = beginnerRatio + intermediateRatio + advancedRatio;
 
-  const numBeginnerQuestions = Math.floor(
+  const numBeginnerQuestions = Math.round(
     (beginnerRatio / ratiosSum) * totalQuestions
   );
-  const numIntermediateQuestions = Math.floor(
+  const numIntermediateQuestions = Math.round(
     (intermediateRatio / ratiosSum) * totalQuestions
   );
   const numAdvancedQuestions = Math.floor(
@@ -242,7 +242,7 @@ const submitQuizData = (req, res) => {
               }
               // If this is the last question, save the user history and send the score as response
               if (index === quizData.length - 1) {
-                const percentage = (score / quizData.length) * 100;
+                const percentage = ((score / totalQuestions) * 100).toFixed(2);
                 // Save user history
                 const history_record_id = uuidv4(); // Generate history record id
                 const date_played = new Date().toISOString().split("T")[0]; // Get current date
@@ -287,7 +287,7 @@ const submitQuizData = (req, res) => {
                         }
 
                         // Send the score as response
-                        res.json(percentage);
+                        res.send({percentage,score});
                       }
                     );
                   }

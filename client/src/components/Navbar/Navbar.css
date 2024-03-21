@@ -8,6 +8,7 @@
   margin: auto;
   z-index: 10;
   border-bottom: 1px solid #69696d;
+  z-index: 99999;
 }
 
 .nav-wrapper {

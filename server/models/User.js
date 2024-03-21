@@ -25,9 +25,7 @@ class User {
     this.role = role; // Default role is 'user'
     this.imageId = imageId;
     this.pool = pool;
-    if (password) {
-      this.password = bcrypt.hashSync(password, 10); // Hash the password
-    }
+    this.password = password;
   }
 
   save() {
