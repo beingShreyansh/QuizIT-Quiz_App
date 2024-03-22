@@ -1,0 +1,32 @@
+.edit-quiz-container {
+    margin: 20px;
+    display: flex;
+    justify-content: center; /* Center align content horizontally */
+    align-items: center; /* Center align content vertically */
+}
+
+.edit-quiz-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.edit-quiz-table th,
+.edit-quiz-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center; /* Center align table data */
+}
+
+.edit-quiz-table th:first-child, /* Target the first th (Sr. No) */
+.edit-quiz-table td:first-child { /* Target the first td (Sr. No) */
+    width: 10%; /* Adjust the width as needed */
+}
+
+.edit-quiz-table th {
+    background-color: #007bff;
+}
+
+/* Style for icons in table */
+.edit-quiz-table td .icon {
+    cursor: pointer;
+}

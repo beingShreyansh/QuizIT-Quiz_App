@@ -1,0 +1,44 @@
+.top-students-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .top-students-table th, .top-students-table td {
+    border: 1px solid white;
+    padding: 8px;
+  }
+  
+  .top-students-table th {
+    text-align: left;
+    background-color: blue;
+  }
+  
+  .top-students-table tr:nth-child(even) {
+    background-color: blue;
+  }
+  .navbar {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .nav-content {
+    width: 100%;
+    max-width: 1200px;
+  }
+  
+  .nav-link {
+    color: black;
+    text-decoration: none;
+    padding: 10px 20px;
+    border: 1px solid black;
+    border-radius: 5px;
+  }
+  
+  .nav-link.admin {
+    background-color: white; /* Set background color to white */
+  }
+  
+  .nav-link:hover {
+    background-color: #f0f0f0;
+  }
+  

@@ -1,0 +1,203 @@
+input {
+  outline: none;
+  border: none;
+}
+
+input:focus::-webkit-input-placeholder {
+  color: transparent;
+}
+
+input::-webkit-input-placeholder {
+  color: #adadad;
+}
+
+.txt1 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 13px;
+  color: #dadada;
+  line-height: 1.5;
+}
+
+.txt2 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 13px;
+  color: #dadada;
+  line-height: 1.5;
+}
+.text-center {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+}
+.p-b-20 {
+  padding: 19px 10px 10px 20px;
+}
+.p-b-26 {
+  padding-bottom: 26px;
+}
+.p-b-48 {
+  padding-bottom: 48px;
+}
+
+.p-t-115 {
+  padding-top: 80px;
+}
+.limiter {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.container-login100 {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  background: #242424;
+}
+
+.wrap-login100 {
+  width: 390px;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 77px 55px 33px 55px;
+}
+
+.login100-form {
+  width: 100%;
+}
+
+.login100-form-title {
+  display: block;
+  font-family: "Montserrat", sans-serif;
+  font-size: 30px;
+  color: #dadada;
+  line-height: 1.2;
+  text-align: center;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.login100-form-title i {
+  font-size: 60px;
+}
+
+.wrap-input {
+  width: 100%;
+  position: relative;
+  border-bottom: 2px solid #adadad;
+  margin-bottom: 37px;
+  display: flex;
+}
+
+.input100 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 15px;
+  color: #555555;
+  line-height: 1.2;
+
+  display: block;
+  width: 100%;
+  height: 45px;
+  background: transparent;
+  padding: 0 5px;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 576px) {
+  .wrap-login100 {
+    padding: 77px 15px 33px 15px;
+  }
+}
+
+.validate-input {
+  position: relative;
+}
+
+@media (max-width: 992px) {
+  .alert-validate::before {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  backdrop-filter: blur(
+    5px
+  ); /* Apply blur effect to content behind the modal */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+  width: 400px; /* Adjust width as needed */
+  position: relative; /* Ensure relative positioning for absolute positioning of close button */
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 24px;
+  color: #888; /* Adjust color to grey */
+  transition: color 0.3s ease; /* Smooth color transition */
+}
+
+.modal-close:hover {
+  color: #333; /* Darken color on hover */
+}
+
+.modal-content h2 {
+  color: #333; /* Adjust color to a darker grey */
+  margin-bottom: 20px; /* Add space below heading */
+}
+
+.modal-content input[type="password"],
+.modal-content input[type="text"] {
+  width: calc(100% - 20px); /* Make input full width with padding */
+  padding: 10px;
+  margin-bottom: 20px; /* Add space below input */
+  border: 1px solid #ddd; /* Add subtle border */
+  border-radius: 5px; /* Add border radius */
+  transition: border-color 0.3s ease; /* Smooth border color transition */
+}
+
+.modal-content input[type="password"]:focus,
+.modal-content input[type="text"]:focus {
+  border-color: #007bff; /* Change border color on focus */
+}
+
+.modal-content button {
+  background-color: #007bff; /* Primary color for button */
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth background color transition */
+}
+
+.modal-content button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+.modal-content .error {
+  color: #ff0000; /* Red color for error message */
+  margin-bottom: 20px; /* Add space below error message */
+}

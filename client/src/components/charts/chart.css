@@ -1,0 +1,21 @@
+/* Modify the CSS to set the width of the BarChart to 100% */
+.recharts-wrapper {
+    width: 100%;
+  }
+  
+  .nav li {
+    list-style-type: none;
+  }
+  
+  .nav a {
+    text-decoration: none;
+    padding: 20px 20px;
+    background-color: white; /* Set background color to white */
+    color: black; /* Set text color to black */
+    border-radius: 5px;
+  }
+  
+  .nav a:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+  }
+  
