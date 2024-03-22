@@ -27,12 +27,13 @@ const fetchCategories = (req, res) => {
 // Controller to fetch questions and options by quiz name from the database
 const fetchQuestionsAndOptions = (req, res) => {
   const quizId = req.params.quizId;
+  const { questionId } = req.params;
   const query = `
         SELECT 
             qq.question_id,
             qq.quiz_id, 
             qq.question_content, 
-           qq.imageId,
+            qq.imageId,
             qq.ques_proficiency_level, 
             qq.ques_type,
             MAX(CASE WHEN all_options.option_num = 1 THEN o.option_value END) AS option_1,
@@ -68,6 +69,25 @@ const fetchQuestionsAndOptions = (req, res) => {
       const data = JSON.parse(JSON.stringify(results));
       res.json(data);
     }
+  });
+  // Query to retrieve correct options for the current question
+  const correctOptionQuery =
+  "SELECT option_id FROM options WHERE quiz_id = ? AND question_id = ? AND correct_01 = '1'";
+  pool.query(
+    correctOptionQuery,
+    [quizId, questionId],
+    (err, correctOptionsRows) => {
+      if (err) {
+        console.error(
+          "Error retrieving correct options for quiz: ",
+          err
+        );
+        res.status(500).json({ error: "Error retrieving correct options for quiz" });
+        return;
+      }
+      console.log(quizId);
+      console.log(questionId);
+      console.log(correctOptionsRows);
   });
 };
 // In quizController.js
@@ -156,6 +176,7 @@ const deleteQuiz = (req, res) => {
   // Call the function to start the process
   identifyUserHistoryEntries();
 };
+
 const updateQuestion = async (req, res) => {
   const { questionId } = req.params;
   const {
@@ -171,113 +192,134 @@ const updateQuestion = async (req, res) => {
     imageUrl,
   } = req.body;
 
-  let imageId = null; // Initialize imageId to null
-
-  if (imageUrl) {
-    // If questionDiagramURL is not empty, upload image to S3 and get the signed URL
-    imageId = uuidv4();
-    await uploadImageToS3(imageUrl, `${imageId}.jpg`);
-  }
+  let optionsLst = [option_1, option_2, option_3, option_4, option_5];
+  console.log(optionsLst);
 
   // Start building the query to update the question
-  let query = `
+  let questionUpdateQuery = `
         UPDATE quiz_question qq
         INNER JOIN quiz q ON qq.quiz_id = q.quiz_id
         SET
             qq.question_content = ?,
             qq.ques_proficiency_level = ?,
-            qq.ques_type = ?,
-            qq.imageId = ?
+            qq.ques_type = ?
         WHERE
             qq.question_id = ? AND q.quiz_id = ?;
     `;
-  let queryParams = [
+  let quesUpdateQueryParams = [
     questionContent,
     proficiencyLevel,
     questionType,
     questionId,
-    quizId,
-    imageId,
+    quizId
   ];
 
-  // Execute the query to update the question
-  pool.query(query, queryParams, (error, results) => {
-    if (error) {
-      console.error("Error updating question:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    } else {
-      // If options are provided, update them
-      if (option_1 || option_2 || option_3 || option_4 || option_5) {
-        // Fetch option_ids associated with the provided quiz_id and question_id
-        let optionIdQuery = `
-                    SELECT option_id
-                    FROM options
-                    WHERE quiz_id = ? AND question_id = ?;
+  try
+  {
+    pool.query(
+      questionUpdateQuery, 
+      quesUpdateQueryParams, 
+      (error, results) =>
+      {
+        if(error) 
+        {
+            console.error("Error updating question:", error);
+            res.status(500).json({ error: "Internal Server Error" });
+        }      
+      });
+
+    // Updating options
+    let optionIdQuery = `
+                      SELECT option_id
+                      FROM options
+                      WHERE quiz_id = ? AND question_id = ?;
                 `;
-        let optionIdQueryParams = [quizId, questionId];
-        // Execute the query to retrieve option_ids
-        pool.query(
-          optionIdQuery,
-          optionIdQueryParams,
-          (optionIdError, optionIdResults) => {
-            if (optionIdError) {
-              console.error("Error retrieving option_ids:", optionIdError);
-              res.status(500).json({ error: "Internal Server Error" });
-            } else {
-              // Extract option_ids from the results
-              const optionIds = optionIdResults.map((row) => row.option_id);
-              // Construct and execute the query to update options
-              let optionsQuery = `
-                            UPDATE options 
-                            SET option_value = CASE option_id
-                                WHEN ? THEN ?
-                                WHEN ? THEN ?
-                                WHEN ? THEN ?
-                                WHEN ? THEN ?
-                                WHEN ? THEN ?
-                                END
-                            WHERE question_id = ?;
-                        `;
+    let optionIdQueryParams = [quizId, questionId];
+    pool.query(
+      optionIdQuery,
+      optionIdQueryParams,
+      (optionIdError, optionIdResults) => 
+      {
+        if (optionIdError) 
+        {
+            console.error("Error retrieving option_ids:", optionIdError);
+            res.status(500).json({ error: "Internal Server Error" });
+        } 
+        else 
+        {
+          // Extract option_ids from the results
+          const optionIds = optionIdResults.map((row) => row.option_id);
+          console.log(optionIds);
+          // Construct and execute the query to update options
+          let optionsQuery = `
+              UPDATE options
+              SET option_value = ?
+              WHERE option_id = ? AND question_id = ?;
+          `;
+          let optionsInsertQuery = `
+              INSERT INTO options VALUES(?, ?, ?, ?, ?);
+          `;
+          // Execute the query to update options
+          for (let i = 0; i < optionsLst.length; i++) 
+          {
+            if(i < optionIds.length)
+            {
               let optionsQueryParams = [
-                optionIds[0],
-                option_1,
-                optionIds[1],
-                option_2,
-                optionIds[2],
-                option_3,
-                optionIds[3],
-                option_4,
-                optionIds[4],
-                option_5,
-                questionId,
+                optionsLst[i],
+                optionIds[i],
+                questionId
               ];
-              // Execute the query to update options
               pool.query(
                 optionsQuery,
                 optionsQueryParams,
-                (optionsError, optionsResults) => {
-                  if (optionsError) {
-                    console.error("Error updating options:", optionsError);
-                    res.status(500).json({ error: "Internal Server Error" });
-                  } else {
-                    res.status(200).json({
-                      message: "Question and options updated successfully",
-                    });
-                  }
+                (optionsError, optionsResults) => 
+                {
+                  if (optionsError) 
+                  {
+                      console.error("Error updating options:", optionsError);
+                      res.status(500).json({ error: "Internal Server Error" });
+                  } 
                 }
               );
             }
-          }
-        );
-      } else {
-        res.status(200).json({ message: "Question updated successfully" });
+            else
+            {
+              let optionId = uuidv4();
+              let remOptionsQueryParams = [
+                optionId,
+                quizId,
+                questionId,
+                optionsLst[i],
+                '0'
+              ];
+              pool.query(
+                optionsInsertQuery,
+                remOptionsQueryParams,
+                (optionsError, optionsResults) => 
+                {
+                  if (optionsError) 
+                  {
+                      console.error("Error updating options:", optionsError);
+                      res.status(500).json({ error: "Internal Server Error" });
+                  } 
+                }
+              );
+            }
+          } 
+        }
+        console.log("END");
+        res.send(201);
       }
-    }
-  });
+    );
+  }
+  catch(error)
+  {
+    res.send(error.message);
+  }
 };
 
 const deleteQuestion = (req, res) => {
-  console.log("error in deletion database query");
+  
   const questionId = req.params.questionId;
 
   // Delete options associated with the question first
@@ -302,13 +344,18 @@ const deleteQuestion = (req, res) => {
         (questionError, questionResults) => {
           if (questionError) {
             console.error("Error deleting question:", questionError);
-            res.status(500).json({
-              error: "An error occurred while deleting the question.",
-            });
+            res
+              .status(500)
+              .json({
+                error: "An error occurred while deleting the question.",
+              });
           } else {
-            res.status(200).json({
-              message: "Question and associated options deleted successfully.",
-            });
+            res
+              .status(200)
+              .json({
+                message:
+                  "Question and associated options deleted successfully.",
+              });
           }
         }
       );
