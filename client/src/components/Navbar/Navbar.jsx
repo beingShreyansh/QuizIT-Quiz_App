@@ -175,9 +175,7 @@ const Navbar = () => {
                 <NavLink to="/admin/user-history" className="navlink">
                   User Statistics
                 </NavLink>
-                <NavLink to="/admin/chart" className="navlink">
-                  chart
-                </NavLink>
+
                 <NavLink to="/admin/top-students" className="navlink">
                   TopStudents
                 </NavLink>

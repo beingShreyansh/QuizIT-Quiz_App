@@ -50,18 +50,20 @@ function App() {
       path: "/admin",
       element: <ProtectedRoute adminOnly={true} />,
       children: [
-        { path: "", element: <Layout Children={UploadQuiz} /> },
-        { path: "add-quiz", element: <Layout Children={UploadQuiz} /> }, // Removed the leading slash
+        { path: "", element: <Layout Children={Chart} /> },
+        { path: "add-quiz", element: <Layout Children={UploadQuiz} /> },
         { path: "editQuiz", element: <Layout Children={EditQuiz} /> },
-        { path: "chart", element: <Layout Children={Chart} /> }, 
-        { path: "top-students", element: <Layout Children={TopStudentsTable} /> },  // Also removed the leading slash
+        {
+          path: "top-students",
+          element: <Layout Children={TopStudentsTable} />,
+        },
         {
           path: "user-history",
           element: <Layout Children={AdminUserHistory} />,
         },
       ],
     },
-    { path: "*", element: <PageNotFound /> }, // Catch-all route
+    { path: "*", element: <PageNotFound /> },
   ]);
 
   return (
