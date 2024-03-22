@@ -13,7 +13,7 @@
 .nav-wrapper {
   margin: auto;
   text-align: center;
-  width: 70%;
+  width: 90%;
 }
 
 @media (max-width: 768px) {
@@ -47,8 +47,6 @@
   display: flex;
   justify-content: flex-end;
   list-style: none;
-  margin-right: 15px;
-  gap: 20px;
   transition: transform 0.5s ease-out;
 }
 

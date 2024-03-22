@@ -37,7 +37,7 @@ function Chart() {
   };
 
   return (
-    <div>
+    <center>
       <h1 className="i">Quiz App Statistics</h1>
       <BarChart
         width={1000}
@@ -53,7 +53,7 @@ function Chart() {
         <Bar dataKey="avg_questions_attempted" fill="#8884d8" name="Avg Questions Attempted" />
         <Bar dataKey="avg_marks_obtained" fill="#82ca9d" name="Avg Marks Obtained" />
       </BarChart>
-    </div>
+    </center>
   );
 }
 
