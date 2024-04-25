@@ -46,6 +46,16 @@ const putObject = async (fileName, contentType) => {
   return url;
 };
 
+const putQuestionObject = async (fileName, contentType) => {
+  const command = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: `.uploads/questions/${fileName}`,
+    ContentType: contentType,
+  });
+  const url = await getSignedUrl(s3Client, command);
+  return url;
+};
+
 const uploadImageToS3 = async (imageUrl, fileName) => {
   try {
     // If imageUrl is a relative URL, convert it into an absolute URL
@@ -92,4 +102,4 @@ const uploadImageToS3 = async (imageUrl, fileName) => {
   }
 };
 
-module.exports = { getObjectUrl, putObject, uploadImageToS3 };
+module.exports = { getObjectUrl, putObject, uploadImageToS3 ,putQuestionObject};

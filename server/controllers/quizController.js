@@ -1,7 +1,8 @@
 const { request } = require("express");
 const mysql = require("mysql");
-const { uploadImageToS3 } = require("../awsConfig");
+const { uploadImageToS3, putQuestionObject, getObjectUrl } = require("../awsConfig");
 const { v4: uuidv4 } = require("uuid");
+const { db } = require("../dbConfig");
 
 const pool = mysql.createPool({
   connectionLimit: 10,
@@ -27,69 +28,88 @@ const fetchCategories = (req, res) => {
 // Controller to fetch questions and options by quiz name from the database
 const fetchQuestionsAndOptions = (req, res) => {
   const quizId = req.params.quizId;
-  const { questionId } = req.params;
+  const questionId = req.params.questionId;
+
   const query = `
-        SELECT 
-            qq.question_id,
-            qq.quiz_id, 
-            qq.question_content, 
-            qq.imageId,
-            qq.ques_proficiency_level, 
-            qq.ques_type,
-            MAX(CASE WHEN all_options.option_num = 1 THEN o.option_value END) AS option_1,
-            MAX(CASE WHEN all_options.option_num = 2 THEN o.option_value END) AS option_2,
-            MAX(CASE WHEN all_options.option_num = 3 THEN o.option_value END) AS option_3,
-            MAX(CASE WHEN all_options.option_num = 4 THEN o.option_value END) AS option_4,
-            MAX(CASE WHEN all_options.option_num = 5 THEN o.option_value END) AS option_5
-        FROM 
-            quiz q
-        JOIN 
-            quiz_question qq ON q.quiz_id = qq.quiz_id
-        CROSS JOIN 
-            (SELECT 1 AS option_num UNION ALL
-             SELECT 2 UNION ALL
-             SELECT 3 UNION ALL
-             SELECT 4 UNION ALL
-             SELECT 5) AS all_options
-        LEFT JOIN 
-            options o ON qq.question_id = o.question_id AND qq.quiz_id = o.quiz_id AND 
-            (SELECT COUNT(*) FROM options WHERE question_id = qq.question_id AND quiz_id = qq.quiz_id AND option_id <= o.option_id) = all_options.option_num
-        WHERE 
-            q.quiz_id = ?
-        GROUP BY 
-            qq.question_id, 
-            qq.question_content, 
-             
-            qq.ques_proficiency_level, 
-            qq.ques_type`;
-  pool.query(query, [quizId], (error, results) => {
+    SELECT 
+      qq.question_id,
+      qq.quiz_id, 
+      qq.question_content, 
+      qq.imageId,
+      qq.ques_proficiency_level, 
+      qq.ques_type,
+      MAX(CASE WHEN all_options.option_num = 1 THEN o.option_value END) AS option_1,
+      MAX(CASE WHEN all_options.option_num = 2 THEN o.option_value END) AS option_2,
+      MAX(CASE WHEN all_options.option_num = 3 THEN o.option_value END) AS option_3,
+      MAX(CASE WHEN all_options.option_num = 4 THEN o.option_value END) AS option_4,
+      MAX(CASE WHEN all_options.option_num = 5 THEN o.option_value END) AS option_5,
+      (SELECT GROUP_CONCAT(option_value) FROM options WHERE quiz_id = qq.quiz_id AND question_id = qq.question_id AND correct_01 = '1') AS correct_options
+    FROM 
+      quiz q
+    JOIN 
+      quiz_question qq ON q.quiz_id = qq.quiz_id
+    CROSS JOIN 
+      (SELECT 1 AS option_num UNION ALL
+       SELECT 2 UNION ALL
+       SELECT 3 UNION ALL
+       SELECT 4 UNION ALL
+       SELECT 5) AS all_options
+    LEFT JOIN 
+      options o ON qq.question_id = o.question_id AND qq.quiz_id = o.quiz_id AND 
+      (SELECT COUNT(*) FROM options WHERE question_id = qq.question_id AND quiz_id = qq.quiz_id AND option_id <= o.option_id) = all_options.option_num
+    WHERE 
+      q.quiz_id = ?
+    GROUP BY 
+      qq.question_id, 
+      qq.question_content, 
+      qq.imageId,
+      qq.ques_proficiency_level, 
+      qq.ques_type;
+  `;
+
+  pool.query(query, [quizId], async (error, results) => {
     if (error) {
+      console.error("Error retrieving questions and options: ", error);
       res.status(500).json({ error: "Internal Server Error" });
-    } else {
-      const data = JSON.parse(JSON.stringify(results));
-      res.json(data);
+      return;
     }
-  });
-  // Query to retrieve correct options for the current question
-  const correctOptionQuery =
-  "SELECT option_id FROM options WHERE quiz_id = ? AND question_id = ? AND correct_01 = '1'";
-  pool.query(
-    correctOptionQuery,
-    [quizId, questionId],
-    (err, correctOptionsRows) => {
-      if (err) {
-        console.error(
-          "Error retrieving correct options for quiz: ",
-          err
+
+    const data = JSON.parse(JSON.stringify(results));
+    // Parse correct options into an array
+    data.forEach(async (row) => {
+      row.correct_options = row.correct_options
+        ? row.correct_options.split(",")
+        : [];
+
+      if (row.imageId) {
+        // Convert imageId to URL
+        row.imageUrl = await getObjectUrl(
+          `.uploads/questions/${row.imageId}.jpg`
         );
-        res.status(500).json({ error: "Error retrieving correct options for quiz" });
-        return;
       }
-      console.log(quizId);
-      console.log(questionId);
-      console.log(correctOptionsRows);
+    });
+
+    // Wait for all image URLs to be fetched
+    await Promise.all(
+      data.map(async (row) => {
+        if (row.imageId && !row.imageUrl) {
+          row.imageUrl = await getObjectUrl(
+            `.uploads/questions/${row.imageId}.jpg`
+          );
+        }
+        return row;
+      })
+    );
+
+    // Remove imageId from the response
+    data.forEach((row) => {
+      delete row.imageId;
+    });
+
+    res.json(data);
   });
 };
+
 // In quizController.js
 const deleteQuiz = (req, res) => {
   const { quizId } = req.params;
@@ -184,16 +204,20 @@ const updateQuestion = async (req, res) => {
     quizId,
     proficiencyLevel,
     questionType,
-    option_1,
-    option_2,
-    option_3,
-    option_4,
-    option_5,
-    imageUrl,
+    options,
+   
   } = req.body;
 
-  let optionsLst = [option_1, option_2, option_3, option_4, option_5];
-  console.log(optionsLst);
+  const isValid = false;
+  options.map((option) => {
+    if (option.isCorrect !== false) return true;
+  });
+
+  if (isValid === false) {
+    return res.send("Right option is not available");
+  }
+
+  let optionsLst = options.map((option) => option.value);
 
   // Start building the query to update the question
   let questionUpdateQuery = `
@@ -211,22 +235,16 @@ const updateQuestion = async (req, res) => {
     proficiencyLevel,
     questionType,
     questionId,
-    quizId
+    quizId,
   ];
 
-  try
-  {
-    pool.query(
-      questionUpdateQuery, 
-      quesUpdateQueryParams, 
-      (error, results) =>
-      {
-        if(error) 
-        {
-            console.error("Error updating question:", error);
-            res.status(500).json({ error: "Internal Server Error" });
-        }      
-      });
+  try {
+    pool.query(questionUpdateQuery, quesUpdateQueryParams, (error, results) => {
+      if (error) {
+        console.error("Error updating question:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    });
 
     // Updating options
     let optionIdQuery = `
@@ -238,88 +256,73 @@ const updateQuestion = async (req, res) => {
     pool.query(
       optionIdQuery,
       optionIdQueryParams,
-      (optionIdError, optionIdResults) => 
-      {
-        if (optionIdError) 
-        {
-            console.error("Error retrieving option_ids:", optionIdError);
-            res.status(500).json({ error: "Internal Server Error" });
-        } 
-        else 
-        {
+      (optionIdError, optionIdResults) => {
+        if (optionIdError) {
+          console.error("Error retrieving option_ids:", optionIdError);
+          res.status(500).json({ error: "Internal Server Error" });
+        } else {
           // Extract option_ids from the results
           const optionIds = optionIdResults.map((row) => row.option_id);
-          console.log(optionIds);
           // Construct and execute the query to update options
           let optionsQuery = `
               UPDATE options
-              SET option_value = ?
+              SET option_value = ?,
+              correct_01 = ?
               WHERE option_id = ? AND question_id = ?;
           `;
           let optionsInsertQuery = `
               INSERT INTO options VALUES(?, ?, ?, ?, ?);
           `;
           // Execute the query to update options
-          for (let i = 0; i < optionsLst.length; i++) 
-          {
-            if(i < optionIds.length)
-            {
+          for (let i = 0; i < optionsLst.length; i++) {
+            if (i < optionIds.length) {
               let optionsQueryParams = [
                 optionsLst[i],
+                options[i].isCorrect === true ? 1 : 0,
                 optionIds[i],
-                questionId
+                questionId,
               ];
               pool.query(
                 optionsQuery,
                 optionsQueryParams,
-                (optionsError, optionsResults) => 
-                {
-                  if (optionsError) 
-                  {
-                      console.error("Error updating options:", optionsError);
-                      res.status(500).json({ error: "Internal Server Error" });
-                  } 
+                (optionsError, optionsResults) => {
+                  if (optionsError) {
+                    console.error("Error updating options:", optionsError);
+                    res.status(500).json({ error: "Internal Server Error" });
+                  }
                 }
               );
-            }
-            else
-            {
+            } else {
               let optionId = uuidv4();
               let remOptionsQueryParams = [
                 optionId,
                 quizId,
                 questionId,
                 optionsLst[i],
-                '0'
+                options[i] === "true" ? 1 : 0,
               ];
               pool.query(
                 optionsInsertQuery,
                 remOptionsQueryParams,
-                (optionsError, optionsResults) => 
-                {
-                  if (optionsError) 
-                  {
-                      console.error("Error updating options:", optionsError);
-                      res.status(500).json({ error: "Internal Server Error" });
-                  } 
+                (optionsError, optionsResults) => {
+                  if (optionsError) {
+                    console.error("Error updating options:", optionsError);
+                    res.status(500).json({ error: "Internal Server Error" });
+                  }
                 }
               );
             }
-          } 
+          }
         }
-        console.log("END");
         res.send(201);
       }
     );
-  }
-  catch(error)
-  {
+  } catch (error) {
     res.send(error.message);
   }
 };
 
 const deleteQuestion = (req, res) => {
-  
   const questionId = req.params.questionId;
 
   // Delete options associated with the question first
@@ -344,18 +347,13 @@ const deleteQuestion = (req, res) => {
         (questionError, questionResults) => {
           if (questionError) {
             console.error("Error deleting question:", questionError);
-            res
-              .status(500)
-              .json({
-                error: "An error occurred while deleting the question.",
-              });
+            res.status(500).json({
+              error: "An error occurred while deleting the question.",
+            });
           } else {
-            res
-              .status(200)
-              .json({
-                message:
-                  "Question and associated options deleted successfully.",
-              });
+            res.status(200).json({
+              message: "Question and associated options deleted successfully.",
+            });
           }
         }
       );
@@ -363,10 +361,41 @@ const deleteQuestion = (req, res) => {
   );
 };
 
+const getSignedObjectUrlToPutQues = async (req, res) => {
+  try {
+    const { fileName, contentType } = req.query;
+    const key = uuidv4();
+    const signedUrl = await putQuestionObject(key, contentType);
+    res.json({ signedUrl, imageId: key });
+  } catch (error) {
+    console.error("Error registering user:", error);
+    res.status(500).json({ error: "Failed to register user" });
+  }
+};
+
+const putImageToOption = (req, res) => {
+  const { imageId } = req.params;
+  const { quizId } = req.body;
+  const { questionId } = req.body;
+s
+  try {
+
+    const updateQuery = "UPDATE quiz_question SET imageId = ? WHERE quiz_id = ? AND question_id= ?";
+    db.query(updateQuery, [imageId, quizId,questionId]);
+
+    res.send("Image ID updated successfully");
+  } catch (error) {
+    console.error("Error updating image ID:", error);
+    res.status(500).send("Internal server error");
+  }
+};
+
 module.exports = {
   fetchCategories,
   fetchQuestionsAndOptions,
   deleteQuiz,
   updateQuestion,
+  putImageToOption,
   deleteQuestion,
+  getSignedObjectUrlToPutQues
 };

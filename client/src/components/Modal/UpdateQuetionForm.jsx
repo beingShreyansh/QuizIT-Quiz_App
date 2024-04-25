@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import "./UpdateQuestionForm.css"; // Import the CSS file
 import axios from "axios";
-
+import "./UpdateQuestionForm.css"; // Import the CSS file
+import toast from "react-hot-toast";
 
 function UpdateQuestionForm({
   isOpen,
@@ -13,114 +13,172 @@ function UpdateQuestionForm({
   initialData,
   quizId,
 }) {
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [formData, setFormData] = useState({
+    questionContent: "",
+    proficiencyLevel: "",
+    questionType: "",
+    options: [
+      { value: "", isCorrect: false }, // Default values for option A
+      { value: "", isCorrect: false }, // Default values for option B
+      { value: "", isCorrect: false }, // Default values for option C
+      { value: "", isCorrect: false }, // Default values for option D
+      { value: "", isCorrect: false }, // Default values for option E
+    ],
+    imageUrl: "",
+    imageId: "",
+  });
 
-  
-
-  // Define state variables for form fields and options
-  const [questionContent, setQuestionContent] = useState("");
-  const [proficiencyLevel, setProficiencyLevel] = useState("");
-  const [questionType, setQuestionType] = useState("");
-  const [OptionA, setOptionA] = useState("");
-  const [OptionB, setOptionB] = useState("");
-  const [OptionC, setOptionC] = useState("");
-  const [OptionD, setOptionD] = useState("");
-  const [OptionE, setOptionE] = useState("");
-  
-  const [imageUrl, setImageUrl] = useState("");
-
-  const proficiencyLevels = {
-    Beginner: "0",
-    Intermediate: "1",
-    Advanced: "2",
-  };
-  const questionTypes = {
-    MCQ: "0",
-    Scenario: "1",
-  };
-
-  // Populate form fields with initial data on component mount
   useEffect(() => {
-    console.log("initialData:", initialData);
     if (initialData) {
-      console.log("Setting state values from initialData:", initialData);
-      setQuestionContent(initialData.question_content || "");
-      setProficiencyLevel(initialData.ques_proficiency_level || "");
-      setQuestionType(initialData.ques_type || "");
-      setOptionA(initialData.option_1 || "");
-      setOptionB(initialData.option_2 || "");
-      setOptionC(initialData.option_3 || "");
-      setOptionD(initialData.option_4 || "");
-      setOptionE(initialData.option_5 || "");
-      
-      setImageUrl(initialData.imageId || "");
+      const {
+        question_content,
+        ques_proficiency_level,
+        ques_type,
+        option_1,
+        option_2,
+        option_3,
+        option_4,
+        option_5,
+        imageUrl,
+        correct_options,
+      } = initialData;
+
+      const options = [
+        {
+          value: option_1 || "",
+          isCorrect: correct_options.includes(option_1),
+        },
+        {
+          value: option_2 || "",
+          isCorrect: correct_options.includes(option_2),
+        },
+        {
+          value: option_3 || "",
+          isCorrect: correct_options.includes(option_3),
+        },
+        {
+          value: option_4 || "",
+          isCorrect: correct_options.includes(option_4),
+        },
+        {
+          value: option_5 || "",
+          isCorrect: correct_options.includes(option_5),
+        },
+      ];
+      setFormData({
+        ...formData,
+        questionContent: question_content || "",
+        proficiencyLevel: ques_proficiency_level || "",
+        questionType: ques_type || "",
+        options,
+        imageUrl: imageUrl || "",
+      });
     }
   }, [initialData]);
 
-  // Function to handle form submission
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedImage(file);
+  };
+
+  const handlePut = async () => {
+    try {
+      if (selectedImage.name) {
+        const signedUrlResponse = await axios.get(
+          `${import.meta.env.VITE_API_URL}/editQuiz/get-signed-url`,
+          {
+            params: {
+              fileName: selectedImage.name,
+              contentType: selectedImage.type,
+            },
+          }
+        );
+
+        const putResponse = await axios.put(
+          signedUrlResponse.data.signedUrl,
+          selectedImage,
+          {
+            headers: {
+              "Content-Type": "image/jpeg",
+            },
+          }
+        );
+
+
+        const questionId = initialData.question_id;
+        if (putResponse.status === 200) {
+          // Update imageId for the user
+          const updateResponse = await axios.put(
+            `${import.meta.env.VITE_API_URL}/editQuiz/putImageIdToOption/${
+              signedUrlResponse.data.imageId
+            }`,
+            { quizId, questionId}
+          );
+          setFormData({ ...formData, imageId: signedUrlResponse.data.imageId });
+          toast.success("Image uploaded successfully");
+        }
+      } else {
+        toast.error("Upload a image");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // Prepare data to send to the backend
-      const requestData = {
-        quizId: quizId,
-        questionId: selectedQuestionId,
-        optionId: selectedOptionId, // Assuming optionId is needed for the controller
-      };
+      let isValid = false;
+      formData.options.map((option) => {
+        if (option.isCorrect !== false) return (isValid = true);
+      });
 
-      if (questionContent) {
-        requestData.questionContent = questionContent;
-      }
+      if (isValid == false) {
+        return toast.error("Right option is not Selected!!");
+      } else {
+        const requestData = {
+          quizId,
+          questionId: selectedQuestionId,
+          optionId: selectedOptionId,
+          questionContent: formData.questionContent,
+          proficiencyLevel: formData.proficiencyLevel,
+          questionType: formData.questionType,
+          options: formData.options,
+          imageId: formData.imageId,
+        };
 
-      if (proficiencyLevel) {
-        requestData.proficiencyLevel = proficiencyLevel;
-      }
+        const cleanedRequestData = Object.fromEntries(
+          Object.entries(requestData).filter(
+            ([_, value]) => value !== undefined && value !== ""
+          )
+        );
 
-      if (questionType) {
-        requestData.questionType = questionType;
-      }
+        await axios.put(
+          `${import.meta.env.VITE_API_URL}/editQuiz/update/${
+            cleanedRequestData.questionId
+          }`,
+          cleanedRequestData
+        );
 
-      if (OptionA) {
-        requestData.option_1 = OptionA;
+        toast.success("Question updated successfully.");
+        onClose();
       }
-
-      if (OptionB) {
-        requestData.option_2 = OptionB;
-      }
-
-      if (OptionC) {
-        requestData.option_3 = OptionC;
-      }
-
-      if (OptionD) {
-        requestData.option_4 = OptionD;
-      }
-
-      if (OptionE) {
-        requestData.option_5 = OptionE;
-      }
-      
-      if (imageUrl) {
-        requestData.imageUrl = imageUrl;
-      }
-
-      console.log(requestData);
-      // Make a PUT request to update the question
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/editQuiz/update/${
-          requestData.questionId
-        }`,
-        requestData
-      );
-       // Show success 
-       alert("Question updated successfully.");
-      
-      // Close the form after successful update
-      onClose();
     } catch (error) {
       console.error("Error updating question:", error);
-      // Handle error state or show an error message to the user
     }
+  };
+
+  const handleOptionChange = (index, value) => {
+    const newOptions = [...formData.options];
+    newOptions[index].value = value;
+    setFormData({ ...formData, options: newOptions });
+  };
+
+  const handleCheckboxChange = (index) => {
+    const newOptions = [...formData.options];
+    newOptions[index].isCorrect = !newOptions[index].isCorrect;
+    setFormData({ ...formData, options: newOptions });
   };
 
   return (
@@ -137,80 +195,81 @@ function UpdateQuestionForm({
           <input
             className="update-form-input"
             type="text"
-            value={questionContent}
-            onChange={(e) => setQuestionContent(e.target.value)}
+            value={formData.questionContent}
+            onChange={(e) =>
+              setFormData({ ...formData, questionContent: e.target.value })
+            }
           />
 
           <label className="update-form-label">Proficiency Level:</label>
           <select
             className="update-form-select"
-            value={proficiencyLevel}
-            onChange={(e) => setProficiencyLevel(e.target.value)}
+            value={formData.proficiencyLevel}
+            onChange={(e) =>
+              setFormData({ ...formData, proficiencyLevel: e.target.value })
+            }
           >
             <option value="">Select Proficiency Level</option>
-            {Object.keys(proficiencyLevels).map((level) => (
-              <option key={level} value={proficiencyLevels[level]}>
-                {level}
-              </option>
-            ))}
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
           </select>
 
           <label className="update-form-label">Question Type:</label>
           <select
             className="update-form-select"
-            value={questionType}
-            onChange={(e) => setQuestionType(e.target.value)}
+            value={formData.questionType}
+            onChange={(e) =>
+              setFormData({ ...formData, questionType: e.target.value })
+            }
           >
             <option value="">Select Question Type</option>
-            {Object.keys(questionTypes).map((type) => (
-              <option key={type} value={questionTypes[type]}>
-                {type}
-              </option>
-            ))}
+            <option value="MCQ">MCQ</option>
+            <option value="Scenario">Scenario</option>
           </select>
-          <label className="update-form-label">Option A:</label>
-          <input
-            className="update-form-input"
-            type="text"
-            value={OptionA}
-            onChange={(e) => setOptionA(e.target.value)}
-          />
-          <label className="update-form-label">Option B:</label>
-          <input
-            className="update-form-input"
-            type="text"
-            value={OptionB}
-            onChange={(e) => setOptionB(e.target.value)}
-          />
-          <label className="update-form-label">Option C:</label>
-          <input
-            className="update-form-input"
-            type="text"
-            value={OptionC}
-            onChange={(e) => setOptionC(e.target.value)}
-          />
-          <label className="update-form-label">Option D:</label>
-          <input
-            className="update-form-input"
-            type="text"
-            value={OptionD}
-            onChange={(e) => setOptionD(e.target.value)}
-          />
-          <label className="update-form-label">Option E:</label>
-          <input
-            className="update-form-input"
-            type="text"
-            value={OptionE}
-            onChange={(e) => setOptionE(e.target.value)}
-          />
-         
-          <label className="update-form-label"> Image Url:</label>
-          <input
-            className="update-form-input"
-            type="text"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-          />
+
+          {formData.options.map((option, index) => (
+            <div className="label-input-container" key={index}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={option.isCorrect}
+                  onChange={() => handleCheckboxChange(index)}
+                />
+              </label>
+              <label className="update-form-label">
+                Option {String.fromCharCode(65 + index)}:
+              </label>
+              <input
+                className="update-form-input"
+                type="text"
+                value={option.value}
+                onChange={(e) => handleOptionChange(index, e.target.value)}
+              />
+            </div>
+          ))}
+
+          <h2>Change Profile Picture</h2>
+          <div className="avatar-container">
+            <label htmlFor="file-inputs" className="file-labels">
+              <img
+                src={formData.imageUrl || "placeholder-image-url"} // Use a placeholder image if no image is selected
+                alt="--------No URL----"
+                className="avatar-imageUrl"
+              />
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="file-inputs-question-url"
+              id="file-inputs"
+            />
+          </div>
+          <button className="upload-btn" onClick={handlePut}>
+            Upload
+          </button>
+
           <div className="update-form-buttons">
             <button className="update-form-button" type="submit">
               Update
